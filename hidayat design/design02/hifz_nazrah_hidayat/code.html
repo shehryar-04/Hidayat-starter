@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Hifz &amp; Nazrah - HIDAYAT Academy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;600;700;900&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+        }
+        .pattern-overlay {
+            background-image: radial-gradient(circle at 2px 2px, rgba(58, 122, 79, 0.05) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#3A7A4F",
+                        "primary-container": "#2D5D3C",
+                        "on-primary": "#ffffff",
+                        "secondary": "#8CB753",
+                        "secondary-container": "#D1E7C4",
+                        "on-secondary-container": "#2D5D3C",
+                        "background": "#F2FAED",
+                        "surface": "#F2FAED",
+                        "surface-container": "#E6F3DF",
+                        "surface-container-low": "#EFF8EA",
+                        "surface-container-high": "#E2EFE0",
+                        "on-surface": "#1A2E1F",
+                        "on-background": "#1A2E1F",
+                        "outline": "#728574",
+                        "outline-variant": "#D1E7C4"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit-xl": "48px",
+                        "grid-cols": "12",
+                        "unit-lg": "24px",
+                        "max-width": "1280px",
+                        "margin": "auto",
+                        "unit-sm": "8px",
+                        "gutter": "24px",
+                        "unit-xs": "4px",
+                        "unit-md": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Noto Serif"],
+                        "label-lg": ["Manrope"],
+                        "headline-xl": ["Noto Serif"],
+                        "headline-lg": ["Noto Serif"],
+                        "label-sm": ["Manrope"],
+                        "body-md": ["Manrope"],
+                        "body-lg": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-xl": ["48px", {"lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md selection:bg-secondary-container selection:text-primary">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 border-b border-[#D1E7C4] bg-[#F2FAED]/95 backdrop-blur-md">
+<nav class="flex justify-between items-center w-full px-8 py-4 max-w-7xl mx-auto">
+<div class="text-2xl font-serif font-bold text-[#3A7A4F]">HIDAYAT Academy</div>
+<div class="hidden md:flex items-center space-x-8 font-['Noto_Serif'] font-medium text-sm tracking-wide">
+<a class="text-slate-600 hover:text-[#3A7A4F] transition-colors cursor-pointer" href="#">Home</a>
+<a class="text-slate-600 hover:text-[#3A7A4F] transition-colors cursor-pointer" href="#">Darse Nizami</a>
+<a class="text-[#3A7A4F] border-b-2 border-[#3A7A4F] pb-1 font-bold cursor-pointer" href="#">Hifz &amp; Nazrah</a>
+<a class="text-slate-600 hover:text-[#3A7A4F] transition-colors cursor-pointer" href="#">Short Courses</a>
+<a class="text-slate-600 hover:text-[#3A7A4F] transition-colors cursor-pointer" href="#">Darul Ifta</a>
+<a class="text-slate-600 hover:text-[#3A7A4F] transition-colors cursor-pointer" href="#">Research Center</a>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden lg:flex items-center bg-white/50 px-4 py-2 rounded-full border border-outline-variant">
+<span class="material-symbols-outlined text-outline text-[20px] mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-40" placeholder="Search courses..." type="text"/>
+</div>
+<button class="bg-[#3A7A4F] text-white px-6 py-2.5 rounded-lg font-label-lg hover:bg-primary-container transition-all active:opacity-80">
+                Enroll Now
+            </button>
+</div>
+</nav>
+</header>
+<main class="pt-24 pb-20">
+<!-- Hero Section -->
+<section class="relative h-[450px] overflow-hidden flex items-center mb-unit-xl">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover" data-alt="Macro close-up of beautifully bound Quran pages with elegant Arabic script and soft golden sunlight illumination" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6arcQAYa61Q7jukN__tl0KK9JfWlvMLZSdcB5FNVvCCZT8db5pkhOdMnmhwgRxLFDgYe4WExPMVu480qDwe9k9U2D8mbaKI3NkRzVci871hohgEA0K-EU1R_NMY48P9S00sYE8t5JwFiLO6qifdYk74q-lvyvkcauytpnY3GXwHZFvA6pZnRj96SzU1lW_qE6EIoRROBNFJXyv5ZVI0Q6PzgDr7Znlw_SQyTJ4Jw2Qm9RuViXdmoyaWS8zu-vP67XlpWi3RybV1k"/>
+<div class="absolute inset-0 bg-gradient-to-r from-[#3A7A4F]/90 to-[#3A7A4F]/40 backdrop-blur-[2px]"></div>
+</div>
+<div class="relative z-10 max-w-screen-xl mx-auto px-12 w-full">
+<div class="max-w-2xl">
+<span class="inline-block px-4 py-1.5 bg-[#8CB753] text-white font-label-sm rounded-full mb-6 uppercase tracking-widest">Sacred Sciences</span>
+<h1 class="font-headline-xl text-white mb-6">Illuminating Hearts through the Quran</h1>
+<p class="font-body-lg text-white/90 mb-8 max-w-lg">
+                    Embark on a spiritual journey of preservation and recitation. From foundational Nazrah to the profound mastery of Hifz, we provide a scholarly environment for spiritual growth.
+                </p>
+<div class="flex gap-4">
+<button class="bg-white text-primary px-8 py-3 rounded-xl font-label-lg hover:bg-background transition-all shadow-lg">Begin Journey</button>
+<button class="border border-white/40 text-white px-8 py-3 rounded-xl font-label-lg hover:bg-white/10 transition-all backdrop-blur-sm">Our Curriculum</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Virtues Section -->
+<section class="max-w-screen-xl mx-auto px-12 mb-unit-xl">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-unit-lg items-stretch">
+<!-- Verse Card -->
+<div class="md:col-span-7 bg-white p-12 rounded-[2rem] shadow-sm border border-[#D1E7C4] relative overflow-hidden flex flex-col justify-center">
+<div class="absolute top-0 right-0 w-64 h-64 bg-secondary-container/20 rounded-full blur-3xl -mr-20 -mt-20"></div>
+<div class="relative z-10">
+<div class="w-16 h-1 bg-[#8CB753] mb-8"></div>
+<h2 class="font-headline-lg text-primary mb-6">The Virtues of Quran</h2>
+<div class="bg-surface-container-low p-8 rounded-2xl border-l-4 border-secondary mb-8">
+<div class="flex justify-center mb-6">
+<div class="w-full h-24 bg-background rounded-lg flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-secondary text-5xl" data-weight="fill">menu_book</span>
+<p class="font-headline-md text-primary ml-4 font-serif italic text-center">[Arabic Calligraphy Placeholder]</p>
+</div>
+</div>
+<p class="font-body-lg italic text-on-surface-variant leading-relaxed">
+                            "Indeed, it is We who sent down the Quran and indeed, We will be its guardian." 
+                            <span class="block mt-2 font-label-sm text-secondary">— Surah Al-Hijr, 15:9</span>
+</p>
+</div>
+<p class="font-body-md text-on-surface-variant">
+                        Memorizing the Quran is not merely an act of memory; it is the planting of divine light within the chest. Our programs focus on both the accuracy of preservation and the spiritual etiquette (Adab) of the Carrier of the Quran.
+                    </p>
+</div>
+</div>
+<!-- Fast Fact Card -->
+<div class="md:col-span-5 space-y-unit-lg">
+<div class="bg-primary p-10 rounded-[2rem] text-white flex flex-col justify-between h-full relative overflow-hidden">
+<span class="material-symbols-outlined absolute -bottom-10 -right-10 text-[200px] text-white/5 opacity-20">verified</span>
+<div>
+<h3 class="font-headline-md mb-4">Certified Ijazah</h3>
+<p class="font-body-md text-white/80">Connect your recitation back to the Prophet (ﷺ) through an unbroken chain of scholars (Isnad).</p>
+</div>
+<div class="mt-8 pt-8 border-t border-white/10">
+<div class="flex items-center gap-4">
+<div class="h-12 w-12 rounded-full bg-secondary flex items-center justify-center text-white">
+<span class="material-symbols-outlined">shield_moon</span>
+</div>
+<p class="font-label-lg">Scholar-Led Guidance</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Course Cards -->
+<section class="max-w-screen-xl mx-auto px-12 mb-unit-xl">
+<div class="text-center mb-16">
+<h2 class="font-headline-lg text-primary">Program Pathways</h2>
+<div class="w-20 h-1 bg-[#8CB753] mx-auto mt-4 rounded-full"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Full Hifz Card -->
+<div class="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-[#D1E7C4] flex flex-col">
+<div class="h-3 bg-primary"></div>
+<div class="p-8 flex-grow">
+<div class="flex items-center justify-between mb-6">
+<span class="material-symbols-outlined text-primary text-4xl" data-weight="fill">auto_stories</span>
+<span class="bg-secondary-container text-primary px-3 py-1 rounded text-xs font-bold uppercase">Advanced</span>
+</div>
+<h3 class="font-headline-md text-primary mb-4">Full Hifz Program</h3>
+<p class="text-slate-600 font-body-md mb-6">A comprehensive program designed for the complete memorization of the Quran with strict adherence to Tajweed rules.</p>
+<ul class="space-y-3 mb-8">
+<li class="flex items-center text-sm gap-2 text-slate-600">
+<span class="material-symbols-outlined text-secondary text-sm">check_circle</span> 
+                            Personalized revision schedules
+                        </li>
+<li class="flex items-center text-sm gap-2 text-slate-600">
+<span class="material-symbols-outlined text-secondary text-sm">check_circle</span> 
+                            Mutashabihat guidance
+                        </li>
+</ul>
+</div>
+<div class="p-6 bg-surface-container-low border-t border-outline-variant">
+<button class="w-full py-3 bg-primary text-white rounded-xl font-label-lg group-hover:bg-primary-container transition-colors">Apply Now</button>
+</div>
+</div>
+<!-- Tajweed Classes Card -->
+<div class="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-[#D1E7C4] flex flex-col">
+<div class="h-3 bg-[#8CB753]"></div>
+<div class="p-8 flex-grow">
+<div class="flex items-center justify-between mb-6">
+<span class="material-symbols-outlined text-secondary text-4xl" data-weight="fill">record_voice_over</span>
+<span class="bg-[#F2FAED] text-[#3A7A4F] px-3 py-1 rounded text-xs font-bold uppercase border border-[#D1E7C4]">Technical</span>
+</div>
+<h3 class="font-headline-md text-primary mb-4">Tajweed Mastery</h3>
+<p class="text-slate-600 font-body-md mb-6">The science of correct pronunciation. Perfecting Makharij and Sifat of letters.</p>
+<ul class="space-y-3 mb-8">
+<li class="flex items-center text-sm gap-2 text-slate-600">
+<span class="material-symbols-outlined text-secondary text-sm">check_circle</span> 
+                            Theoretical &amp; Practical sessions
+                        </li>
+<li class="flex items-center text-sm gap-2 text-slate-600">
+<span class="material-symbols-outlined text-secondary text-sm">check_circle</span> 
+                            Correction of Surah Al-Fatiha
+                        </li>
+</ul>
+</div>
+<div class="p-6 bg-surface-container-low border-t border-outline-variant">
+<button class="w-full py-3 bg-primary text-white rounded-xl font-label-lg group-hover:bg-primary-container transition-colors">View Curriculum</button>
+</div>
+</div>
+<!-- Basic Nazrah Card -->
+<div class="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-[#D1E7C4] flex flex-col">
+<div class="h-3 bg-slate-500"></div>
+<div class="p-8 flex-grow">
+<div class="flex items-center justify-between mb-6">
+<span class="material-symbols-outlined text-slate-500 text-4xl" data-weight="fill">edit_note</span>
+<span class="bg-slate-100 text-slate-600 px-3 py-1 rounded text-xs font-bold uppercase">Foundation</span>
+</div>
+<h3 class="font-headline-md text-primary mb-4">Basic Nazrah</h3>
+<p class="text-slate-600 font-body-md mb-6">Foundational reading for beginners. Focuses on fluency and letter recognition.</p>
+<ul class="space-y-3 mb-8">
+<li class="flex items-center text-sm gap-2 text-slate-600">
+<span class="material-symbols-outlined text-secondary text-sm">check_circle</span> 
+                            Interactive Noorani Qaida lessons
+                        </li>
+<li class="flex items-center text-sm gap-2 text-slate-600">
+<span class="material-symbols-outlined text-secondary text-sm">check_circle</span> 
+                            Step-by-step reading progress
+                        </li>
+</ul>
+</div>
+<div class="p-6 bg-surface-container-low border-t border-outline-variant">
+<button class="w-full py-3 bg-primary text-white rounded-xl font-label-lg group-hover:bg-primary-container transition-colors">Register Interests</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Batch & Timings -->
+<section class="max-w-screen-xl mx-auto px-12">
+<div class="bg-white rounded-[2.5rem] p-12 border border-[#D1E7C4] shadow-sm pattern-overlay">
+<div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+<div>
+<h2 class="font-headline-lg text-primary">Academic Batches</h2>
+<p class="text-slate-600 mt-2">Find a schedule that aligns with your professional or academic life.</p>
+</div>
+<div class="flex gap-2 bg-background p-1.5 rounded-full border border-outline-variant">
+<button class="px-6 py-2 bg-primary text-white rounded-full font-label-sm">Morning</button>
+<button class="px-6 py-2 hover:bg-secondary-container/50 rounded-full font-label-sm text-primary">Evening</button>
+<button class="px-6 py-2 hover:bg-secondary-container/50 rounded-full font-label-sm text-primary">Weekend</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Schedule Cards -->
+<div class="bg-background p-6 rounded-2xl border border-outline-variant shadow-sm">
+<p class="text-secondary font-label-sm mb-2">Morning Session A</p>
+<h4 class="font-headline-md text-primary mb-1">07:00 — 09:30</h4>
+<p class="text-xs text-slate-500 font-label-sm uppercase tracking-tighter mb-4">Mon to Fri</p>
+<div class="pt-4 border-t border-outline-variant">
+<p class="text-xs text-slate-500">Available For:</p>
+<p class="font-label-lg text-primary">Full Hifz Program</p>
+</div>
+</div>
+<div class="bg-background p-6 rounded-2xl border border-outline-variant shadow-sm">
+<p class="text-secondary font-label-sm mb-2">Evening Session B</p>
+<h4 class="font-headline-md text-primary mb-1">17:00 — 19:00</h4>
+<p class="text-xs text-slate-500 font-label-sm uppercase tracking-tighter mb-4">Mon, Wed, Fri</p>
+<div class="pt-4 border-t border-outline-variant">
+<p class="text-xs text-slate-500">Available For:</p>
+<p class="font-label-lg text-primary">Tajweed &amp; Nazrah</p>
+</div>
+</div>
+<div class="bg-background p-6 rounded-2xl border border-outline-variant shadow-sm">
+<p class="text-secondary font-label-sm mb-2">Weekend Intensive</p>
+<h4 class="font-headline-md text-primary mb-1">09:00 — 13:00</h4>
+<p class="text-xs text-slate-500 font-label-sm uppercase tracking-tighter mb-4">Sat &amp; Sun</p>
+<div class="pt-4 border-t border-outline-variant">
+<p class="text-xs text-slate-500">Available For:</p>
+<p class="font-label-lg text-primary">Advanced Tajweed</p>
+</div>
+</div>
+<div class="bg-primary p-6 rounded-2xl flex flex-col justify-center items-center text-center text-white">
+<span class="material-symbols-outlined text-4xl mb-2">event_available</span>
+<p class="font-label-lg">Custom Timings?</p>
+<p class="text-xs text-white/80 mt-2">Private tutoring available</p>
+<a class="mt-4 text-white underline font-label-sm underline-offset-4" href="#">Inquire Now</a>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full mt-24 border-t border-[#D1E7C4] bg-[#F2FAED]">
+<div class="w-full py-8 px-8 flex flex-col md:flex-row justify-between items-center max-w-7xl mx-auto font-sans text-sm">
+<div class="flex flex-col md:flex-row items-center gap-8">
+<span class="font-serif text-[#3A7A4F] text-lg font-bold">HIDAYAT Academy</span>
+<div class="flex gap-6">
+<a class="text-slate-500 hover:text-[#3A7A4F] transition-colors" href="#">Privacy Policy</a>
+<a class="text-slate-500 hover:text-[#3A7A4F] transition-colors" href="#">Terms of Service</a>
+<a class="text-slate-500 hover:text-[#3A7A4F] transition-colors" href="#">Contact Us</a>
+</div>
+</div>
+<div class="mt-4 md:mt-0 text-slate-500">
+            © 2024 HIDAYAT Academy. Preserving Sacred Tradition.
+        </div>
+</div>
+</footer>
+</body></html>

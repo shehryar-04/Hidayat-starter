@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Darse Nizami | HIDAYAT Academy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;500;600;700;900&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .pattern-overlay {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l15 30-15 30-15-30z' fill='%233A7A4F' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed": "#8CB753",
+                        "surface-container": "#F2FAED",
+                        "on-surface-variant": "#475569",
+                        "primary-fixed": "#D1E7C4",
+                        "secondary-container": "#E3F1D5",
+                        "tertiary-fixed-dim": "#c8c6c2",
+                        "surface-dim": "#E2E8F0",
+                        "surface-container-highest": "#CBD5E1",
+                        "surface-bright": "#F2FAED",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#8CB753",
+                        "background": "#F2FAED",
+                        "surface-container-high": "#E8F4E1",
+                        "on-secondary-fixed": "#1A2E05",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed-variant": "#474743",
+                        "primary-container": "#3A7A4F",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-container": "#3A7A4F",
+                        "surface-variant": "#D1E7C4",
+                        "secondary": "#8CB753",
+                        "secondary-fixed-dim": "#8CB753",
+                        "tertiary-container": "#454441",
+                        "on-surface": "#0F172A",
+                        "on-background": "#0F172A",
+                        "tertiary": "#2e2e2b",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#3A7A4F",
+                        "on-primary-fixed-variant": "#3A7A4F",
+                        "on-primary": "#ffffff",
+                        "primary": "#3A7A4F",
+                        "on-secondary": "#ffffff",
+                        "inverse-on-surface": "#F2FAED",
+                        "on-secondary-fixed-variant": "#3A7A4F",
+                        "inverse-surface": "#1E293B",
+                        "tertiary-fixed": "#e5e2dd",
+                        "on-tertiary-fixed": "#1c1c19",
+                        "on-primary-fixed": "#002117",
+                        "surface-tint": "#3A7A4F",
+                        "outline": "#64748B",
+                        "on-tertiary-container": "#b3b1ad",
+                        "surface-container-low": "#F8FCF5",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#D1E7C4",
+                        "outline-variant": "#D1E7C4",
+                        "surface": "#F2FAED"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit-xl": "48px",
+                        "grid-cols": "12",
+                        "unit-lg": "24px",
+                        "max-width": "1280px",
+                        "margin": "auto",
+                        "unit-sm": "8px",
+                        "gutter": "24px",
+                        "unit-xs": "4px",
+                        "unit-md": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Noto Serif"],
+                        "label-lg": ["Manrope"],
+                        "headline-xl": ["Noto Serif"],
+                        "headline-lg": ["Noto Serif"],
+                        "label-sm": ["Manrope"],
+                        "body-md": ["Manrope"],
+                        "body-lg": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-xl": ["48px", { "lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md selection:bg-primary-fixed selection:text-primary">
+<!-- Top Navigation Bar - {{DATA:COMPONENTS:COMPONENTS_10}} -->
+<nav class="fixed top-0 w-full z-50 border-b border-[#D1E7C4] dark:border-slate-800 bg-[#F2FAED] dark:bg-slate-950 backdrop-blur-md">
+<div class="flex justify-between items-center w-full px-8 py-4 max-w-7xl mx-auto">
+<div class="text-2xl font-serif font-bold text-[#3A7A4F] dark:text-[#8CB753]">HIDAYAT</div>
+<div class="hidden md:flex items-center gap-8 font-['Noto_Serif'] font-medium text-sm tracking-wide">
+<a class="text-slate-600 dark:text-slate-400 hover:text-[#3A7A4F] dark:hover:text-[#8CB753] transition-colors" href="#">Home</a>
+<a class="text-[#3A7A4F] dark:text-[#8CB753] border-b-2 border-[#3A7A4F] pb-1 font-bold" href="#">Darse Nizami</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-[#3A7A4F] dark:hover:text-[#8CB753] transition-colors" href="#">Hifz &amp; Nazrah</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-[#3A7A4F] dark:hover:text-[#8CB753] transition-colors" href="#">Short Courses</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-[#3A7A4F] dark:hover:text-[#8CB753] transition-colors" href="#">Darul Ifta</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-[#3A7A4F] dark:hover:text-[#8CB753] transition-colors" href="#">Research Center</a>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm" data-icon="search">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full text-sm focus:ring-2 focus:ring-[#3A7A4F]/20 w-64" placeholder="Search courses..." type="text"/>
+</div>
+<button class="bg-[#3A7A4F] text-white px-6 py-2 rounded-lg font-label-lg hover:opacity-80 transition-all active:scale-95">Enroll Now</button>
+</div>
+</div>
+</nav>
+<!-- Hero Section -->
+<header class="pt-32 pb-20 px-8 pattern-overlay border-b border-[#D1E7C4]">
+<div class="max-w-screen-2xl mx-auto flex flex-col items-center text-center">
+<div class="flex items-center gap-2 mb-6 px-4 py-1.5 bg-primary-fixed/50 rounded-full border border-primary/20">
+<span class="material-symbols-outlined text-primary text-base" data-icon="school">school</span>
+<span class="text-primary font-label-sm uppercase tracking-widest">Al-Dars al-Nizami Program</span>
+</div>
+<h1 class="font-headline-xl text-primary mb-6 max-w-4xl">Preserving Sacred Knowledge through Scholarly Excellence</h1>
+<p class="font-body-lg text-on-surface-variant max-w-2xl mb-10">Experience a traditional curriculum modernized for contemporary clarity. Our Darse Nizami program offers rigorous study in Arabic literature, Jurisprudence, Theology, and Prophetic Traditions.</p>
+<div class="flex flex-wrap justify-center gap-12 text-on-surface-variant border-t border-[#D1E7C4] pt-10 w-full max-w-3xl">
+<div class="flex flex-col items-center">
+<span class="font-headline-md text-primary">8 Years</span>
+<span class="font-label-sm">Standard Track</span>
+</div>
+<div class="flex flex-col items-center border-x border-[#D1E7C4] px-12">
+<span class="font-headline-md text-primary">500+</span>
+<span class="font-label-sm">Active Scholars</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="font-headline-md text-primary">Global</span>
+<span class="font-label-sm">Online Access</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Program Categories - Bento Grid -->
+<main class="max-w-screen-2xl mx-auto px-8 py-24">
+<div class="mb-16">
+<h2 class="font-headline-lg text-primary mb-2">Academic Tracks</h2>
+<p class="font-body-md text-on-surface-variant">Structured pathways for men and women dedicated to the path of knowledge.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+<!-- Alim Course Card (Men) -->
+<div class="md:col-span-8 group bg-surface-container-lowest rounded-xl border border-[#D1E7C4] shadow-sm hover:shadow-xl hover:shadow-[#3A7A4F]/5 transition-all overflow-hidden flex flex-col md:flex-row">
+<div class="md:w-1/2 relative h-64 md:h-auto overflow-hidden">
+<img alt="Islamic library with old manuscripts" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="close-up of an ancient illuminated Arabic manuscript in a library with soft warm sunlight streaming through a window" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9zO1ZW_4ma0MzgXPZmJYYhnad3bDXGtH2w8EbaWoYtdzYFOUI-OGi9RDTR0y1ETRR-_PuiTMRIYI_jn2IZRqxV61pUHhL3qQS3Xvuz6IPoK8Jr7C0LoaArH8OAwD2gRSNO4o0l6tG7tdcAN-6oCphWlOs6zAG4td2MyvP6nLrAcxoP7uOJ7NSnF7aOje3sc1ZZ9ZGHnCMwMPj8YW1PVqoipHt3QUhBMWq1aSnF0zaNGosKIltNoDVYpJFUDJTymAUySY4O3jjOyk"/>
+<div class="absolute inset-0 bg-primary/20"></div>
+</div>
+<div class="md:w-1/2 p-8 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-headline-md text-primary">Alim Course (Boys)</h3>
+<span class="bg-secondary text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-tighter">Comprehensive</span>
+</div>
+<p class="font-body-md text-on-surface-variant mb-6">A rigorous 8-year program covering Sarf, Nahw, Mantiq, Fiqh, Usul al-Fiqh, and the major books of Hadith.</p>
+<ul class="space-y-3 mb-8">
+<li class="flex items-center gap-3 text-sm text-on-surface">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="check_circle">check_circle</span>
+                                Classical Arabic Mastery
+                            </li>
+<li class="flex items-center gap-3 text-sm text-on-surface">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="check_circle">check_circle</span>
+                                Ijazah in Sihah Sitta
+                            </li>
+</ul>
+</div>
+<div class="flex items-center justify-between border-t border-[#D1E7C4] pt-6">
+<div class="flex flex-col">
+<span class="text-[10px] font-bold text-outline uppercase tracking-wider">Duration</span>
+<span class="text-sm font-semibold">8 Academic Years</span>
+</div>
+<button class="bg-[#3A7A4F] text-white px-6 py-2.5 rounded-lg font-label-lg hover:shadow-md transition-all active:scale-95">Enroll Now</button>
+</div>
+</div>
+</div>
+<!-- Alimah Course Card (Women) -->
+<div class="md:col-span-4 group bg-surface-container-lowest rounded-xl border border-[#D1E7C4] shadow-sm hover:shadow-xl hover:shadow-[#3A7A4F]/5 transition-all overflow-hidden flex flex-col">
+<div class="h-48 relative overflow-hidden">
+<img alt="Islamic geometric patterns" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="elegant geometric pattern wall with teal and gold ceramic tiles in a modern Islamic educational center" src="https://lh3.googleusercontent.com/aida-public/AB6AXuArVBEjP6WY78XpIncQldDNyHk6t5C6jCLfcu_Yq3r4cxlDD01yGDjk-Gpc-k9JJt3U5fRl2bPuoVehHjM81gz2ZZU5Xsi7KGFtrqfron07J2FhyWTZ6Xtsrgb1PCA4y8QiQIKT6GiTfHiFEuYCuTD_VksSBb6yaxFgtZBWwfNbMhQ3K0WXslUn3otskwSqqxgboeJE7mGa5myYfpOmlANT_eUN8HGVn6l1faokwMwgywiSxoM1OzwaPX_6Hw0EvCo8e1YvRzAxjJI"/>
+<div class="absolute inset-0 bg-primary/20"></div>
+</div>
+<div class="p-8 flex-1 flex flex-col">
+<h3 class="font-headline-md text-primary mb-4">Alimah Course (Girls)</h3>
+<p class="font-body-md text-on-surface-variant mb-6">Specially structured 6-year program focusing on core scholarly competencies for women's spiritual leadership.</p>
+<div class="mt-auto">
+<div class="flex items-center gap-4 mb-6">
+<div class="flex -space-x-3">
+<div class="w-10 h-10 rounded-full border-2 border-white bg-surface-container overflow-hidden">
+<img alt="Instructor Profile" class="w-full h-full object-cover" data-alt="professional portrait of a middle-aged woman wearing a modest headscarf and professional attire in a bright office" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAc2GBrUHv6YzdUpz9S0KhbDLDSJaCW44JuGKW04SVFQZTTjo0c7DlKgmtA982lcCuVghbYgGOInQ7tK6U_pSLiivGM7d3Jk8fhIKH_opRdHdBsyLDjVTeUmRLseaMum44aaZ5fZKvfwjEys0Z2zzTJd6Wx2aS2TBq-ipycs_lJNgjrVDmXgYEENw1FNcUz0UFQbR4G3EUx60sLXUsg5xJGLGrp__RWvIeE9dwv3H4Pq8wrhvVgsIo2mmkXDSZVThjYuhsqUMqz5LM"/>
+</div>
+<div class="w-10 h-10 rounded-full border-2 border-white bg-primary text-white flex items-center justify-center text-xs font-bold">+12</div>
+</div>
+<span class="text-xs text-outline font-medium">Expert Female Faculty</span>
+</div>
+<button class="w-full border-2 border-secondary text-secondary px-6 py-2.5 rounded-lg font-label-lg hover:bg-secondary-container transition-all">Course Details</button>
+</div>
+</div>
+</div>
+<!-- Fast-track/Short Intensive Card -->
+<div class="md:col-span-4 group bg-primary-container text-white rounded-xl shadow-lg p-8 flex flex-col justify-between border border-primary">
+<div>
+<div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-white" data-icon="bolt">bolt</span>
+</div>
+<h3 class="font-headline-md mb-4">Intensive Arabic</h3>
+<p class="text-white/80 font-body-md mb-6">A preparatory 1-year immersion designed for those seeking to bridge the gap before entering Darse Nizami.</p>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-sm font-label-lg">Register for Spring '25</span>
+<span class="material-symbols-outlined hover:translate-x-1 transition-transform cursor-pointer" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+<!-- Syllabus Overview Card -->
+<div class="md:col-span-8 group bg-surface-container-high rounded-xl border border-[#D1E7C4] p-8 relative overflow-hidden">
+<div class="relative z-10 grid grid-cols-1 sm:grid-cols-2 gap-8">
+<div>
+<h3 class="font-headline-md text-primary mb-6">Curriculum Excellence</h3>
+<div class="space-y-4">
+<div class="flex items-start gap-4">
+<div class="w-8 h-8 rounded bg-white flex items-center justify-center shrink-0 shadow-sm">
+<span class="text-xs font-bold text-primary">01</span>
+</div>
+<div>
+<h4 class="font-bold text-on-surface text-sm">Linguistic Foundation</h4>
+<p class="text-xs text-on-surface-variant">Focus on Sarf (Morphology) and Nahw (Grammar) using classical texts.</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="w-8 h-8 rounded bg-white flex items-center justify-center shrink-0 shadow-sm">
+<span class="text-xs font-bold text-primary">02</span>
+</div>
+<div>
+<h4 class="font-bold text-on-surface text-sm">Rational Sciences</h4>
+<p class="text-xs text-on-surface-variant">Introduction to Logic (Mantiq) and Theology (Aqeedah).</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="w-8 h-8 rounded bg-white flex items-center justify-center shrink-0 shadow-sm">
+<span class="text-xs font-bold text-primary">03</span>
+</div>
+<div>
+<h4 class="font-bold text-on-surface text-sm">Advanced Jurisprudence</h4>
+<p class="text-xs text-on-surface-variant">Comparative Fiqh and Usul al-Fiqh from primary sources.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white/50 backdrop-blur rounded-lg p-6 border border-white/50">
+<h4 class="font-label-lg text-primary mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+                            Digital Resources
+                        </h4>
+<div class="space-y-3">
+<div class="flex justify-between items-center p-3 bg-white rounded border border-[#D1E7C4] hover:border-primary transition-colors cursor-pointer group/item">
+<span class="text-xs font-medium">2024 Syllabus PDF</span>
+<span class="material-symbols-outlined text-sm text-outline group-hover/item:text-primary" data-icon="download">download</span>
+</div>
+<div class="flex justify-between items-center p-3 bg-white rounded border border-[#D1E7C4] hover:border-primary transition-colors cursor-pointer group/item">
+<span class="text-xs font-medium">Entrance Exam Guide</span>
+<span class="material-symbols-outlined text-sm text-outline group-hover/item:text-primary" data-icon="download">download</span>
+</div>
+<div class="flex justify-between items-center p-3 bg-white rounded border border-[#D1E7C4] hover:border-primary transition-colors cursor-pointer group/item">
+<span class="text-xs font-medium">Book List (Years 1-4)</span>
+<span class="material-symbols-outlined text-sm text-outline group-hover/item:text-primary" data-icon="download">download</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Subtle Decorative Calligraphy -->
+<div class="absolute -right-12 -bottom-12 opacity-5 pointer-events-none">
+<span class="material-symbols-outlined text-[240px] text-primary" data-icon="auto_stories">auto_stories</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Faculty Section -->
+<section class="bg-surface-container-lowest py-24 px-8 border-y border-[#D1E7C4]">
+<div class="max-w-screen-2xl mx-auto">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
+<div class="max-w-xl">
+<h2 class="font-headline-lg text-primary mb-4">World-Class Mentors</h2>
+<p class="font-body-md text-on-surface-variant">Our instructors are authorized scholars (Ulama) with chains of narration (Asnad) reaching back to the Prophetic era.</p>
+</div>
+<button class="flex items-center gap-2 text-primary font-label-lg group">
+                    View Full Faculty 
+                    <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+<!-- Faculty Member -->
+<div class="group">
+<div class="aspect-[3/4] rounded-xl overflow-hidden mb-6 bg-surface-container relative">
+<img alt="Sheikh Portrait" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="professional portrait of an elderly bearded man with a white turban and a gentle expression in front of a soft neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCM_Bm-jKplmy5-6tvWed62cM--m_KbjImkyMkoSbSqqUom292cweBw11qf-1dW7XMi9H8ocZ86fbPau6nTxYqdNjnct1Nier9nH246A7O7uDVOb5SqkgZ5-FzKpG6jMlU6uRfveDDQ2_r2k3bTk_tWsbmx3F0Q2-XVITA7RqAe9Ss96f0bSje9-O9g9Ys3yfvkEFXnCjy_7_NkBKpncVTBOZRYHxsvN-gSziYvoAXOODioFmVwoOoj2FlC_eNYd81mhpwXIxEIWkk"/>
+</div>
+<h4 class="font-headline-md text-primary text-lg">Sheikh Mufti Rashid</h4>
+<p class="text-sm text-on-surface-variant mb-4">Head of Hadith Department</p>
+<div class="flex gap-2">
+<span class="px-2 py-0.5 bg-surface-container text-[10px] font-bold rounded text-primary">PHD ISLAMIC LAW</span>
+<span class="px-2 py-0.5 bg-surface-container text-[10px] font-bold rounded text-primary">25Y EXPERIENCE</span>
+</div>
+</div>
+<!-- Faculty Member -->
+<div class="group">
+<div class="aspect-[3/4] rounded-xl overflow-hidden mb-6 bg-surface-container relative">
+<img alt="Scholar Portrait" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="portrait of a focused young man with a trimmed beard and professional attire sitting in a library environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmxRLBnB6eJ_kq2sxDHbnbe4w1ug7E5g--Ea8NAGcDq4y1nzDz8-3q2coJKIt6Vg0RYWDtD90FagbdUCDYh3tAt9LhH24vJihJOMvfayv-U7wZBuSCQaIzBZhXTN0pudC5Ok1yMp3GKqnYpXvm-Cji7ROOqdSjBpKATeHxmeiTo88vNQe_r8P6RvgGUMNAtODcer-Wp-OxbU2PYN0_8alA0q3eDbX2G2kl4xRW9ukG6e7y8ph-wVQzBAkpRG9BresAU7kQSwpAppE"/>
+</div>
+<h4 class="font-headline-md text-primary text-lg">Maulana Anas Khan</h4>
+<p class="text-sm text-on-surface-variant mb-4">Lead Instructor of Arabic Literature</p>
+<div class="flex gap-2">
+<span class="px-2 py-0.5 bg-surface-container text-[10px] font-bold rounded text-primary">MA ARABIC</span>
+<span class="px-2 py-0.5 bg-surface-container text-[10px] font-bold rounded text-primary">ADIB</span>
+</div>
+</div>
+<!-- Faculty Member -->
+<div class="group">
+<div class="aspect-[3/4] rounded-xl overflow-hidden mb-6 bg-surface-container relative">
+<img alt="Female Scholar Portrait" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="portrait of a professional woman in a modest hijab with a kind, scholarly appearance, holding a book" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQJWXpIcC9130oFGKAzJtjwAQIj6gummFylDTCyZC1dasE_9drYE4eSjm5mxykREJICFacMq9zMC2Vk8DK3UR2-Cp2JthEIqxHHurxPcaPkZHyEKUtR630VL63kHhzSw8ysP6TmJpQpuWyY816euuYzBG3eVslR-PsfKxzttGkI_ogro490Ef5jr9fWWs1ZlwoYnG4QHhAXnaL5VwtYhhgqbe627yCyfZAEl0N667RFBCI9BpICJP23I9HF_J9Xj4Wu-YRVz4HvwI"/>
+</div>
+<h4 class="font-headline-md text-primary text-lg">Alimah Zainab Ahmed</h4>
+<p class="text-sm text-on-surface-variant mb-4">Director of Girls Division</p>
+<div class="flex gap-2">
+<span class="px-2 py-0.5 bg-surface-container text-[10px] font-bold rounded text-primary">HADITH SPECIALIST</span>
+<span class="px-2 py-0.5 bg-surface-container text-[10px] font-bold rounded text-primary">FAITH COUNSELOR</span>
+</div>
+</div>
+<!-- Faculty Member -->
+<div class="group">
+<div class="aspect-[3/4] rounded-xl overflow-hidden mb-6 bg-surface-container relative">
+<img alt="Instructor Portrait" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="portrait of a graceful middle-aged woman in elegant modest wear standing in a sunlit academic hallway" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3IXWYgjA48bZw7uz4yPxLKzj1runPMcUfByk3R17CaJqcsT_G8DOoS50jWcdcM6LEUxZ_z7HrQeHyKWC6OyV0F6abtRsrhwdHUFD-xereDCZUvIrXJG2QbHhssnS1SEfehl4tSH304c4YVyycIULr6k_0usd3CLHoAacI1jIzPDzK2_GvzwyHRMw2J1IVPMxezsEOEVt9RMbQ9nllSmnuZi_U4EbTWaknELB0DOpbSVd1aoWNRzXhOtlPdCTMyeZtUWX8_MlIuVs"/>
+</div>
+<h4 class="font-headline-md text-primary text-lg">Alimah Maryam Siddiqui</h4>
+<p class="text-sm text-on-surface-variant mb-4">Senior Lecturer of Fiqh</p>
+<div class="flex gap-2">
+<span class="px-2 py-0.5 bg-surface-container text-[10px] font-bold rounded text-primary">IFTA AUTHORIZED</span>
+<span class="px-2 py-0.5 bg-surface-container text-[10px] font-bold rounded text-primary">12Y TEACHING</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Admission Call to Action -->
+<section class="max-w-screen-2xl mx-auto px-8 py-24">
+<div class="bg-[#3A7A4F] rounded-3xl p-12 md:p-20 relative overflow-hidden text-center flex flex-col items-center">
+<div class="relative z-10 max-w-2xl">
+<h2 class="font-headline-xl text-white mb-6">Begin Your Spiritual Journey Today</h2>
+<p class="text-primary-fixed font-body-lg mb-10">Admissions for the 2024-25 academic session are now open. Seats are limited to ensure personalized scholarly attention.</p>
+<div class="flex flex-col sm:flex-row gap-4 justify-center">
+<button class="bg-[#8CB753] text-[#1A2E05] px-10 py-4 rounded-xl font-headline-md text-lg hover:shadow-lg transition-all active:scale-95">Apply Online</button>
+<button class="bg-transparent border border-white text-white px-10 py-4 rounded-xl font-headline-md text-lg hover:bg-white/10 transition-all">Schedule Consultation</button>
+</div>
+</div>
+<!-- Background Decoration -->
+<div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+<svg fill="none" height="100%" width="100%" xmlns="http://www.w3.org/2000/svg">
+<pattern height="40" id="pattern-grid" patternunits="userSpaceOnUse" width="40" x="0" y="0">
+<path d="M40 0H0V40" stroke="white" stroke-width="0.5"></path>
+</pattern>
+<rect fill="url(#pattern-grid)" height="100%" width="100%"></rect>
+</svg>
+</div>
+</div>
+</section>
+<!-- Footer - {{DATA:COMPONENTS:COMPONENTS_10}} -->
+<footer class="w-full border-t border-[#D1E7C4] dark:border-slate-800 bg-[#F2FAED] dark:bg-slate-950">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 px-8 py-16 max-w-7xl mx-auto">
+<div class="md:col-span-1">
+<span class="text-xl font-serif font-bold text-[#3A7A4F] mb-4 block">HIDAYAT</span>
+<p class="text-slate-600 dark:text-slate-400 font-sans text-sm leading-relaxed mb-6">Empowering students with the light of traditional Islamic knowledge and modern academic rigor.</p>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-[#3A7A4F]/50 cursor-pointer hover:text-[#3A7A4F]" data-icon="facebook">social_leaderboard</span>
+<span class="material-symbols-outlined text-[#3A7A4F]/50 cursor-pointer hover:text-[#3A7A4F]" data-icon="youtube">video_youtube</span>
+<span class="material-symbols-outlined text-[#3A7A4F]/50 cursor-pointer hover:text-[#3A7A4F]" data-icon="mail">mail</span>
+</div>
+</div>
+<div>
+<h4 class="text-[#3A7A4F] font-bold mb-6">Quick Links</h4>
+<ul class="space-y-4">
+<li><a class="text-slate-600 dark:text-slate-400 hover:text-[#3A7A4F] transition-colors block" href="#">About Us</a></li>
+<li><a class="text-slate-600 dark:text-slate-400 hover:text-[#3A7A4F] transition-colors block" href="#">Contact Us</a></li>
+<li><a class="text-slate-600 dark:text-slate-400 hover:text-[#3A7A4F] transition-colors block" href="#">Privacy Policy</a></li>
+<li><a class="text-slate-600 dark:text-slate-400 hover:text-[#3A7A4F] transition-colors block" href="#">Terms of Service</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-[#3A7A4F] font-bold mb-6">Student Center</h4>
+<ul class="space-y-4">
+<li><a class="text-slate-600 dark:text-slate-400 hover:text-[#3A7A4F] transition-colors block" href="#">Student Portal</a></li>
+<li><a class="text-slate-600 dark:text-slate-400 hover:text-[#3A7A4F] transition-colors block" href="#">Research Journal</a></li>
+<li><a class="text-slate-600 dark:text-slate-400 hover:text-[#3A7A4F] transition-colors block" href="#">Library Catalog</a></li>
+<li><a class="text-slate-600 dark:text-slate-400 hover:text-[#3A7A4F] transition-colors block" href="#">Alumni Association</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-[#3A7A4F] font-bold mb-6">Newsletter</h4>
+<p class="text-slate-600 dark:text-slate-400 text-xs mb-4">Stay updated with our latest scholarly publications and course announcements.</p>
+<div class="flex">
+<input class="bg-white border-[#D1E7C4] rounded-l-lg text-sm text-[#0F172A] focus:ring-1 focus:ring-[#3A7A4F] w-full" placeholder="Your email" type="email"/>
+<button class="bg-[#8CB753] text-[#1A2E05] px-4 py-2 rounded-r-lg">
+<span class="material-symbols-outlined text-sm" data-icon="send">send</span>
+</button>
+</div>
+</div>
+</div>
+<div class="border-t border-[#D1E7C4] py-8 px-8 max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+<p class="text-slate-500 dark:text-slate-400 font-sans text-xs">© 2024 HIDAYAT Academy. Preserving Sacred Tradition. Dedicated to Spiritual Clarity and Scholarly Excellence.</p>
+<div class="flex gap-8">
+<span class="text-[#3A7A4F]/40 text-[10px] uppercase tracking-widest">Tradition</span>
+<span class="text-[#3A7A4F]/40 text-[10px] uppercase tracking-widest">Scholarship</span>
+<span class="text-[#3A7A4F]/40 text-[10px] uppercase tracking-widest">Service</span>
+</div>
+</div>
+</footer>
+</body></html>

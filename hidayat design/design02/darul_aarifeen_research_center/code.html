@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Darul Aarifeen Research Center | HIDAYAT</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;600;700;900&amp;family=Manrope:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed": "#8CB753", // Highlights
+                        "surface-container": "#E3F1DC", 
+                        "on-surface-variant": "#435248",
+                        "primary-fixed": "#D1E7C4",
+                        "secondary-container": "#E3F1DC",
+                        "tertiary-fixed-dim": "#c8c6c2",
+                        "surface-dim": "#F2FAED",
+                        "surface-container-highest": "#D1E7C4",
+                        "surface-bright": "#F2FAED",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#8CB753",
+                        "background": "#F2FAED",
+                        "surface-container-high": "#D1E7C4",
+                        "on-secondary-fixed": "#121C14",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed-variant": "#474743",
+                        "primary-container": "#3A7A4F",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-container": "#3A7A4F",
+                        "surface-variant": "#D1E7C4",
+                        "secondary": "#8CB753",
+                        "secondary-fixed-dim": "#8CB753",
+                        "tertiary-container": "#454441",
+                        "on-surface": "#121C14",
+                        "on-background": "#121C14",
+                        "tertiary": "#2e2e2b",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#8CB753",
+                        "on-primary-fixed-variant": "#3A7A4F",
+                        "on-primary": "#ffffff",
+                        "primary": "#3A7A4F",
+                        "on-secondary": "#ffffff",
+                        "inverse-on-surface": "#F2FAED",
+                        "on-secondary-fixed-variant": "#3A7A4F",
+                        "inverse-surface": "#27313f",
+                        "tertiary-fixed": "#e5e2dd",
+                        "on-tertiary-fixed": "#1c1c19",
+                        "on-primary-fixed": "#121C14",
+                        "surface-tint": "#3A7A4F",
+                        "outline": "#707974",
+                        "on-tertiary-container": "#b3b1ad",
+                        "surface-container-low": "#F2FAED",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#F2FAED",
+                        "outline-variant": "#D1E7C4",
+                        "surface": "#F2FAED"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit-xl": "48px",
+                        "grid-cols": "12",
+                        "unit-lg": "24px",
+                        "max-width": "1280px",
+                        "margin": "auto",
+                        "unit-sm": "8px",
+                        "gutter": "24px",
+                        "unit-xs": "4px",
+                        "unit-md": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Noto Serif"],
+                        "label-lg": ["Manrope"],
+                        "headline-xl": ["Noto Serif"],
+                        "headline-lg": ["Noto Serif"],
+                        "label-sm": ["Manrope"],
+                        "body-md": ["Manrope"],
+                        "body-lg": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-xl": ["48px", {"lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .pattern-bg {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%233A7A4F' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 border-b border-[#D1E7C4] bg-[#F2FAED] backdrop-blur-md">
+<nav class="flex justify-between items-center w-full px-8 py-4 max-w-7xl mx-auto">
+<div class="text-2xl font-serif font-bold text-[#3A7A4F]">HIDAYAT</div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="font-['Noto_Serif'] font-medium text-slate-600 hover:text-[#3A7A4F] transition-colors" href="#">Home</a>
+<a class="font-['Noto_Serif'] font-medium text-slate-600 hover:text-[#3A7A4F] transition-colors" href="#">Darse Nizami</a>
+<a class="font-['Noto_Serif'] font-medium text-slate-600 hover:text-[#3A7A4F] transition-colors" href="#">Hifz &amp; Nazrah</a>
+<a class="font-['Noto_Serif'] font-medium text-slate-600 hover:text-[#3A7A4F] transition-colors" href="#">Short Courses</a>
+<a class="font-['Noto_Serif'] font-medium text-slate-600 hover:text-[#3A7A4F] transition-colors" href="#">Darul Ifta</a>
+<a class="font-['Noto_Serif'] font-medium text-[#3A7A4F] border-b-2 border-[#3A7A4F] pb-1 font-bold" href="#">Research Center</a>
+</div>
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-[#3A7A4F] cursor-pointer">search</span>
+<button class="bg-[#3A7A4F] text-white px-6 py-2 rounded-lg font-['Noto_Serif'] font-medium hover:opacity-80 transition-all active:scale-95">Enroll Now</button>
+</div>
+</nav>
+</header>
+<main class="pt-24">
+<!-- Hero Section -->
+<section class="relative h-[614px] flex items-center overflow-hidden bg-[#3A7A4F]">
+<div class="absolute inset-0 opacity-20 pattern-bg"></div>
+<div class="relative z-10 max-w-screen-2xl mx-auto px-12 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+<div class="text-on-primary">
+<span class="font-label-lg text-secondary-fixed mb-4 block tracking-[0.2em] uppercase">Darul Aarifeen</span>
+<h1 class="font-headline-xl text-white mb-6">Advancing the Frontiers of Islamic Scholarship</h1>
+<p class="font-body-lg text-primary-fixed max-w-lg mb-8">A sanctuary for intellectual rigor and spiritual clarity, dedicated to preserving classical heritage while addressing contemporary challenges.</p>
+<div class="flex gap-4">
+<button class="bg-secondary text-on-secondary px-8 py-3 rounded-lg font-label-lg flex items-center gap-2 hover:opacity-90">
+                            Explore Journals <span class="material-symbols-outlined">menu_book</span>
+</button>
+<button class="border border-primary-fixed text-primary-fixed px-8 py-3 rounded-lg font-label-lg hover:bg-white/10">Ongoing Projects</button>
+</div>
+</div>
+<div class="hidden md:block relative h-full">
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="w-80 h-96 bg-white/5 border border-white/20 rounded-xl backdrop-blur-sm p-8 flex flex-col justify-center items-center text-center">
+<span class="material-symbols-outlined text-6xl text-secondary-fixed mb-6" data-weight="fill">history_edu</span>
+<h3 class="font-headline-md text-white">500+</h3>
+<p class="font-label-lg text-secondary-fixed">Manuscripts Digitized</p>
+</div>
+<div class="absolute -top-12 -right-8 w-64 h-80 bg-[#121C14] border border-[#3A7A4F]/30 rounded-xl p-8 flex flex-col justify-center items-center text-center shadow-2xl">
+<span class="material-symbols-outlined text-6xl text-secondary-fixed mb-6">science</span>
+<h3 class="font-headline-md text-white">24</h3>
+<p class="font-label-lg text-primary-fixed">Active Projects</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Research Publications Bento Grid -->
+<section class="max-w-screen-2xl mx-auto px-12 py-unit-xl">
+<div class="flex items-end justify-between mb-12">
+<div class="max-w-2xl">
+<h2 class="font-headline-lg text-primary mb-4">Latest Research Publications</h2>
+<p class="font-body-md text-on-surface-variant">Access our peer-reviewed journals and monographs covering Theology, Jurisprudence, and History.</p>
+</div>
+<button class="text-primary font-label-lg flex items-center gap-2 hover:underline underline-offset-4">
+                    View Archive <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<!-- Large Featured Journal -->
+<div class="md:col-span-2 md:row-span-2 bg-white rounded-xl overflow-hidden shadow-sm border border-[#D1E7C4] flex flex-col">
+<div class="h-80 bg-surface-container-high relative flex items-center justify-center overflow-hidden">
+<img alt="Old manuscript detail" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9Hc9NraCOBEy8y9TzmP-FRJ9T00orxZlbCxHjr2ecHpK3CpN7V26qdqLKO7-w_OJa1E9XCvnwb8iopryL2eDRYGbxZ0Rkz7XvkQsa_5qX8ZBX-SzyVeTEZgKu1hUMJAbMt9WHhj_-WVNd9rMYAhik_wB1tmMfGokR49fdOaVbhQ2dHX3jsWtBabNTb76EdCu0nMqJ5gvfXtQUBNWC-2j_U0Rc9JmpxMLefqKESnOxKLi-OS_1AkSaYilFdud6hI2HR6rcTVOhueU"/>
+<div class="absolute inset-0 bg-[#3A7A4F]/20"></div>
+<div class="absolute top-6 left-6 bg-primary text-white px-4 py-1 rounded-full font-label-sm">FEATURED VOLUME</div>
+</div>
+<div class="p-8 flex-1 flex flex-col">
+<span class="text-secondary font-label-sm mb-2">Quarterly Journal · Fall 2023</span>
+<h3 class="font-headline-md text-primary mb-4">Al-Mifta: Critical Approaches to Classical Texts</h3>
+<p class="font-body-md text-on-surface-variant mb-6 flex-1">This issue explores the intersection of 11th-century dialectical theology and modern linguistic frameworks.</p>
+<div class="flex items-center justify-between pt-6 border-t border-surface-variant">
+<span class="font-label-sm text-outline">ISSN: 2451-9002</span>
+<button class="bg-surface-container text-primary p-2 rounded-full hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Secondary Publication -->
+<div class="bg-white rounded-xl overflow-hidden shadow-sm border border-[#D1E7C4] flex flex-col">
+<div class="h-48 bg-surface-container flex items-center justify-center relative">
+<div class="absolute top-0 inset-x-0 h-1 bg-secondary"></div>
+<span class="material-symbols-outlined text-4xl text-primary opacity-30">menu_book</span>
+</div>
+<div class="p-6">
+<h4 class="font-headline-md text-primary text-lg mb-2">Monograph: Maqasid Ethics</h4>
+<p class="font-label-sm text-on-surface-variant mb-4">Dr. Ahmed Salman</p>
+<button class="text-primary font-label-lg flex items-center gap-2 group">
+                            Read Summary <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Secondary Publication 2 -->
+<div class="bg-white rounded-xl overflow-hidden shadow-sm border border-[#D1E7C4] flex flex-col">
+<div class="h-48 bg-surface-container flex items-center justify-center relative">
+<div class="absolute top-0 inset-x-0 h-1 bg-secondary"></div>
+<span class="material-symbols-outlined text-4xl text-primary opacity-30">auto_stories</span>
+</div>
+<div class="p-6">
+<h4 class="font-headline-md text-primary text-lg mb-2">Legalism in the Digital Age</h4>
+<p class="font-label-sm text-on-surface-variant mb-4">Darul Aarifeen Editorial</p>
+<button class="text-primary font-label-lg flex items-center gap-2 group">
+                            Read Summary <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Ongoing Projects Card -->
+<div class="md:col-span-2 bg-primary text-on-primary rounded-xl p-8 flex items-center gap-8 shadow-lg">
+<div class="bg-white/10 p-6 rounded-full">
+<span class="material-symbols-outlined text-5xl text-secondary-fixed" data-weight="fill">architecture</span>
+</div>
+<div>
+<h3 class="font-headline-md text-white mb-2">Ongoing: The Encyclopedia of Hadith Narrators</h3>
+<p class="font-body-md text-primary-fixed/80 mb-4">A multi-year digital humanities project creating a comprehensive database of biographical entries.</p>
+<div class="flex items-center gap-4">
+<span class="h-2 flex-1 bg-white/20 rounded-full overflow-hidden">
+<span class="block h-full w-[65%] bg-secondary-fixed"></span>
+</span>
+<span class="font-label-sm text-white">65% Complete</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Our Scholars Section -->
+<section class="bg-surface-container-low py-unit-xl">
+<div class="max-w-screen-2xl mx-auto px-12">
+<div class="text-center mb-16">
+<span class="font-label-lg text-primary tracking-widest uppercase mb-4 block">The Faculty</span>
+<h2 class="font-headline-lg text-primary">Academic Leadership</h2>
+<div class="w-24 h-1 bg-secondary mx-auto mt-6"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+<!-- Scholar 1 -->
+<div class="text-center group">
+<div class="relative w-48 h-48 mx-auto mb-8">
+<div class="absolute inset-0 bg-[#D1E7C4] rounded-full -rotate-6 group-hover:rotate-0 transition-transform"></div>
+<img alt="Scholar Portrait" class="relative w-48 h-48 rounded-full object-cover border-4 border-white shadow-xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJ4pngwiDKam7-MVjmyelH2WOntMxi_BMTP-SdD2ZrErE0Kxh9cGlTMy8pSMaiuSY8U1KPSrntvixFOoIl8mFEGB-WuX34GGFAdwdTVjZt7YMvMLRKDkCT-m0DIiPlE13E0CfXzLE_qOso5yvT66e8ontdngp5tEUvWN9oJBYphLGmok6XXWX51oMnD0OWwffd15SKXFp7PP0oR5nNons7W91K5xJ4HCNS3Rew_pO-XkivCZ1Mi3m9c2PyRjxIjmFefQeTt2xuH10"/>
+</div>
+<h3 class="font-headline-md text-primary mb-2">Sheikh Dr. Omar Al-Faruqi</h3>
+<p class="font-label-lg text-secondary mb-4">Director of Research</p>
+<p class="font-body-md text-on-surface-variant max-w-xs mx-auto italic">"Bridging traditional epistemologies with the complexities of the modern world."</p>
+</div>
+<!-- Scholar 2 -->
+<div class="text-center group">
+<div class="relative w-48 h-48 mx-auto mb-8">
+<div class="absolute inset-0 bg-[#D1E7C4] rounded-full -rotate-6 group-hover:rotate-0 transition-transform"></div>
+<img alt="Scholar Portrait" class="relative w-48 h-48 rounded-full object-cover border-4 border-white shadow-xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPmlhMkEk_8ch02xlBzVoeNTApZiOaOfp_cCQdDXJf4wCwITOL94wSoRxZHMOs12MS30kQNQSWqJ9E0-sfsl_nCatCvce0cpOm3x65Wg5JVC906_bxaf01D2EDHARMauHnU0CYqMXRLC-aNtScANISOM3JC88I-CkHOdnYV2bvG6Vkx_XL097q5p7jj6Y11VBQyVlc_pwWtR0luhxbvRek345MLBFAXFFtWgxuoiUWJKjuUCZ6KKKh8Kfuk4NXfUHFvCa1AAtZisA"/>
+</div>
+<h3 class="font-headline-md text-primary mb-2">Mufti Yahya Hussaini</h3>
+<p class="font-label-lg text-secondary mb-4">Head of Jurisprudence</p>
+<p class="font-body-md text-on-surface-variant max-w-xs mx-auto italic">"Preserving the integrity of Fiqh through rigorous scholarly methodology."</p>
+</div>
+<!-- Scholar 3 -->
+<div class="text-center group">
+<div class="relative w-48 h-48 mx-auto mb-8">
+<div class="absolute inset-0 bg-[#D1E7C4] rounded-full -rotate-6 group-hover:rotate-0 transition-transform"></div>
+<img alt="Scholar Portrait" class="relative w-48 h-48 rounded-full object-cover border-4 border-white shadow-xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCckP5d5a3RK48t-jvIM1_G-j6oWlGA723gYnBj7il-QZUDskGDT3RwfWf8KSPDQjubH7Nox6OU5dORs9rRkrPgmUjKDGD1G6oLlABi5tDCKLtQ1Oy-ICG2g-s7ZVcJW2g5R11KhwH18bwYqP3DZoQLritcZ1ezzvCigTDL6rZR7YJuGYed_WuXr9ZefJ2C6gSHocQQn65cwGmMhChWSQgVsQ-ypbJSRmYj9phOmcoSH9cQ7PAGK1W3pLeF-jRe2OJi5Tg1pvIyIiU"/>
+</div>
+<h3 class="font-headline-md text-primary mb-2">Ustadha Maryam Zaid</h3>
+<p class="font-label-lg text-secondary mb-4">Classical Texts Specialist</p>
+<p class="font-body-md text-on-surface-variant max-w-xs mx-auto italic">"Resurrecting forgotten narratives through manuscript restoration."</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Journal Subscription CTA -->
+<section class="max-w-screen-2xl mx-auto px-12 py-unit-xl">
+<div class="bg-white rounded-3xl p-12 border border-[#D1E7C4] flex flex-col md:flex-row items-center justify-between gap-12 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-64 h-64 opacity-5 pointer-events-none">
+<span class="material-symbols-outlined text-[200px] text-primary">ink_pen</span>
+</div>
+<div class="relative z-10">
+<h2 class="font-headline-lg text-primary mb-4">Subscribe to our Quarterly Digest</h2>
+<p class="font-body-lg text-on-surface-variant max-w-xl">Stay updated with the latest research papers, project announcements, and academic events from Darul Aarifeen.</p>
+</div>
+<div class="w-full md:w-auto flex flex-col gap-4 relative z-10">
+<div class="flex gap-2">
+<input class="bg-[#F2FAED] border-[#D1E7C4] rounded-lg px-6 py-3 font-body-md focus:ring-2 focus:ring-[#3A7A4F] focus:border-transparent outline-none min-w-[300px]" placeholder="Email Address" type="email"/>
+<button class="bg-[#3A7A4F] text-white px-8 py-3 rounded-lg font-label-lg hover:shadow-lg transition-shadow">Join Us</button>
+</div>
+<p class="text-xs text-outline text-center">Join 5,000+ researchers and students globally.</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-[#F2FAED] border-t border-[#D1E7C4]">
+<div class="w-full py-8 px-8 flex flex-col md:flex-row justify-between items-center max-w-7xl mx-auto">
+<div class="flex flex-col md:flex-row gap-8 items-center">
+<span class="font-serif text-[#3A7A4F] font-bold text-xl">HIDAYAT</span>
+<p class="text-slate-500 font-sans text-sm">© 2024 HIDAYAT Academy. Preserving Sacred Tradition.</p>
+</div>
+<div class="flex gap-8 mt-4 md:mt-0">
+<a class="text-slate-500 font-sans text-sm hover:text-[#3A7A4F] transition-colors" href="#">Privacy Policy</a>
+<a class="text-slate-500 font-sans text-sm hover:text-[#3A7A4F] transition-colors" href="#">Terms of Service</a>
+<a class="text-slate-500 font-sans text-sm hover:text-[#3A7A4F] transition-colors" href="#">Contact Us</a>
+</div>
+</div>
+</footer>
+</body></html>

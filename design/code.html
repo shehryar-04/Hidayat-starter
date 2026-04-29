@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Hidayat</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-container": "#765b00",
+                    "on-background": "#191c1c",
+                    "surface": "#f8faf9",
+                    "on-tertiary-container": "#ffafaf",
+                    "on-surface": "#191c1c",
+                    "on-secondary-fixed-variant": "#594400",
+                    "surface-container-low": "#f2f4f3",
+                    "surface-container-lowest": "#ffffff",
+                    "background": "#f8faf9",
+                    "on-error-container": "#93000a",
+                    "tertiary": "#652528",
+                    "surface-variant": "#e1e3e2",
+                    "on-surface-variant": "#404942",
+                    "outline": "#707a72",
+                    "secondary-container": "#fdd670",
+                    "inverse-surface": "#2e3131",
+                    "on-secondary": "#ffffff",
+                    "primary-fixed-dim": "#8dd6ab",
+                    "surface-bright": "#f8faf9",
+                    "inverse-primary": "#8dd6ab",
+                    "secondary": "#755b00",
+                    "primary-fixed": "#a8f3c6",
+                    "surface-tint": "#206b48",
+                    "secondary-fixed": "#ffdf91",
+                    "error-container": "#ffdad6",
+                    "on-primary-fixed-variant": "#005232",
+                    "on-error": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "primary-container": "#0b5d3b",
+                    "tertiary-container": "#823b3d",
+                    "primary": "#004429",
+                    "surface-container": "#eceeed",
+                    "on-primary": "#ffffff",
+                    "inverse-on-surface": "#eff1f0",
+                    "outline-variant": "#bfc9c0",
+                    "on-primary-fixed": "#002111",
+                    "on-primary-container": "#8ad4a8",
+                    "on-tertiary-fixed": "#3c060c",
+                    "surface-container-high": "#e6e9e8",
+                    "error": "#ba1a1a",
+                    "tertiary-fixed": "#ffdad9",
+                    "tertiary-fixed-dim": "#ffb3b2",
+                    "secondary-fixed-dim": "#e8c25f",
+                    "surface-dim": "#d8dad9",
+                    "on-secondary-fixed": "#241a00",
+                    "surface-container-highest": "#e1e3e2",
+                    "on-tertiary-fixed-variant": "#753133"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "serif": ["Noto Serif", "serif"],
+                    "sans": ["Public Sans", "sans-serif"],
+                    "headline": ["Noto Serif"],
+                    "body": ["Public Sans"],
+                    "label": ["Public Sans"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .pattern-overlay {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l2.5 7.5L40 10l-7.5 2.5L30 20l-2.5-7.5L20 10l7.5-2.5L30 0zm0 40l2.5 7.5L40 50l-7.5 2.5L30 60l-2.5-7.5L20 50l7.5-2.5L30 40zM10 20l2.5 7.5L20 30l-7.5 2.5L10 40l-2.5-7.5L0 30l7.5-2.5L10 20zm40 0l2.5 7.5L60 30l-7.5 2.5L50 40l-2.5-7.5L40 30l7.5-2.5L50 20z' fill='%23004429' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+        .tonal-shift-no-borders { border: none !important; }
+        .glass-nav { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+    </style>
+</head>
+<body class="bg-surface text-on-background font-body selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 border-t-2 border-amber-500 bg-surface/80 glass-nav shadow-sm">
+<div class="flex justify-between items-center px-8 py-4 w-full max-w-screen-2xl mx-auto">
+<div class="text-2xl font-serif font-bold text-emerald-900 tracking-tight">The Illuminated Scholar</div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="text-slate-600 hover:text-emerald-800 transition-colors font-serif text-sm tracking-wide" href="#">Admissions</a>
+<a class="text-slate-600 hover:text-emerald-800 transition-colors font-serif text-sm tracking-wide" href="#">Curriculum</a>
+<a class="text-slate-600 hover:text-emerald-800 transition-colors font-serif text-sm tracking-wide" href="#">Darul Ifta</a>
+<a class="text-slate-600 hover:text-emerald-800 transition-colors font-serif text-sm tracking-wide" href="#">Research</a>
+<a class="text-slate-600 hover:text-emerald-800 transition-colors font-serif text-sm tracking-wide" href="#">About</a>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden lg:flex items-center bg-surface-container-high rounded-full px-4 py-1.5">
+<span class="material-symbols-outlined text-outline text-lg" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-xs w-32 font-sans" placeholder="Search archives..." type="text"/>
+</div>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-xl text-sm font-medium hover:bg-primary-container transition-all scale-95 active:scale-90 duration-200">
+                    Student Portal
+                </button>
+</div>
+</div>
+</nav>
+<!-- Hero Section -->
+<header class="relative pt-24 min-h-[921px] flex items-center overflow-hidden bg-surface-container-low pattern-overlay">
+<div class="container mx-auto px-8 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+<div class="lg:col-span-6 z-10">
+<div class="inline-block px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-[10px] font-bold tracking-[0.2em] uppercase mb-6">
+                    Global Excellence in Islamic Sciences
+                </div>
+<h1 class="font-serif text-5xl md:text-7xl text-primary leading-[1.1] mb-8 tracking-tighter">
+                    Preserving Heritage, <br/><span class="italic text-secondary">Inspiring Tomorrow.</span>
+</h1>
+<p class="text-on-surface-variant text-lg md:text-xl max-w-xl leading-relaxed mb-10 font-light">
+                    Join an elite community of scholars dedicated to the rigorous study of traditional Islamic sciences within a modern global framework.
+                </p>
+<div class="flex flex-wrap gap-4">
+<button class="bg-primary text-on-primary px-8 py-4 rounded-xl font-medium shadow-xl shadow-primary/10 flex items-center gap-2 group">
+                        Explore Our Programs
+                        <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<button class="bg-surface-container-highest text-on-surface px-8 py-4 rounded-xl font-medium flex items-center gap-2 outline-variant/20 outline outline-1">
+                        Download Prospectus
+                    </button>
+</div>
+</div>
+<div class="lg:col-span-6 relative">
+<div class="relative z-10 rounded-2xl overflow-hidden aspect-[4/5] shadow-2xl">
+<img class="w-full h-full object-cover" data-alt="Magnificent high-ceiling traditional library with mahogany shelves filled with ancient manuscripts and soft warm golden sunlight streaming through arched windows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9Ke8TcOwaTC0VgpQf5N5vjXtd67VE-Cbk_8fdMtjSJiPr-kkNVkT277jKvYLdVyC8Zyw-GbeKL1QlBlD1FIsrcaFsphRY96f2teRv9iUb204Iwok0P6xhBghmtHuYw4on6jpgqEND8_l8xXgz8q_eci4aUGVbtsHuII36DFsVHHKtLl4avni-92MbU4j_YVpHT47WN3HWsyELXhlDZ3KkgzVyT2mr4yKvUoQ9l1PQMMA-uZ5Chy7s2j1SbY8PmsEn5_TYrFHVVow"/>
+</div>
+<!-- Asymmetrical decorative element -->
+<div class="absolute -bottom-10 -left-10 w-48 h-48 bg-secondary/10 rounded-full blur-3xl"></div>
+<div class="absolute -top-10 -right-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+</div>
+</div>
+</header>
+<!-- Academic Excellence (Overview) -->
+<section class="py-24 bg-surface-container-lowest">
+<div class="container mx-auto px-8">
+<div class="max-w-3xl mb-20">
+<h2 class="font-serif text-4xl text-primary mb-6">Academic Excellence</h2>
+<div class="h-1 w-20 bg-secondary mb-8"></div>
+<p class="text-on-surface-variant text-xl leading-relaxed">
+                    Darul Aarifeen Global Institute represents a synthesis of classical pedagogical methods (Ijazah) and contemporary academic research standards. Our faculty includes world-renowned scholars across diverse disciplines.
+                </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Excellence Cards -->
+<div class="p-8 bg-surface-container-low rounded-2xl border-b-4 border-transparent hover:border-secondary transition-all group">
+<span class="material-symbols-outlined text-4xl text-secondary mb-6 block" data-icon="menu_book">menu_book</span>
+<h3 class="font-serif text-2xl text-primary mb-4">Authentic Lineage</h3>
+<p class="text-on-surface-variant leading-relaxed">Direct chains of transmission (Isnad) connecting our students to the foundational texts of the Islamic tradition.</p>
+</div>
+<div class="p-8 bg-surface-container-low rounded-2xl border-b-4 border-transparent hover:border-secondary transition-all group">
+<span class="material-symbols-outlined text-4xl text-secondary mb-6 block" data-icon="psychology">psychology</span>
+<h3 class="font-serif text-2xl text-primary mb-4">Critical Inquiry</h3>
+<p class="text-on-surface-variant leading-relaxed">Encouraging rigorous intellectual engagement with modern philosophical and ethical challenges.</p>
+</div>
+<div class="p-8 bg-surface-container-low rounded-2xl border-b-4 border-transparent hover:border-secondary transition-all group">
+<span class="material-symbols-outlined text-4xl text-secondary mb-6 block" data-icon="language">language</span>
+<h3 class="font-serif text-2xl text-primary mb-4">Global Network</h3>
+<p class="text-on-surface-variant leading-relaxed">A diverse community of students representing over 40 nations, unified by the pursuit of sacred knowledge.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Curriculum Highlights - Bento Grid -->
+<section class="py-24 bg-surface pattern-overlay">
+<div class="container mx-auto px-8">
+<div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+<div>
+<span class="text-secondary font-sans text-xs font-bold tracking-widest uppercase mb-4 block">Our Curriculum</span>
+<h2 class="font-serif text-4xl text-primary">Foundations of Ilm</h2>
+</div>
+<a class="text-primary font-medium flex items-center gap-2 hover:text-secondary transition-colors group" href="#">
+                    View Full Curriculum <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform" data-icon="north_east">north_east</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-4 h-[800px] md:h-[600px]">
+<!-- Bento Item 1 -->
+<div class="md:col-span-2 md:row-span-2 relative group overflow-hidden rounded-2xl bg-primary">
+<img class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" data-alt="Close-up of ancient Arabic calligraphy on aged parchment with rich ink details and golden illumination borders" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCevTY83jKdauTbRtmFNx3hXu5AQWMXLl7YV-ZZHM1KrGjYpvkv4LpvhcOT4DAEF5Jhcju37nsPIj2ley3huEV_9CqJDibSVKB8NiQUYPDMgonRMkhzheXCj6Fe0aRJHOXMsRMYgK9HviZYOXN7xvgpWJpNNwcWMNZLRIsLi7vmvW8_jc-avBg-chTiL2m4baD-fjxPBvdY-ye4z3SQm_qImuXC1n1GA1EuXGybz9w2iVpWtPVqL_e9WtlZ3RF_BQBXKDs0JoeELYU"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary via-primary/20 to-transparent"></div>
+<div class="absolute bottom-0 p-10">
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-[10px] font-bold uppercase mb-4 inline-block">Specialization</span>
+<h3 class="text-white font-serif text-3xl mb-4">Advanced Hadith Studies</h3>
+<p class="text-white/80 max-w-sm">Detailed analysis of the six canonical books with focus on Fiqh al-Hadith and Usul.</p>
+</div>
+</div>
+<!-- Bento Item 2 -->
+<div class="md:col-span-2 relative group overflow-hidden rounded-2xl bg-surface-container-high">
+<div class="absolute inset-0 p-8 flex flex-col justify-end z-10">
+<h3 class="text-primary font-serif text-2xl mb-2">Classical Arabic Literature</h3>
+<p class="text-on-surface-variant text-sm">Mastery of Balagha and Nahw through the study of pre-Islamic and early Islamic poetry.</p>
+</div>
+<div class="absolute top-0 right-0 p-8">
+<span class="material-symbols-outlined text-secondary/30 text-6xl" data-icon="menu_book">menu_book</span>
+</div>
+</div>
+<!-- Bento Item 3 -->
+<div class="relative group overflow-hidden rounded-2xl bg-surface-container-highest">
+<div class="p-8">
+<h3 class="text-primary font-serif text-xl mb-2">Usul al-Fiqh</h3>
+<p class="text-on-surface-variant text-sm">The methodology of legal derivation.</p>
+</div>
+</div>
+<!-- Bento Item 4 -->
+<div class="relative group overflow-hidden rounded-2xl bg-emerald-900">
+<div class="p-8">
+<h3 class="text-amber-200 font-serif text-xl mb-2">Islamic Finance</h3>
+<p class="text-emerald-50/70 text-sm">Modern application of Maqasid al-Sharia in economics.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Research Publications -->
+<section class="py-24 bg-surface-container-low overflow-hidden">
+<div class="container mx-auto px-8 relative">
+<div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl"></div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
+<div class="lg:col-span-4 sticky top-32">
+<h2 class="font-serif text-4xl text-primary mb-8">Scholarly Research</h2>
+<p class="text-on-surface-variant mb-8 leading-relaxed">
+                        Our research wing publishes the quarterly <i>Journal of Illuminated Thought</i>, featuring peer-reviewed articles from our resident and visiting faculty.
+                    </p>
+<button class="flex items-center gap-4 text-primary font-bold group">
+<div class="w-12 h-12 rounded-full border border-primary/20 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</div>
+                        Visit Research Portal
+                    </button>
+</div>
+<div class="lg:col-span-8 space-y-1">
+<!-- Scholarly List -->
+<div class="group py-8 px-4 flex flex-col md:flex-row justify-between items-start md:items-center bg-surface-container-lowest hover:bg-white transition-all relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary scale-y-0 group-hover:scale-y-100 transition-transform origin-top"></div>
+<div class="mb-4 md:mb-0">
+<span class="text-secondary font-sans text-[10px] font-bold tracking-widest uppercase">Vol. 12 Issue 3 • Philosophy</span>
+<h4 class="text-xl font-serif text-primary mt-1">Ethical Frameworks in Al-Ghazali's Tahafut</h4>
+</div>
+<span class="text-on-surface-variant font-sans text-xs italic">Author: Dr. Suleiman Al-Husseini</span>
+</div>
+<div class="group py-8 px-4 flex flex-col md:flex-row justify-between items-start md:items-center bg-surface-container-lowest hover:bg-white transition-all relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary scale-y-0 group-hover:scale-y-100 transition-transform origin-top"></div>
+<div class="mb-4 md:mb-0">
+<span class="text-secondary font-sans text-[10px] font-bold tracking-widest uppercase">Research Monograph • Law</span>
+<h4 class="text-xl font-serif text-primary mt-1">Digital Assets and the Concept of Mal in Maliki Jurisprudence</h4>
+</div>
+<span class="text-on-surface-variant font-sans text-xs italic">Author: Prof. Amina Ibrahim</span>
+</div>
+<div class="group py-8 px-4 flex flex-col md:flex-row justify-between items-start md:items-center bg-surface-container-lowest hover:bg-white transition-all relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary scale-y-0 group-hover:scale-y-100 transition-transform origin-top"></div>
+<div class="mb-4 md:mb-0">
+<span class="text-secondary font-sans text-[10px] font-bold tracking-widest uppercase">Historical Review • Hadith</span>
+<h4 class="text-xl font-serif text-primary mt-1">The Transmission of the Muwatta in Muslim Spain</h4>
+</div>
+<span class="text-on-surface-variant font-sans text-xs italic">Author: Sheikh Yahya Rhodus</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- News & Events Grid -->
+<section class="py-24 bg-surface">
+<div class="container mx-auto px-8">
+<h2 class="font-serif text-4xl text-primary mb-12 text-center">Institutional Pulse</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- News Card 1 -->
+<article class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm group">
+<div class="h-56 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Scholars gathered in a circle in a contemporary mosque setting for an academic seminar with books on low wooden tables" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBT2kqM8SAbgALPirB7d_HIEJv3imWapco9OIUgq73dbqnTbjrC_i6VsMfAp6xbyM5-SptgjZE6LuxLF8F-tTJY7950I2jnL0Er1zXFOaFIWS1jVs5y-iEZ9OG8YUk6hP9PHMt4fhmGQ1hw1knzefP0izwGy_dt3mUy6IrP0CWO24nd8L8YmlVFF-AgmBy7ZIhXWIjtC6h_eP5lNjc9aphzhOMaB0oanaEsDyrohtRXjTvhkGYDhGUE_pXoVchEG-gUqYNSHFZv99Q"/>
+</div>
+<div class="p-8">
+<time class="text-secondary font-sans text-xs font-bold tracking-widest uppercase mb-3 block">October 15, 2024</time>
+<h3 class="font-serif text-2xl text-primary mb-4 leading-tight">Inaugural Conference on Maqasid and Bioethics</h3>
+<p class="text-on-surface-variant text-sm mb-6 leading-relaxed">International delegates convene to discuss the application of Sharia principles in modern medical advancements.</p>
+<a class="text-primary text-sm font-bold flex items-center gap-2 group-hover:text-secondary transition-colors" href="#">
+                            Read Full Report <span class="material-symbols-outlined text-lg" data-icon="arrow_right_alt">arrow_right_alt</span>
+</a>
+</div>
+</article>
+<!-- News Card 2 -->
+<article class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm group">
+<div class="h-56 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Close-up of a student's hands writing notes in a notebook next to a cup of tea and an open book in a quiet study environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmpL-hUxKdUc0DzAkoWk8yNhkx5b_nQlwdCEbND6yTf4o4eghcE39ZOjpNAvIPQrK4PkQG_rDLv72RA5Xtyeh900Wzvw6HtfDxtpGT9rlg6YMVBk3KqCONdc8RZM7c4aF06f3h_JTcusp6Wg3IF2l2ukbNE7A-BC0Tm9GLY-AwDq5_Xp0m9Hc2KF21MjvprXj5LWvSdzgif3Q-sGVV0BuK7LCVlvMUoJ38Ho2P_hNTW__3id_-08U8SrR2KQs_lF9l4xvARmrQ2tw"/>
+</div>
+<div class="p-8">
+<time class="text-secondary font-sans text-xs font-bold tracking-widest uppercase mb-3 block">October 28, 2024</time>
+<h3 class="font-serif text-2xl text-primary mb-4 leading-tight">Winter Semester Enrollment Now Open</h3>
+<p class="text-on-surface-variant text-sm mb-6 leading-relaxed">Applications are being accepted for the Diploma in Islamic Intellectual History and Applied Ethics.</p>
+<a class="text-primary text-sm font-bold flex items-center gap-2 group-hover:text-secondary transition-colors" href="#">
+                            Apply Online <span class="material-symbols-outlined text-lg" data-icon="arrow_right_alt">arrow_right_alt</span>
+</a>
+</div>
+</article>
+<!-- News Card 3 -->
+<article class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm group">
+<div class="h-56 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Panoramic view of a graduation ceremony at a prestigious university with students in academic regalia sitting in an ornate hall" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAY0yN6-SQCiykB5urnZgd-KfFRDGvrGldVZ54RrFaM3q3dXqE4HAQinpJTiJi0P3TSomJxYttrralLvNXg2_lk411Q3ESZFyQhPRRT7sfA59DFmD1CsEQObY2dAoOGufAUTf6DN5jSIAEy0ltx1FVSfx_KxSk_0t82BM6m49mYylxGZdX-I54V4yqb7OAcX46rVyYkV1Vo5eg58E5p1dEOlruTIUcI2OAR68kgB70RUDVNuDGRcLCYWpH5-PRKBbVP2BmC1GNx5jE"/>
+</div>
+<div class="p-8">
+<time class="text-secondary font-sans text-xs font-bold tracking-widest uppercase mb-3 block">November 10, 2024</time>
+<h3 class="font-serif text-2xl text-primary mb-4 leading-tight">2024 Convocation: Celebrating Our Graduates</h3>
+<p class="text-on-surface-variant text-sm mb-6 leading-relaxed">Honoring the dedication of our 50 newest scholars as they embark on serving global communities.</p>
+<a class="text-primary text-sm font-bold flex items-center gap-2 group-hover:text-secondary transition-colors" href="#">
+                            Event Details <span class="material-symbols-outlined text-lg" data-icon="arrow_right_alt">arrow_right_alt</span>
+</a>
+</div>
+</article>
+</div>
+</div>
+</section>
+<!-- Call to Action -->
+<section class="py-24 bg-primary relative overflow-hidden">
+<div class="absolute inset-0 opacity-10 pattern-overlay"></div>
+<div class="container mx-auto px-8 relative z-10 text-center">
+<h2 class="font-serif text-4xl md:text-5xl text-white mb-8">Ready to Begin Your Scholarly Journey?</h2>
+<p class="text-primary-fixed-dim text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
+                Join a legacy of learning that spans centuries. Our admissions counselors are ready to guide you through the process.
+            </p>
+<div class="flex flex-col md:flex-row justify-center gap-6">
+<button class="bg-secondary text-on-secondary px-10 py-4 rounded-xl font-bold hover:bg-on-secondary-container transition-colors shadow-lg">
+                    Inquire for Admission
+                </button>
+<button class="border border-white/30 text-white px-10 py-4 rounded-xl font-bold hover:bg-white/10 transition-colors">
+                    Virtual Campus Tour
+                </button>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="bg-slate-50 border-t border-emerald-100/20">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 py-10 w-full max-w-screen-2xl mx-auto">
+<div class="mb-6 md:mb-0">
+<div class="font-serif italic text-emerald-800 text-xl font-bold mb-2">The Illuminated Scholar</div>
+<div class="font-sans text-xs uppercase tracking-widest text-slate-500">© 2024 The Illuminated Scholar Institute. Preserving Heritage, Inspiring Excellence.</div>
+</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="text-slate-500 hover:text-amber-600 transition-colors font-sans text-xs uppercase tracking-widest" href="#">Privacy Policy</a>
+<a class="text-slate-500 hover:text-amber-600 transition-colors font-sans text-xs uppercase tracking-widest" href="#">Accreditation</a>
+<a class="text-slate-500 hover:text-amber-600 transition-colors font-sans text-xs uppercase tracking-widest" href="#">Contact Us</a>
+<a class="text-slate-500 hover:text-amber-600 transition-colors font-sans text-xs uppercase tracking-widest" href="#">Support Al-Ilm</a>
+</div>
+</div>
+<div class="py-6 border-t border-slate-200/50 flex justify-center space-x-6">
+<a class="text-emerald-900/40 hover:text-emerald-900 transition-all opacity-80 hover:opacity-100" href="#">
+<span class="material-symbols-outlined" data-icon="public">public</span>
+</a>
+<a class="text-emerald-900/40 hover:text-emerald-900 transition-all opacity-80 hover:opacity-100" href="#">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+</a>
+<a class="text-emerald-900/40 hover:text-emerald-900 transition-all opacity-80 hover:opacity-100" href="#">
+<span class="material-symbols-outlined" data-icon="map">map</span>
+</a>
+</div>
+</footer>
+</body></html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Short Courses | HIDAYAT Academy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;600;700;900&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#3A7A4F",
+                        "on-primary": "#ffffff",
+                        "background": "#F2FAED",
+                        "highlight": "#8CB753",
+                        "surface": "#ffffff",
+                        "outline": "#D1E7C4",
+                        "secondary-fixed": "#8CB753",
+                        "on-secondary-fixed": "#ffffff",
+                        "primary-container": "#3A7A4F",
+                        "on-primary-container": "#F2FAED"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit-xl": "48px",
+                        "unit-lg": "24px",
+                        "max-width": "1280px",
+                        "margin": "auto",
+                        "unit-sm": "8px",
+                        "gutter": "24px",
+                        "unit-xs": "4px",
+                        "unit-md": "16px"
+                    },
+                    "fontFamily": {
+                        "serif": ["Noto Serif", "serif"],
+                        "headline-md": ["Noto Serif"],
+                        "label-lg": ["Noto Serif"],
+                        "headline-xl": ["Noto Serif"],
+                        "headline-lg": ["Noto Serif"],
+                        "label-sm": ["Manrope"],
+                        "body-md": ["Manrope"],
+                        "body-lg": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-xl": ["48px", {"lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .pattern-overlay {
+            background-image: radial-gradient(circle at 2px 2px, rgba(58, 122, 79, 0.05) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+    </style>
+</head>
+<body class="bg-background text-slate-800 font-body-md antialiased">
+<!-- TopNavBar (Shared Component {{DATA:COMPONENTS:COMPONENTS_10}}) -->
+<nav class="fixed top-0 w-full z-50 border-b border-[#D1E7C4] dark:border-slate-800 bg-[#F2FAED] dark:bg-slate-950 backdrop-blur-md">
+<div class="flex justify-between items-center w-full px-8 py-4 max-w-7xl mx-auto">
+<div class="text-2xl font-serif font-bold text-[#3A7A4F] dark:text-[#8CB753] cursor-pointer active:opacity-80 transition-all duration-200">
+                HIDAYAT Academy
+            </div>
+<div class="hidden md:flex items-center gap-8">
+<a class="font-['Noto_Serif'] font-medium text-sm text-slate-600 dark:text-slate-400 hover:text-[#3A7A4F] dark:hover:text-[#8CB753] transition-colors" href="#">Home</a>
+<a class="font-['Noto_Serif'] font-medium text-sm text-slate-600 dark:text-slate-400 hover:text-[#3A7A4F] dark:hover:text-[#8CB753] transition-colors" href="#">Darse Nizami</a>
+<a class="font-['Noto_Serif'] font-medium text-sm text-slate-600 dark:text-slate-400 hover:text-[#3A7A4F] dark:hover:text-[#8CB753] transition-colors" href="#">Hifz &amp; Nazrah</a>
+<a class="font-['Noto_Serif'] font-medium text-sm text-[#3A7A4F] dark:text-[#8CB753] border-b-2 border-[#3A7A4F] pb-1 font-bold" href="#">Short Courses</a>
+<a class="font-['Noto_Serif'] font-medium text-sm text-slate-600 dark:text-slate-400 hover:text-[#3A7A4F] dark:hover:text-[#8CB753] transition-colors" href="#">Darul Ifta</a>
+<a class="font-['Noto_Serif'] font-medium text-sm text-slate-600 dark:text-slate-400 hover:text-[#3A7A4F] dark:hover:text-[#8CB753] transition-colors" href="#">Research Center</a>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="pl-10 pr-4 py-2 bg-white border border-[#D1E7C4] rounded-full text-sm focus:ring-2 focus:ring-[#3A7A4F] focus:border-transparent outline-none w-64 transition-all" placeholder="Search courses..." type="text"/>
+</div>
+<button class="bg-[#3A7A4F] text-white px-6 py-2 rounded-full font-['Noto_Serif'] font-medium hover:bg-[#3A7A4F]/90 transition-all active:scale-95">
+                    Enroll Now
+                </button>
+</div>
+</div>
+</nav>
+<main class="pt-24 min-h-screen pattern-overlay">
+<!-- Hero Section -->
+<section class="max-w-7xl mx-auto px-8 py-16">
+<div class="flex flex-col md:flex-row items-center gap-12">
+<div class="flex-1 space-y-6">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-[#8CB753] text-white rounded-full font-label-sm uppercase tracking-widest">
+<span class="material-symbols-outlined text-[16px]" data-weight="fill">school</span>
+                        Specialized Learning
+                    </div>
+<h1 class="font-headline-xl text-[#3A7A4F] leading-tight">Short Courses for the Modern Soul</h1>
+<p class="font-body-lg text-slate-600 max-w-2xl">
+                        Deepen your understanding of Islamic sciences through our curated, short-term modules. Designed for busy professionals and students seeking spiritual growth and intellectual rigor.
+                    </p>
+</div>
+<div class="hidden lg:block w-1/3 aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl relative border-4 border-white">
+<img class="w-full h-full object-cover" data-alt="Close up of an open classic book with elegant Arabic calligraphy on aged paper, warm scholarly ambient lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5V5itpTGp8aS--Fm8jKYFmZYkx_jJi7XqnXnaZbM0pooBKFKHkF1rrSE4kt1wuxlaR9q2cITwW32SdiTMmLDPvhhP0G6FFhAprbbLVf4YGnFaRxTYfrOVOpQy_w4iaa7pg-RHQQapKKqnl2cQ-_ozIIvImR70bm35kzo_aTJbEa_gSWGaBjePwmCq-f_ZYZ_mZJzU1N81P5seClIGVU5yDIRbdSv0pGUDNROqfJKJkU2-hg6Di95AuV30k2AtF7rpTV3QQZu3K1E"/>
+<div class="absolute inset-0 bg-[#3A7A4F]/10 mix-blend-multiply"></div>
+</div>
+</div>
+</section>
+<!-- Filters & Navigation -->
+<section class="sticky top-[73px] z-40 bg-white/90 backdrop-blur-md border-y border-[#D1E7C4]">
+<div class="max-w-7xl mx-auto px-8 py-4 flex flex-wrap items-center justify-between gap-4">
+<div class="flex items-center gap-4 overflow-x-auto pb-2 md:pb-0">
+<button class="px-6 py-2 rounded-full bg-[#3A7A4F] text-white font-serif font-bold whitespace-nowrap">All Courses</button>
+<button class="px-6 py-2 rounded-full bg-white border border-[#D1E7C4] text-slate-600 font-serif font-medium hover:border-[#3A7A4F] hover:text-[#3A7A4F] transition-all whitespace-nowrap">Theology</button>
+<button class="px-6 py-2 rounded-full bg-white border border-[#D1E7C4] text-slate-600 font-serif font-medium hover:border-[#3A7A4F] hover:text-[#3A7A4F] transition-all whitespace-nowrap">Language</button>
+<button class="px-6 py-2 rounded-full bg-white border border-[#D1E7C4] text-slate-600 font-serif font-medium hover:border-[#3A7A4F] hover:text-[#3A7A4F] transition-all whitespace-nowrap">Ethics</button>
+<button class="px-6 py-2 rounded-full bg-white border border-[#D1E7C4] text-slate-600 font-serif font-medium hover:border-[#3A7A4F] hover:text-[#3A7A4F] transition-all whitespace-nowrap">History</button>
+</div>
+<div class="flex items-center gap-3">
+<select class="bg-white border-[#D1E7C4] rounded-lg font-label-sm text-slate-600 focus:ring-[#3A7A4F] focus:border-[#3A7A4F]">
+<option>Duration: All</option>
+<option>4 Weeks</option>
+<option>8 Weeks</option>
+<option>12 Weeks</option>
+</select>
+<select class="bg-white border-[#D1E7C4] rounded-lg font-label-sm text-slate-600 focus:ring-[#3A7A4F] focus:border-[#3A7A4F]">
+<option>Level: All</option>
+<option>Beginner</option>
+<option>Intermediate</option>
+<option>Advanced</option>
+</select>
+</div>
+</div>
+</section>
+<!-- Course Grid -->
+<section class="max-w-7xl mx-auto px-8 py-16">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<!-- Card 1: Arabic Language -->
+<div class="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-[#D1E7C4]">
+<div class="relative h-48 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Handcrafted ink well and reed pen on textured paper with artistic Arabic script, high contrast lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkpOdYN1LsP60sWMsJ6SkWWvkvho8F0R20SjkjkPmERut5RQ4-oUf2R7QlVeZvmHwV1i3ONKEVTEKjIzrCNBD_NQwQFzQpO1z8WWMLz7sADQzhBdQcpQxdp-8c0LNcCTJPuWYr8jg5dZIH7wiwEX7v8Q1AyrCj9venf87t8HF7jMcb6KvcSI0vcinXeZ7yWcRrfVFzES3051GiWqVmvV039LnoHKW2luK0aOvkUFz970MylRahFeDITGBqljkbwYnrpTmElfYfjDI"/>
+<div class="absolute top-4 left-4 bg-[#8CB753] text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">Language</div>
+</div>
+<div class="p-8 space-y-4">
+<h3 class="font-headline-md text-[#3A7A4F] group-hover:text-[#8CB753] transition-colors">Arabic Language: Foundations</h3>
+<p class="font-body-md text-slate-500 line-clamp-2">Master the fundamentals of Classical Arabic grammar and vocabulary to access original texts.</p>
+<div class="flex items-center justify-between pt-4 border-t border-[#F2FAED]">
+<div class="flex items-center gap-2 text-slate-400 text-sm">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+                                12 Weeks
+                            </div>
+<div class="flex items-center gap-2 text-slate-400 text-sm">
+<span class="material-symbols-outlined text-[18px]">signal_cellular_alt</span>
+                                Beginner
+                            </div>
+</div>
+</div>
+</div>
+<!-- Card 2: Fiqh for Daily Life -->
+<div class="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-[#D1E7C4]">
+<div class="relative h-48 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A serene modern workspace with prayer beads and a neat stack of journals, morning light through a window" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwKRUSNGtFfPWA0JJyQ9_I0QRgB0wiMeUDbHmjoZfMPJpF82V6VpbI1xY9iSKrGqgDg7I9czeUz0U7QfRThMaMWz7X3IfrF7mht7AuhO03dlQoBORkwK9HUkkvcrG0mQ-1t7ECeTZpWGatmHUdcQysHG8QtbQSKObc_7P6nunQKYYn88YQkApt7nZSBgAFdV2g8QDim0dA9anibWjB_LZUg1_kG2BzS3knpmtoszdBhZfxARl-L1fX0uWfs_WukaFubGEuzzrIqhA"/>
+<div class="absolute top-4 left-4 bg-[#3A7A4F] text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">Theology</div>
+</div>
+<div class="p-8 space-y-4">
+<h3 class="font-headline-md text-[#3A7A4F] group-hover:text-[#8CB753] transition-colors">Fiqh for Daily Life</h3>
+<p class="font-body-md text-slate-500 line-clamp-2">A practical guide to essential Islamic jurisprudence for contemporary living and worship.</p>
+<div class="flex items-center justify-between pt-4 border-t border-[#F2FAED]">
+<div class="flex items-center gap-2 text-slate-400 text-sm">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+                                8 Weeks
+                            </div>
+<div class="flex items-center gap-2 text-slate-400 text-sm">
+<span class="material-symbols-outlined text-[18px]">signal_cellular_alt</span>
+                                Intermediate
+                            </div>
+</div>
+</div>
+</div>
+<!-- Card 3: Prophetic Seerah -->
+<div class="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-[#D1E7C4]">
+<div class="relative h-48 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Golden sunrise over a vast desert horizon with subtle sand ripples and soft shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA262UiY1zUPX0ddBAAK_AZx8L1zzoSDWv1OLZEK6gO_CMW-vmY6f6AF9gxhmCF8_mzx22A5an-JJL2936ZeneRz7S0smA3ZfN2gXM5XSEUjVJhPgoWBUoYfUjVUllVNJYVy1G2aL8KshlxO-0iAzOjANJMiK7H9sMqDooliM-ZcGxMBsBIthU8bblTWYzvp1AAz378uZlPcg_cOK8kjOQOCBckl4MOmAadEyjbuB5FMcp0cbdw0boQVteBirpKFdKH3BgZOfHp-70"/>
+<div class="absolute top-4 left-4 bg-slate-800 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">History</div>
+</div>
+<div class="p-8 space-y-4">
+<h3 class="font-headline-md text-[#3A7A4F] group-hover:text-[#8CB753] transition-colors">Prophetic Seerah</h3>
+<p class="font-body-md text-slate-500 line-clamp-2">Exploring the life and character of the Prophet (PBUH) as a model for universal leadership.</p>
+<div class="flex items-center justify-between pt-4 border-t border-[#F2FAED]">
+<div class="flex items-center gap-2 text-slate-400 text-sm">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+                                10 Weeks
+                            </div>
+<div class="flex items-center gap-2 text-slate-400 text-sm">
+<span class="material-symbols-outlined text-[18px]">signal_cellular_alt</span>
+                                All Levels
+                            </div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Newsletter / CTA -->
+<section class="max-w-7xl mx-auto px-8 mb-24">
+<div class="bg-[#3A7A4F] text-white rounded-[40px] p-12 md:p-20 relative overflow-hidden">
+<div class="relative z-10 max-w-2xl space-y-8">
+<h2 class="font-headline-lg">Stay Informed</h2>
+<p class="font-body-lg text-[#D1E7C4]">Get notified when we launch new specialized courses and academic seminars.</p>
+<div class="flex flex-col sm:flex-row gap-4">
+<input class="flex-1 bg-white/10 border border-white/20 rounded-xl px-6 py-4 focus:ring-2 focus:ring-[#8CB753] focus:border-transparent outline-none placeholder:text-white/40" placeholder="Your email address" type="email"/>
+<button class="bg-[#8CB753] text-white px-10 py-4 rounded-xl font-serif font-bold hover:bg-[#8CB753]/90 transition-all">Subscribe Now</button>
+</div>
+</div>
+<div class="absolute right-0 bottom-0 opacity-10 pointer-events-none transform translate-x-1/4 translate-y-1/4 scale-150">
+<span class="material-symbols-outlined text-[300px]" data-weight="fill">mosque</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer (Shared Component {{DATA:COMPONENTS:COMPONENTS_10}}) -->
+<footer class="bg-[#F2FAED] dark:bg-slate-950 w-full border-t border-[#D1E7C4] dark:border-slate-800">
+<div class="w-full py-12 px-8 flex flex-col md:flex-row justify-between items-start max-w-7xl mx-auto gap-12">
+<div class="flex flex-col gap-4">
+<span class="font-serif text-2xl font-bold text-[#3A7A4F]">HIDAYAT Academy</span>
+<p class="text-slate-500 max-w-xs font-sans text-sm">Nurturing the next generation of scholars through traditional wisdom and contemporary pedagogy.</p>
+</div>
+<div class="flex flex-wrap gap-16">
+<div>
+<h4 class="text-[#3A7A4F] font-serif font-bold mb-4">Quick Links</h4>
+<ul class="space-y-2 font-sans text-sm">
+<li><a class="text-slate-500 hover:text-[#3A7A4F] transition-colors" href="#">About Us</a></li>
+<li><a class="text-slate-500 hover:text-[#3A7A4F] transition-colors" href="#">Contact Us</a></li>
+<li><a class="text-slate-500 hover:text-[#3A7A4F] transition-colors" href="#">Privacy Policy</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-[#3A7A4F] font-serif font-bold mb-4">Student Access</h4>
+<ul class="space-y-2 font-sans text-sm">
+<li><a class="text-slate-500 hover:text-[#3A7A4F] transition-colors" href="#">Student Portal</a></li>
+<li><a class="text-slate-500 hover:text-[#3A7A4F] transition-colors" href="#">Digital Library</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-[#3A7A4F] font-serif font-bold mb-4">Connect</h4>
+<div class="flex gap-4">
+<a class="w-10 h-10 rounded-full bg-[#3A7A4F] flex items-center justify-center text-white hover:bg-[#8CB753] transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">share</span>
+</a>
+<a class="w-10 h-10 rounded-full bg-[#3A7A4F] flex items-center justify-center text-white hover:bg-[#8CB753] transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">alternate_email</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="w-full py-8 px-8 flex flex-col md:flex-row justify-between items-center max-w-7xl mx-auto border-t border-[#D1E7C4]/50">
+<p class="font-sans text-sm text-slate-500">© 2024 HIDAYAT Academy. Preserving Sacred Tradition.</p>
+<div class="flex gap-6 mt-4 md:mt-0 font-sans text-sm">
+<a class="text-slate-500 hover:text-[#3A7A4F]" href="#">Privacy Policy</a>
+<a class="text-slate-500 hover:text-[#3A7A4F]" href="#">Terms of Service</a>
+<a class="text-slate-500 hover:text-[#3A7A4F]" href="#">Contact Us</a>
+</div>
+</div>
+</footer>
+</body></html>
