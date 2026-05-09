@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Supabase (migrations are tracked separately if needed)
+supabase/
+.supabase/
+
+# Design files
+design/
+hidayat design/
+
+# Kiro / specs
+.kiro/
+
+# Documentation & notes
+*.md
+*.txt
+TASK_*.md
+
+# Editor
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Lock file (optional — remove this line if you want to track it)
+package-lock.json
