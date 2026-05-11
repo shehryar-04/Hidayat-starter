@@ -310,10 +310,6 @@ function UpcomingCourseVideo() {
                 <span className="text-sm sm:text-body-md text-slate-600">Certificate upon completion</span>
               </li>
             </ul>
-            <button className="bg-primary text-white px-8 py-3 rounded-xl font-label-lg flex items-center gap-2 mx-auto lg:mx-0 hover:-translate-y-0.5 transition-all shadow-lg shadow-primary/20">
-              <Icon name="notifications" className="text-lg" />
-              <span>Notify Me</span>
-            </button>
           </div>
         </div>
       </div>
