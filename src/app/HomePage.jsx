@@ -130,6 +130,11 @@ function Hero() {
   return (
     <section className="relative min-h-[50vh] lg:min-h-[600px] flex items-center overflow-hidden bg-white pt-2 sm:pt-4">
 
+  {/* Mobile background — matches the PC door theme */}
+  <div className="absolute inset-0 lg:hidden pointer-events-none z-0">
+    <img src="/assets/open.webp" alt="" className="absolute inset-0 w-full h-full object-cover opacity-10" />
+  </div>
+
   {/* LEFT HALF LOGO WATERMARK */}
   <div className="absolute top-[15%] left-0 h-[80%] w-[45%] overflow-hidden pointer-events-none z-0">
     <img
@@ -199,7 +204,7 @@ function Hero() {
         <div className="absolute bottom-8 left-8 right-8 p-6 bg-white/10 backdrop-blur-md rounded-xl border border-white/20">
           <div className="flex items-center space-x-4">
             <div className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center">
-              <Icon name="history_edu" className="text-white" />
+              <Icon name="menu_book" className="text-white" />
             </div>
             <div>
               <p className="font-serif text-white text-lg font-semibold">
@@ -255,6 +260,61 @@ function Vision() {
               <p className="text-sm sm:text-body-md text-slate-500 leading-relaxed">{desc}</p>
             </div>
           ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ─── Upcoming Course Video Section ───────────────────────────
+function UpcomingCourseVideo() {
+  return (
+    <section className="py-16 sm:py-24 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+          {/* Left — Video */}
+          <div className="rounded-2xl overflow-hidden shadow-xl border border-outline aspect-video">
+            <iframe
+              src="https://www.youtube.com/embed/7isIOkZx36E"
+              title="Upcoming Course — Hidayat"
+              className="w-full h-full"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+
+          {/* Right — Text */}
+          <div className="space-y-5 sm:space-y-6 text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 px-4 py-1 bg-secondary/10 text-secondary rounded-full border border-secondary/20">
+              <Icon name="play_circle" className="text-[18px]" />
+              <span className="text-[10px] sm:text-label-sm font-bold tracking-wider uppercase">Coming Soon</span>
+            </div>
+            <h2 className="font-serif text-2xl sm:text-3xl lg:text-headline-lg text-primary leading-tight">
+              Our Upcoming Course
+            </h2>
+            <p className="text-sm sm:text-body-lg text-slate-500 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+              A new journey into the depths of Islamic knowledge. Stay tuned for our latest course designed to nurture both the mind and the soul with authentic scholarship.
+            </p>
+            <ul className="space-y-3 text-left max-w-md mx-auto lg:mx-0">
+              <li className="flex items-start gap-3">
+                <Icon name="check_circle" className="text-secondary text-xl mt-0.5" />
+                <span className="text-sm sm:text-body-md text-slate-600">Expert scholars with decades of teaching experience</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Icon name="check_circle" className="text-secondary text-xl mt-0.5" />
+                <span className="text-sm sm:text-body-md text-slate-600">Structured curriculum rooted in classical texts</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Icon name="check_circle" className="text-secondary text-xl mt-0.5" />
+                <span className="text-sm sm:text-body-md text-slate-600">Certificate upon completion</span>
+              </li>
+            </ul>
+            <button className="bg-primary text-white px-8 py-3 rounded-xl font-label-lg flex items-center gap-2 mx-auto lg:mx-0 hover:-translate-y-0.5 transition-all shadow-lg shadow-primary/20">
+              <Icon name="notifications" className="text-lg" />
+              <span>Notify Me</span>
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -532,6 +592,7 @@ export default function HomePage() {
       )}
 
       <Vision />
+      <UpcomingCourseVideo />
       <Courses />
       <FatwaSection />
       <Newsletter />

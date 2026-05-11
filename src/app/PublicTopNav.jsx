@@ -63,6 +63,7 @@ export default function PublicTopNav() {
     { label: 'Darul Ifta',     href: '/darul-ifta',      protected: false },
     { label: 'Research Center', href: '/research-center', protected: false },
     { label: 'Articles',       href: '/articles',        protected: false },
+    { label: 'Downloads',      href: '/articles',        protected: false },
   ]
 
   const handleLinkClick = (e, link) => {

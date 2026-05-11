@@ -1,6 +1,8 @@
+import { WhatsAppButton } from '../../shared/WhatsAppButton'
+
 export default function NazraModule() {
   return (
-    <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 text-center">
+    <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 text-center relative">
       <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6">
         <span className="material-symbols-outlined text-4xl text-primary">record_voice_over</span>
       </div>
@@ -13,6 +15,14 @@ export default function NazraModule() {
         <span className="font-label-lg text-sm">Under Construction</span>
       </div>
       <p className="text-sm text-slate-400 mt-4">This module is being developed. Check back soon.</p>
+
+      {/* WhatsApp CTA */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <WhatsAppButton
+          message="Assalamu Alaikum, I would like to inquire about the Nazra Program."
+          label="Inquire on WhatsApp"
+        />
+      </div>
     </div>
   )
 }

@@ -5,6 +5,7 @@ import { FatwaList } from './FatwaList'
 import { FatwaEditor } from './FatwaEditor'
 import { PublicFatwaList } from './PublicFatwaList'
 import { QuestionSubmitForm } from './QuestionSubmitForm'
+import { WhatsAppButton } from '../../shared/WhatsAppButton'
 
 function Icon({ name, className = '' }) {
   return <span className={`material-symbols-outlined ${className}`}>{name}</span>
@@ -128,6 +129,13 @@ function ScholarStudentView() {
         </div>
         <PublicFatwaList hideHeader />
       </div>
+      {/* WhatsApp CTA */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <WhatsAppButton
+          message="Assalamu Alaikum, I have a question for Darul Ifta."
+          label="Ask on WhatsApp"
+        />
+      </div>
     </div>
   )
 }
@@ -147,6 +155,13 @@ function GuestView() {
           </p>
         </div>
         <PublicFatwaList hideHeader />
+      </div>
+      {/* WhatsApp CTA */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <WhatsAppButton
+          message="Assalamu Alaikum, I have a question for Darul Ifta."
+          label="Ask on WhatsApp"
+        />
       </div>
     </div>
   )
