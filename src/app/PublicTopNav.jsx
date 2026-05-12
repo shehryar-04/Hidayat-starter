@@ -34,13 +34,16 @@ export default function PublicTopNav() {
 
   const [mobileOpen, setMobileOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
 
   const userMenuRef = useRef()
+  const moreMenuRef = useRef()
 
   useEffect(() => {
     const handler = (e) => {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setUserMenuOpen(false)
+      if (moreMenuRef.current && !moreMenuRef.current.contains(e.target)) setMoreMenuOpen(false)
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
@@ -54,17 +57,24 @@ export default function PublicTopNav() {
     navigate('/')
   }
 
-  // Same links for everyone — protected ones redirect guests to /login
-  const navLinks = [
+  // Primary links shown directly in navbar
+  const primaryLinks = [
     { label: 'Home',           href: '/',                protected: false },
     { label: 'Darse Nizami',   href: '/dars-e-nizami',   protected: false },
     { label: 'Hifz & Nazrah',  href: '/hifz',            protected: false },
     { label: 'Short Courses',  href: '/short-courses',   protected: true },
     { label: 'Darul Ifta',     href: '/darul-ifta',      protected: false },
+  ]
+
+  // Secondary links grouped under "More" dropdown
+  const moreLinks = [
     { label: 'Research Center', href: '/research-center', protected: false },
     { label: 'Articles',       href: '/articles',        protected: false },
-    { label: 'Downloads',      href: '/articles',        protected: false },
+    { label: 'Downloads',      href: '/downloads',       protected: false },
   ]
+
+  // All links combined (for mobile drawer)
+  const navLinks = [...primaryLinks, ...moreLinks]
 
   const handleLinkClick = (e, link) => {
     e.preventDefault()
@@ -95,8 +105,8 @@ export default function PublicTopNav() {
           </a>
 
           {/* Desktop nav */}
-          <div className="hidden lg:flex items-center space-x-5 xl:space-x-7 flex-1 justify-center">
-            {navLinks.map((link) => (
+          <div className="hidden lg:flex items-center space-x-4 xl:space-x-6 flex-1 justify-center">
+            {primaryLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
@@ -108,6 +118,36 @@ export default function PublicTopNav() {
                 {link.label}
               </a>
             ))}
+            {/* More dropdown */}
+            <div className="relative" ref={moreMenuRef}>
+              <button
+                onClick={() => setMoreMenuOpen(o => !o)}
+                className={`font-serif font-medium text-sm cursor-pointer transition-colors whitespace-nowrap flex items-center gap-1 ${
+                  moreLinks.some(l => isActive(l.href)) ? 'text-primary font-bold' : 'text-slate-600 hover:text-primary'
+                }`}
+              >
+                More
+                <svg className={`w-3.5 h-3.5 transition-transform ${moreMenuOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {moreMenuOpen && (
+                <div className="absolute left-1/2 -translate-x-1/2 top-full mt-3 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+                  {moreLinks.map((link) => (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      onClick={(e) => { handleLinkClick(e, link); setMoreMenuOpen(false) }}
+                      className={`block px-4 py-2.5 text-sm font-serif font-medium transition-colors ${
+                        isActive(link.href) ? 'text-primary bg-primary/5' : 'text-slate-600 hover:text-primary hover:bg-neutral-50'
+                      }`}
+                    >
+                      {link.label}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center gap-3">

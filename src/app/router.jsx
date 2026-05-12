@@ -17,6 +17,7 @@ import StudentReportsModule from '../modules/reports'
 import StudentAdminModule from '../modules/student-admin'
 import ScholarAdminModule from '../modules/scholar-admin'
 import ArticlesPage from '../modules/articles'
+import DownloadsPage from '../modules/downloads'
 
 /**
  * Shell wrapper — single navbar for all pages (guest + authenticated).
@@ -56,6 +57,7 @@ export default function AppRouter() {
       <Route path="/darul-ifta/*" element={<AppShell><DarulIftaModule /></AppShell>} />
       <Route path="/research-center/*" element={<AppShell><ResearchCenterModule /></AppShell>} />
       <Route path="/articles/*" element={<AppShell><ArticlesPage /></AppShell>} />
+      <Route path="/downloads/*" element={<AppShell><DownloadsPage /></AppShell>} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
