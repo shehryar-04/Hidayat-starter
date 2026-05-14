@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useRole } from './RoleProvider'
 import PublicTopNav from './PublicTopNav'
 import Logo from './Logo'
+import FlashcardSlider from './FlashcardSlider'
 
 function Icon({ name, className = '' }) {
   return <span className={`material-symbols-outlined ${className}`}>{name}</span>
@@ -588,6 +589,7 @@ export default function HomePage() {
       )}
 
       <Vision />
+      <FlashcardSlider />
       <UpcomingCourseVideo />
       <Courses />
       <FatwaSection />
