@@ -131,7 +131,7 @@ export default function FlashcardSlider() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 sm:mb-12 gap-4">
           <div>
             <span className="text-[10px] sm:text-xs text-primary-500 tracking-[0.3em] uppercase font-bold">Test Your Knowledge</span>
-            <h2 className="font-display font-bold text-2xl sm:text-3xl text-neutral-900 mt-2">Islamic Knowledge Flashcards</h2>
+            <h2 className="font-display font-bold text-2xl sm:text-3xl text-neutral-900 mt-2">Do you know answer to these questions?</h2>
             <p className="text-sm text-neutral-500 mt-2">Click any card to reveal the answer. Swipe or use arrows to browse all 40 cards.</p>
           </div>
           <div className="flex items-center gap-2">
