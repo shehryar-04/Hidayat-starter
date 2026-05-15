@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
+import { Button, Textarea, Label } from '../../shared/ui'
 
 /**
  * Question Submission Form Component
@@ -69,50 +70,50 @@ export function QuestionSubmissionForm({ onComplete }) {
   }
 
   return (
-    <div className="question-submission-form">
-      <h2>Submit a Religious Question</h2>
+    <div className="max-w-xl mx-auto px-4 py-6 md:px-6 md:py-8">
+      <h2 className="text-xl font-bold text-neutral-800 mb-4">Submit a Religious Question</h2>
 
-      {error && <div className="error-message">{error}</div>}
+      {error && <div className="bg-red-50 text-red-700 rounded-lg p-4 text-sm mb-4">{error}</div>}
 
       {success && (
-        <div className="success-message">
+        <div className="bg-green-50 text-green-700 rounded-lg p-4 text-sm mb-4">
           <strong>Question submitted successfully!</strong>
-          <p>Reference Number: {referenceNumber}</p>
-          <p>Your question has been assigned a reference number for tracking.</p>
+          <p className="mt-1">Reference Number: {referenceNumber}</p>
+          <p className="mt-1">Your question has been assigned a reference number for tracking.</p>
         </div>
       )}
 
       {!success && (
-        <form onSubmit={handleSubmit} className="form">
-          <div className="form-group">
-            <label htmlFor="question_text">Your Question *</label>
-            <textarea
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="question_text">Your Question <span className="text-red-500">*</span></Label>
+            <Textarea
               id="question_text"
               name="question_text"
               value={formData.question_text}
               onChange={handleInputChange}
               required
               placeholder="Please enter your religious question..."
-              rows="6"
+              rows={6}
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="context">Additional Context (Optional)</label>
-            <textarea
+          <div className="space-y-2">
+            <Label htmlFor="context">Additional Context <span className="text-gray-400 font-normal">(Optional)</span></Label>
+            <Textarea
               id="context"
               name="context"
               value={formData.context}
               onChange={handleInputChange}
               placeholder="Provide any additional context or background information..."
-              rows="4"
+              rows={4}
             />
           </div>
 
-          <div className="form-actions">
-            <button type="submit" disabled={loading || !formData.question_text.trim()}>
-              {loading ? 'Submitting...' : 'Submit Question'}
-            </button>
+          <div className="pt-4">
+            <Button type="submit" variant="primary" disabled={loading || !formData.question_text.trim()} loading={loading}>
+              Submit Question
+            </Button>
           </div>
         </form>
       )}

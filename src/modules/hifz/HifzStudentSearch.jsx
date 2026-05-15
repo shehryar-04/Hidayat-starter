@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
+import { Button, Input, Card, CardContent, EmptyState } from '../../shared/ui'
+import { Search, Users } from 'lucide-react'
 
 /**
  * Hifz Student Search Component
@@ -56,54 +58,67 @@ export function HifzStudentSearch({ onSelectStudent }) {
   }
 
   return (
-    <div className="hifz-student-search">
-      <form onSubmit={handleSearch} className="search-form">
-        <div className="form-group">
-          <label htmlFor="search-name">Student Name</label>
-          <input
-            id="search-name"
-            type="text"
-            placeholder="Search by name..."
-            value={searchName}
-            onChange={(e) => setSearchName(e.target.value)}
-          />
+    <div className="space-y-6">
+      <form onSubmit={handleSearch} className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <label htmlFor="search-name" className="text-sm font-medium text-neutral-700">Student Name</label>
+            <Input
+              id="search-name"
+              type="text"
+              placeholder="Search by name..."
+              value={searchName}
+              onChange={(e) => setSearchName(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="search-enrollment" className="text-sm font-medium text-neutral-700">Enrollment Number</label>
+            <Input
+              id="search-enrollment"
+              type="text"
+              placeholder="Search by enrollment number..."
+              value={searchEnrollment}
+              onChange={(e) => setSearchEnrollment(e.target.value)}
+            />
+          </div>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="search-enrollment">Enrollment Number</label>
-          <input
-            id="search-enrollment"
-            type="text"
-            placeholder="Search by enrollment number..."
-            value={searchEnrollment}
-            onChange={(e) => setSearchEnrollment(e.target.value)}
-          />
-        </div>
-
-        <button type="submit" disabled={loading}>
-          {loading ? 'Searching...' : 'Search'}
-        </button>
+        <Button type="submit" loading={loading}>
+          <Search className="w-4 h-4 mr-2" />
+          Search
+        </Button>
       </form>
 
-      {error && <div className="error-message">{error}</div>}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg p-3" role="alert">
+          {error}
+        </div>
+      )}
 
-      <div className="search-results">
+      <div className="space-y-3">
         {results.length === 0 && !loading && (
-          <p className="no-results">No students found</p>
+          <EmptyState
+            icon={Users}
+            title="No students found"
+            description="Try adjusting your search criteria."
+          />
         )}
 
         {results.map((student) => (
-          <div
+          <Card
             key={student.id}
-            className="student-card"
+            interactive
             onClick={() => onSelectStudent(student)}
           >
-            <div className="student-info">
-              <h3>{student.profiles?.full_name}</h3>
-              <p>Enrollment: {student.enrollment_number}</p>
-            </div>
-            <button className="select-button">Track Progress</button>
-          </div>
+            <CardContent className="flex items-center justify-between py-3">
+              <div>
+                <h3 className="font-medium text-neutral-800">{student.profiles?.full_name}</h3>
+                <p className="text-sm text-neutral-500">Enrollment: {student.enrollment_number}</p>
+              </div>
+              <Button variant="outline" size="sm">Track Progress</Button>
+            </CardContent>
+          </Card>
         ))}
       </div>
     </div>

@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
+import { Library, Download, FileText, BookOpen, GraduationCap } from 'lucide-react'
+import { Button, Input, Label } from '../../shared/ui'
 
 /**
  * Publication Repository — public-facing list of published research.
@@ -39,7 +41,6 @@ export function PublicationRepository() {
 
   const handleSearch = (e) => {
     e.preventDefault()
-    // Client-side filter from already-loaded data
     loadFilteredPublications()
   }
 
@@ -77,14 +78,12 @@ export function PublicationRepository() {
 
   const handleDownload = async (publication) => {
     try {
-      // Increment download count (will fail silently for anon — that's fine)
       await supabase
         .from('publications')
         .update({ download_count: (publication.download_count || 0) + 1 })
         .eq('id', publication.id)
 
       if (publication.file_path) {
-        // Get public URL from the research-publications bucket
         const { data } = supabase.storage
           .from('research-publications')
           .getPublicUrl(publication.file_path)
@@ -103,42 +102,46 @@ export function PublicationRepository() {
     return map[t] || t
   }
 
-  const typeIcon = (t) => {
-    const map = { paper: 'description', book: 'menu_book', article: 'article', thesis: 'school' }
-    return map[t] || 'description'
+  const TypeIcon = ({ type }) => {
+    const iconMap = {
+      paper: FileText,
+      book: BookOpen,
+      article: FileText,
+      thesis: GraduationCap,
+    }
+    const Icon = iconMap[type] || FileText
+    return <Icon className="w-12 h-12 text-primary opacity-30" />
   }
 
   return (
-    <div>
-      {error && <div className="alert-error mb-4">{error}</div>}
+    <div className="max-w-[1280px] mx-auto px-4 py-6 md:px-6 md:py-8">
+      {error && <div className="bg-red-50 text-red-700 rounded-lg p-4 text-sm mb-4">{error}</div>}
 
       {/* Search / Filter bar */}
-      <form onSubmit={handleSearch} className="card mb-6">
+      <form onSubmit={handleSearch} className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6 mb-6">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div>
-            <label className="form-label">Title</label>
-            <input
+          <div className="space-y-2">
+            <Label>Title</Label>
+            <Input
               type="text"
-              className="form-input"
               placeholder="Search by title…"
               value={searchTitle}
               onChange={e => setSearchTitle(e.target.value)}
             />
           </div>
-          <div>
-            <label className="form-label">Author</label>
-            <input
+          <div className="space-y-2">
+            <Label>Author</Label>
+            <Input
               type="text"
-              className="form-input"
               placeholder="Search by author…"
               value={searchAuthor}
               onChange={e => setSearchAuthor(e.target.value)}
             />
           </div>
-          <div>
-            <label className="form-label">Type</label>
+          <div className="space-y-2">
+            <Label>Type</Label>
             <select
-              className="form-input"
+              className="flex h-10 w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               value={publicationType}
               onChange={e => setPublicationType(e.target.value)}
             >
@@ -151,44 +154,42 @@ export function PublicationRepository() {
           </div>
         </div>
         <div className="mt-4 flex gap-3">
-          <button type="submit" className="btn-primary" disabled={loading}>
+          <Button variant="primary" type="submit" disabled={loading}>
             {loading ? 'Searching…' : 'Search'}
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
             type="button"
-            className="btn-ghost"
             onClick={() => { setSearchTitle(''); setSearchAuthor(''); setPublicationType(''); loadPublications() }}
           >
             Clear
-          </button>
+          </Button>
         </div>
       </form>
 
       {/* Publications grid */}
       {loading ? (
-        <div className="loading">Loading publications…</div>
+        <div className="text-center py-12 text-gray-500">Loading publications…</div>
       ) : publications.length === 0 ? (
         <div className="text-center py-16">
-          <span className="material-symbols-outlined text-5xl text-gray-300 mb-4 block">library_books</span>
+          <Library className="w-12 h-12 text-gray-300 mb-4 mx-auto" />
           <p className="text-gray-500">No publications found</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {publications.map(pub => (
-            <div key={pub.id} className="bg-white rounded-xl border border-outline shadow-sm hover:shadow-md transition-shadow flex flex-col overflow-hidden">
+            <div key={pub.id} className="bg-white rounded-xl border border-neutral-200 shadow-sm hover:shadow-md transition-shadow flex flex-col overflow-hidden">
               {/* Top accent bar */}
               <div className="h-1 bg-secondary" />
 
               {/* Icon header */}
-              <div className="h-32 bg-surface-container flex items-center justify-center">
-                <span className="material-symbols-outlined text-5xl text-primary opacity-30">
-                  {typeIcon(pub.publication_type)}
-                </span>
+              <div className="h-32 bg-neutral-50 flex items-center justify-center">
+                <TypeIcon type={pub.publication_type} />
               </div>
 
               {/* Content */}
               <div className="p-5 flex-1 flex flex-col">
-                <span className="badge-green text-xs mb-2 self-start">{typeLabel(pub.publication_type)}</span>
+                <span className="inline-block bg-green-50 text-green-700 text-xs font-medium px-2 py-0.5 rounded-full mb-2 self-start">{typeLabel(pub.publication_type)}</span>
                 <h3 className="font-serif font-semibold text-primary text-lg mb-2 line-clamp-2">{pub.title}</h3>
                 {pub.abstract && (
                   <p className="text-sm text-gray-500 mb-3 line-clamp-3">{pub.abstract}</p>
@@ -201,19 +202,21 @@ export function PublicationRepository() {
               </div>
 
               {/* Footer */}
-              <div className="px-5 py-3 border-t border-outline flex items-center justify-between">
+              <div className="px-5 py-3 border-t border-neutral-200 flex items-center justify-between">
                 <span className="text-xs text-gray-400 flex items-center gap-1">
-                  <span className="material-symbols-outlined text-sm">download</span>
+                  <Download className="w-3.5 h-3.5" />
                   {pub.download_count || 0} downloads
                 </span>
                 {pub.file_path && (
-                  <button
+                  <Button
+                    variant="primary"
+                    size="sm"
                     onClick={() => handleDownload(pub)}
-                    className="btn-primary text-xs px-3 py-1.5 flex items-center gap-1"
+                    className="text-xs flex items-center gap-1"
                   >
-                    <span className="material-symbols-outlined text-sm">picture_as_pdf</span>
+                    <FileText className="w-3.5 h-3.5" />
                     Download PDF
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>

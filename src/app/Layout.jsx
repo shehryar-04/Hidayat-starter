@@ -1,10 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { NavLink, useNavigate, useLocation } from 'react-router-dom'
+import { ChevronDown, Menu, X, User, LogOut } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useRole } from './RoleProvider'
 import { useFeatureFlags } from './FeatureFlagProvider'
 import { useProfile } from './useProfile'
 import Logo from './Logo'
 import ProfileModal from './ProfileModal'
+import { cn } from '../shared/ui'
 
 const allNavItems = [
   { to: '/',                label: 'Home',            exact: true,  roles: ['admin','scholar','mufti','student'] },
@@ -33,7 +36,7 @@ function AvatarCircle({ avatarUrl, initials }) {
     )
   }
   return (
-    <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-white text-xs font-bold ring-2 ring-white/30">
+    <div className="w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center text-white text-xs font-bold ring-2 ring-white/30">
       {initials}
     </div>
   )
@@ -68,6 +71,7 @@ export default function Layout({ children }) {
   useEffect(() => { setMobileMenuOpen(false) }, [location.pathname])
 
   const handleSignOut = async () => {
+    setUserMenuOpen(false)
     await signOut()
     navigate('/')
   }
@@ -88,18 +92,19 @@ export default function Layout({ children }) {
     : '?'
 
   const linkClass = ({ isActive }) =>
-    `text-sm font-medium transition-colors px-1 py-0.5 border-b-2 ${
+    cn(
+      'relative text-sm font-medium transition-colors duration-normal px-1 py-1 whitespace-nowrap group',
       isActive
-        ? 'text-primary border-secondary'
-        : 'text-gray-600 border-transparent hover:text-primary hover:border-primary-300'
-    }`
+        ? 'text-primary-500 font-semibold'
+        : 'text-neutral-600 hover:text-neutral-800'
+    )
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
 
-      {/* ── Top navbar ── */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm">
-        <div className="max-w-screen-xl mx-auto px-6 h-16 flex items-center gap-6">
+      {/* ── Top navbar: frosted-glass, sticky, h-16, z-50 ── */}
+      <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/80 backdrop-blur-xl">
+        <div className="max-w-[1280px] mx-auto px-6 h-16 flex items-center gap-6">
 
           {/* Brand */}
           <NavLink to="/" className="flex items-center gap-2 flex-shrink-0 mr-2">
@@ -110,7 +115,19 @@ export default function Layout({ children }) {
           <nav className="hidden md:flex items-center gap-5 flex-1">
             {inlineItems.map(item => (
               <NavLink key={item.to} to={item.to} end={item.exact} className={linkClass}>
-                {item.label}
+                {({ isActive }) => (
+                  <>
+                    {item.label}
+                    {/* Active indicator: 2px bottom border in primary */}
+                    {isActive && (
+                      <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500 rounded-full" />
+                    )}
+                    {/* Hover underline animation: slides from left 0→100% */}
+                    {!isActive && (
+                      <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-primary-500 rounded-full transition-all duration-[250ms] ease-out group-hover:w-full" />
+                    )}
+                  </>
+                )}
               </NavLink>
             ))}
 
@@ -119,15 +136,25 @@ export default function Layout({ children }) {
               <div className="relative" ref={moreMenuRef}>
                 <button
                   onClick={() => setMoreMenuOpen(o => !o)}
-                  className="text-sm font-medium text-gray-600 hover:text-primary flex items-center gap-1 transition-colors"
+                  className={cn(
+                    'relative text-sm font-medium flex items-center gap-1 transition-colors duration-normal whitespace-nowrap py-1 group',
+                    overflowItems.some(item => location.pathname.startsWith(item.to))
+                      ? 'text-primary-500 font-semibold'
+                      : 'text-neutral-600 hover:text-neutral-800'
+                  )}
                 >
                   More
-                  <svg className={`w-3.5 h-3.5 transition-transform ${moreMenuOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  <ChevronDown className={cn('w-3.5 h-3.5 transition-transform duration-fast', moreMenuOpen && 'rotate-180')} />
+                  {/* Hover underline for More button */}
+                  {!overflowItems.some(item => location.pathname.startsWith(item.to)) && (
+                    <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-primary-500 rounded-full transition-all duration-[250ms] ease-out group-hover:w-full" />
+                  )}
+                  {overflowItems.some(item => location.pathname.startsWith(item.to)) && (
+                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500 rounded-full" />
+                  )}
                 </button>
                 {moreMenuOpen && (
-                  <div className="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
+                  <div className="absolute left-0 top-full mt-2 w-48 bg-white/90 backdrop-blur-xl rounded-xl shadow-lg border border-neutral-200 py-1.5 z-50">
                     {overflowItems.map(item => (
                       <NavLink
                         key={item.to}
@@ -135,7 +162,12 @@ export default function Layout({ children }) {
                         end={item.exact}
                         onClick={() => setMoreMenuOpen(false)}
                         className={({ isActive }) =>
-                          `block px-4 py-2.5 text-sm transition-colors ${isActive ? 'text-primary bg-neutral-50 font-medium' : 'text-gray-600 hover:bg-gray-50 hover:text-primary'}`
+                          cn(
+                            'block px-4 py-2.5 text-sm font-medium transition-colors duration-fast rounded-md',
+                            isActive
+                              ? 'text-primary-500 bg-primary-50'
+                              : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-800'
+                          )
                         }
                       >
                         {item.label}
@@ -153,36 +185,36 @@ export default function Layout({ children }) {
             <div className="relative" ref={userMenuRef}>
               <button
                 onClick={() => setUserMenuOpen(o => !o)}
-                className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                className="flex items-center gap-2 px-2 py-1.5 rounded-lg transition-colors duration-[175ms] hover:bg-neutral-100"
               >
                 <AvatarCircle avatarUrl={avatarUrl} initials={initials} />
                 <div className="hidden sm:block text-left">
-                  <div className="text-xs font-semibold text-gray-800 leading-tight max-w-[120px] truncate">{displayName}</div>
-                  <div className="text-[10px] text-gray-400 capitalize">{role}</div>
+                  <div className="text-xs font-semibold text-neutral-800 leading-tight max-w-[120px] truncate">{displayName}</div>
+                  <div className="text-[10px] text-neutral-400 capitalize">{role}</div>
                 </div>
-                <svg className={`w-3.5 h-3.5 text-gray-400 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
+                <ChevronDown className={cn('w-3.5 h-3.5 text-neutral-400 transition-transform duration-fast', userMenuOpen && 'rotate-180')} />
               </button>
 
               {userMenuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
-                  <div className="px-4 py-3 border-b border-gray-100">
-                    <div className="text-sm font-semibold text-gray-800 truncate">{displayName}</div>
-                    <div className="text-xs text-gray-400 capitalize mt-0.5">{role}</div>
+                <div className="absolute right-0 top-full mt-2 w-52 bg-white/90 backdrop-blur-xl rounded-xl shadow-lg border border-neutral-200 py-1 z-50">
+                  <div className="px-4 py-3 border-b border-neutral-100">
+                    <div className="text-sm font-semibold text-neutral-800 truncate">{displayName}</div>
+                    <div className="text-xs text-neutral-400 capitalize mt-0.5">{role}</div>
                   </div>
                   <button
                     onClick={() => { setUserMenuOpen(false); setProfileOpen(true) }}
-                    className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-neutral-50 flex items-center gap-2.5 transition-colors"
+                    className="w-full text-left px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50 flex items-center gap-2.5 transition-colors duration-fast rounded-md"
                   >
-                    <span className="text-base">👤</span> My Profile
+                    <User className="w-4 h-4 text-neutral-500" />
+                    My Profile
                   </button>
-                  <div className="border-t border-gray-100 mt-1 pt-1">
+                  <div className="border-t border-neutral-100 mt-1 pt-1">
                     <button
                       onClick={handleSignOut}
-                      className="w-full text-left px-4 py-2.5 text-sm text-tertiary hover:bg-red-50 flex items-center gap-2.5 transition-colors"
+                      className="w-full text-left px-4 py-2.5 text-sm text-error hover:bg-error-light flex items-center gap-2.5 transition-colors duration-fast rounded-md"
                     >
-                      <span className="text-base">🚪</span> Sign Out
+                      <LogOut className="w-4 h-4" />
+                      Sign Out
                     </button>
                   </div>
                 </div>
@@ -192,42 +224,58 @@ export default function Layout({ children }) {
             {/* Mobile hamburger */}
             <button
               onClick={() => setMobileMenuOpen(o => !o)}
-              className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              aria-label="Toggle menu"
+              className="md:hidden p-2 rounded-lg transition-colors duration-[175ms] hover:bg-neutral-100"
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
             >
-              <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                {mobileMenuOpen
-                  ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />}
-              </svg>
+              {mobileMenuOpen
+                ? <X className="w-5 h-5 text-neutral-600" />
+                : <Menu className="w-5 h-5 text-neutral-600" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile nav drawer */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-100 bg-white px-6 py-3 space-y-1">
+        {/* Mobile nav drawer — slide-down animation */}
+        <div
+          className={cn(
+            'md:hidden absolute top-16 left-0 right-0 border-b border-gray-200 bg-white/95 backdrop-blur-xl overflow-hidden transition-all duration-[250ms] ease-out',
+            mobileMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+          )}
+        >
+          <div className="px-6 py-3 space-y-1 max-w-[1280px] mx-auto">
             {visibleItems.map(item => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 end={item.exact}
                 className={({ isActive }) =>
-                  `block px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                    isActive ? 'bg-neutral-100 text-primary' : 'text-gray-600 hover:bg-gray-50 hover:text-primary'
-                  }`
+                  cn(
+                    'block px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-fast',
+                    isActive
+                      ? 'bg-primary-50 text-primary-500 border-l-2 border-primary-500'
+                      : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-800'
+                  )
                 }
               >
                 {item.label}
               </NavLink>
             ))}
           </div>
-        )}
+        </div>
       </header>
 
-      {/* ── Page content ── */}
-      <main className="flex-1">
-        {children}
+      {/* ── Page content with proper padding and max-width ── */}
+      <main className="flex-1 px-6 py-8 max-w-[1280px] mx-auto w-full">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: [0, 0, 0.2, 1] }}
+          >
+            {children}
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       {/* Profile modal */}

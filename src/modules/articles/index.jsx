@@ -3,10 +3,8 @@ import { supabase } from '../../lib/supabase'
 import { useRole } from '../../app/RoleProvider'
 import ReactQuill from 'react-quill'
 import 'react-quill/dist/quill.snow.css'
-
-function Icon({ name, className = '' }) {
-  return <span className={`material-symbols-outlined ${className}`}>{name}</span>
-}
+import { Search, Plus, ArrowLeft, Image, CloudUpload, FileText, Download, User } from 'lucide-react'
+import { Button, Input, Textarea, Label, EmptyState, Spinner, buttonVariants } from '../../shared/ui'
 
 export default function ArticlesPage() {
   const { role } = useRole()
@@ -57,46 +55,45 @@ export default function ArticlesPage() {
   }
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className="bg-neutral-50 min-h-screen">
       {/* Hero */}
       <section className="bg-primary text-white relative overflow-hidden">
         <div className="absolute inset-0 pattern-overlay opacity-20" />
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-12 sm:py-20 relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="max-w-2xl">
-            <span className="text-secondary font-label-lg tracking-widest uppercase mb-3 block text-xs sm:text-sm">Knowledge Hub</span>
-            <h1 className="font-serif text-2xl sm:text-4xl lg:text-headline-xl mb-4">Articles & Downloads</h1>
-            <p className="text-sm sm:text-body-lg text-white/70">
+            <span className="text-secondary text-xs font-bold tracking-widest uppercase mb-3 block sm:text-sm">Knowledge Hub</span>
+            <h1 className="font-serif text-2xl sm:text-4xl lg:text-4xl font-bold mb-4">Articles & Downloads</h1>
+            <p className="text-sm sm:text-lg text-white/70">
               Explore our collection of Islamic articles, research papers, and downloadable resources.
             </p>
           </div>
           {isAdmin && (
-            <button onClick={() => setShowForm(true)}
-              className="bg-secondary text-white px-6 py-3 rounded-xl font-label-lg flex items-center gap-2 hover:opacity-90 transition-all shrink-0">
-              <Icon name="add" className="text-lg" />
+            <Button onClick={() => setShowForm(true)} className="shrink-0">
+              <Plus className="w-5 h-5 mr-2" />
               Add Article
-            </button>
+            </Button>
           )}
         </div>
       </section>
 
       {/* Filters */}
-      <section className="sticky top-[57px] sm:top-[65px] z-40 bg-white/90 backdrop-blur-md border-b border-outline">
+      <section className="sticky top-[57px] sm:top-[65px] z-40 bg-white/90 backdrop-blur-md border-b border-neutral-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-3 sm:py-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
           <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
             <button onClick={() => setCategoryFilter('')}
-              className={`px-4 py-1.5 rounded-full font-serif text-xs sm:text-sm font-bold whitespace-nowrap transition-all flex-shrink-0 ${!categoryFilter ? 'bg-primary text-white' : 'bg-white border border-outline text-slate-600 hover:border-primary hover:text-primary'}`}>
+              className={`px-4 py-1.5 rounded-full font-serif text-xs sm:text-sm font-bold whitespace-nowrap transition-all flex-shrink-0 ${!categoryFilter ? 'bg-primary text-white' : 'bg-white border border-neutral-200 text-slate-600 hover:border-primary hover:text-primary'}`}>
               All
             </button>
             {categories.map(cat => (
               <button key={cat} onClick={() => setCategoryFilter(cat)}
-                className={`px-4 py-1.5 rounded-full font-serif text-xs sm:text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 ${categoryFilter === cat ? 'bg-primary text-white' : 'bg-white border border-outline text-slate-600 hover:border-primary hover:text-primary'}`}>
+                className={`px-4 py-1.5 rounded-full font-serif text-xs sm:text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 ${categoryFilter === cat ? 'bg-primary text-white' : 'bg-white border border-neutral-200 text-slate-600 hover:border-primary hover:text-primary'}`}>
                 {cat}
               </button>
             ))}
           </div>
           <div className="relative w-full sm:w-auto sm:ml-auto">
-            <Icon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg" />
-            <input className="pl-9 pr-4 py-2 bg-white border border-outline rounded-full text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary w-full sm:w-64 transition-all"
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+            <Input className="pl-9 pr-4 rounded-full sm:w-64"
               placeholder="Search articles..." value={search} onChange={e => setSearch(e.target.value)} />
           </div>
         </div>
@@ -105,12 +102,13 @@ export default function ArticlesPage() {
       {/* Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
         {loading ? (
-          <div className="flex items-center justify-center py-24 text-slate-400 text-sm">Loading articles…</div>
+          <div className="flex items-center justify-center py-24"><Spinner size="lg" /></div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-16">
-            <Icon name="article" className="text-5xl text-slate-200 mb-4 block mx-auto" />
-            <p className="text-slate-500 text-sm">No articles found</p>
-          </div>
+          <EmptyState
+            icon={FileText}
+            title="No articles found"
+            description="Try adjusting your search or filters."
+          />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map(article => (
@@ -230,67 +228,66 @@ function ArticleForm({ onComplete, onCancel }) {
   }
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className="bg-neutral-50 min-h-screen">
       <div className="max-w-3xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
-        <button onClick={onCancel}
-          className="flex items-center gap-1 text-primary font-medium text-sm mb-6 hover:underline">
-          <span className="material-symbols-outlined text-lg">arrow_back</span> Back to Articles
-        </button>
+        <Button variant="ghost" onClick={onCancel} className="mb-6">
+          <ArrowLeft className="w-4 h-4 mr-1" /> Back to Articles
+        </Button>
 
-        <div className="card">
-          <h2 className="text-headline-md font-serif text-primary mb-1">Add New Article</h2>
+        <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6">
+          <h2 className="text-xl font-bold font-serif text-primary mb-1">Add New Article</h2>
           <p className="text-sm text-gray-500 mb-6">Create a new article or upload a downloadable resource</p>
 
-          {error && <div className="alert-error mb-4">{error}</div>}
-          {success && <div className="alert-success mb-4">Article published successfully!</div>}
+          {error && <div className="bg-red-50 text-red-700 rounded-lg p-4 text-sm mb-4">{error}</div>}
+          {success && <div className="bg-green-50 text-green-700 rounded-lg p-4 text-sm mb-4">Article published successfully!</div>}
 
           {!success && (
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Title */}
-              <div className="form-group">
-                <label className="form-label">Title *</label>
-                <input type="text" name="title" className="form-input" required
+              <div className="space-y-2">
+                <Label>Title *</Label>
+                <Input type="text" name="title" required
                   value={formData.title} onChange={handleTitleChange}
                   placeholder="Enter article title" />
               </div>
 
               {/* Slug */}
-              <div className="form-group">
-                <label className="form-label">Slug (URL-friendly)</label>
-                <input type="text" name="slug" className="form-input"
+              <div className="space-y-2">
+                <Label>Slug (URL-friendly)</Label>
+                <Input type="text" name="slug"
                   value={formData.slug} onChange={handleChange}
                   placeholder="auto-generated-from-title" />
               </div>
 
               {/* Author */}
-              <div className="form-group">
-                <label className="form-label">Author Name</label>
-                <input type="text" name="author_name" className="form-input"
+              <div className="space-y-2">
+                <Label>Author Name</Label>
+                <Input type="text" name="author_name"
                   value={formData.author_name} onChange={handleChange}
                   placeholder="Author name" />
               </div>
 
               {/* Category */}
-              <div className="form-group">
-                <label className="form-label">Category</label>
-                <input type="text" name="category" className="form-input"
+              <div className="space-y-2">
+                <Label>Category</Label>
+                <Input type="text" name="category"
                   value={formData.category} onChange={handleChange}
                   placeholder="e.g. Fiqh, Hadith, Tafsir, History" />
               </div>
 
               {/* Tags */}
-              <div className="form-group">
-                <label className="form-label">Tags (comma-separated)</label>
-                <input type="text" name="tags" className="form-input"
+              <div className="space-y-2">
+                <Label>Tags (comma-separated)</Label>
+                <Input type="text" name="tags"
                   value={formData.tags} onChange={handleChange}
                   placeholder="e.g. quran, sunnah, fiqh" />
               </div>
 
               {/* Cover Image */}
-              <div className="form-group">
-                <label className="form-label">Cover Image</label>
-                <div className="border-2 border-dashed border-outline rounded-lg p-6 text-center hover:border-primary transition-colors">
-                  <span className="material-symbols-outlined text-3xl text-gray-400 mb-2 block">image</span>
+              <div className="space-y-2">
+                <Label>Cover Image</Label>
+                <div className="border-2 border-dashed border-neutral-200 rounded-lg p-6 text-center hover:border-primary transition-colors">
+                  <Image className="w-8 h-8 text-gray-400 mb-2 mx-auto" />
                   <input type="file" onChange={(e) => setCoverFile(e.target.files?.[0] || null)}
                     accept="image/*" className="hidden" id="cover-image-input" />
                   <label htmlFor="cover-image-input" className="cursor-pointer">
@@ -300,23 +297,23 @@ function ArticleForm({ onComplete, onCancel }) {
                   {coverFile && <p className="text-sm text-primary mt-2 font-medium">✓ {coverFile.name}</p>}
                 </div>
                 <p className="text-xs text-gray-400 mt-2">Or paste a URL instead:</p>
-                <input type="url" name="cover_image_url" className="form-input mt-1"
+                <Input type="url" name="cover_image_url" className="mt-1"
                   value={formData.cover_image_url} onChange={handleChange}
                   placeholder="https://example.com/image.jpg" />
               </div>
 
               {/* Excerpt */}
-              <div className="form-group">
-                <label className="form-label">Excerpt / Summary</label>
-                <textarea name="excerpt" className="form-input min-h-[80px]" rows="3"
+              <div className="space-y-2">
+                <Label>Excerpt / Summary</Label>
+                <Textarea name="excerpt" className="min-h-[80px]" rows="3"
                   value={formData.excerpt} onChange={handleChange}
                   placeholder="Brief summary of the article" />
               </div>
 
               {/* Content — Rich Text Editor */}
-              <div className="form-group">
-                <label className="form-label">Full Content</label>
-                <div className="bg-white rounded-lg border border-gray-300 overflow-hidden">
+              <div className="space-y-2">
+                <Label>Full Content</Label>
+                <div className="bg-white rounded-lg border border-neutral-200 overflow-hidden">
                   <ReactQuill
                     theme="snow"
                     value={formData.content}
@@ -339,10 +336,10 @@ function ArticleForm({ onComplete, onCancel }) {
               </div>
 
               {/* File Upload */}
-              <div className="form-group">
-                <label className="form-label">Downloadable File (PDF)</label>
-                <div className="border-2 border-dashed border-outline rounded-lg p-6 text-center hover:border-primary transition-colors">
-                  <span className="material-symbols-outlined text-3xl text-gray-400 mb-2 block">cloud_upload</span>
+              <div className="space-y-2">
+                <Label>Downloadable File (PDF)</Label>
+                <div className="border-2 border-dashed border-neutral-200 rounded-lg p-6 text-center hover:border-primary transition-colors">
+                  <CloudUpload className="w-8 h-8 text-gray-400 mb-2 mx-auto" />
                   <input type="file" onChange={handleFileChange} accept=".pdf,.doc,.docx"
                     className="hidden" id="article-file-input" />
                   <label htmlFor="article-file-input" className="cursor-pointer">
@@ -355,9 +352,9 @@ function ArticleForm({ onComplete, onCancel }) {
               </div>
 
               {/* Or paste file URL directly */}
-              <div className="form-group">
-                <label className="form-label">Or paste file URL directly</label>
-                <input type="url" name="file_url" className="form-input"
+              <div className="space-y-2">
+                <Label>Or paste file URL directly</Label>
+                <Input type="url" name="file_url"
                   value={formData.file_url} onChange={handleChange}
                   placeholder="https://example.com/file.pdf" />
               </div>
@@ -366,16 +363,16 @@ function ArticleForm({ onComplete, onCancel }) {
               <div className="flex items-center gap-3">
                 <input type="checkbox" name="published" id="published"
                   checked={formData.published} onChange={handleChange}
-                  className="form-checkbox" />
+                  className="h-4 w-4 rounded border-neutral-300 text-primary focus:ring-primary" />
                 <label htmlFor="published" className="text-sm text-gray-700 font-medium">Publish immediately</label>
               </div>
 
               {/* Submit */}
               <div className="flex gap-3 pt-2">
-                <button type="submit" className="btn-primary flex-1" disabled={loading || !formData.title.trim()}>
+                <Button variant="primary" type="submit" className="flex-1" disabled={loading || !formData.title.trim()}>
                   {loading ? 'Publishing…' : 'Publish Article'}
-                </button>
-                <button type="button" onClick={onCancel} className="btn-ghost">Cancel</button>
+                </Button>
+                <Button variant="ghost" type="button" onClick={onCancel}>Cancel</Button>
               </div>
             </form>
           )}
@@ -389,19 +386,19 @@ function ArticleForm({ onComplete, onCancel }) {
 function ArticleCard({ article, onClick }) {
   return (
     <article onClick={onClick}
-      className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-outline cursor-pointer">
+      className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-neutral-200 cursor-pointer">
       <div className="h-40 sm:h-48 overflow-hidden relative">
         {article.cover_image_url ? (
           <img src={article.cover_image_url} alt={article.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-primary to-primary-700 flex items-center justify-center">
-            <span className="material-symbols-outlined text-white/20 text-6xl">article</span>
+            <FileText className="w-14 h-14 text-white/20" />
           </div>
         )}
         {article.file_url && (
           <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-primary text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
-            <span className="material-symbols-outlined text-sm">download</span>
+            <Download className="w-3.5 h-3.5" />
             PDF
           </div>
         )}
@@ -418,7 +415,7 @@ function ArticleCard({ article, onClick }) {
         {article.excerpt && (
           <p className="text-sm text-slate-500 line-clamp-2">{article.excerpt}</p>
         )}
-        <div className="flex items-center justify-between pt-3 border-t border-outline/50 text-xs text-slate-400">
+        <div className="flex items-center justify-between pt-3 border-t border-neutral-200/50 text-xs text-slate-400">
           {article.author_name && <span>{article.author_name}</span>}
           {article.published_at && <span>{new Date(article.published_at).toLocaleDateString()}</span>}
         </div>
@@ -430,12 +427,11 @@ function ArticleCard({ article, onClick }) {
 // ─── Article Detail ──────────────────────────────────────────
 function ArticleDetail({ article, onBack }) {
   return (
-    <div className="bg-background min-h-screen">
+    <div className="bg-neutral-50 min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
-        <button onClick={onBack}
-          className="flex items-center gap-1 text-primary font-medium text-sm mb-6 hover:underline">
-          <span className="material-symbols-outlined text-lg">arrow_back</span> Back to Articles
-        </button>
+        <Button variant="ghost" onClick={onBack} className="mb-6">
+          <ArrowLeft className="w-4 h-4 mr-1" /> Back to Articles
+        </Button>
 
         {article.cover_image_url && (
           <img src={article.cover_image_url} alt={article.title}
@@ -452,7 +448,7 @@ function ArticleDetail({ article, onBack }) {
           <div className="flex items-center gap-4 text-sm text-slate-500">
             {article.author_name && (
               <span className="flex items-center gap-1">
-                <span className="material-symbols-outlined text-base">person</span>
+                <User className="w-4 h-4" />
                 {article.author_name}
               </span>
             )}
@@ -464,10 +460,10 @@ function ArticleDetail({ article, onBack }) {
           dangerouslySetInnerHTML={{ __html: article.content || article.excerpt || '<p>No content available.</p>' }} />
 
         {article.file_url && (
-          <div className="mt-10 p-6 bg-white rounded-xl border border-outline flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="mt-10 p-6 bg-white rounded-xl border border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <span className="material-symbols-outlined text-primary text-2xl">picture_as_pdf</span>
+                <FileText className="w-6 h-6 text-primary" />
               </div>
               <div>
                 <p className="font-medium text-gray-800 text-sm">Download Article</p>
@@ -475,8 +471,8 @@ function ArticleDetail({ article, onBack }) {
               </div>
             </div>
             <a href={article.file_url} target="_blank" rel="noopener noreferrer"
-              className="btn-primary flex items-center gap-2">
-              <span className="material-symbols-outlined text-lg">download</span>
+              className={buttonVariants({ variant: 'primary', size: 'md' })}>
+              <Download className="w-4 h-4 mr-2" />
               Download
             </a>
           </div>
@@ -485,7 +481,7 @@ function ArticleDetail({ article, onBack }) {
         {article.tags?.length > 0 && (
           <div className="mt-8 flex flex-wrap gap-2">
             {article.tags.map(tag => (
-              <span key={tag} className="bg-background border border-outline text-slate-600 text-xs px-3 py-1 rounded-full">
+              <span key={tag} className="bg-neutral-50 border border-neutral-200 text-slate-600 text-xs px-3 py-1 rounded-full">
                 #{tag}
               </span>
             ))}

@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
+import { Mail, Lock, User } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import { Button, Input, Label, cn } from '../shared/ui'
 
 export default function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false)
@@ -41,8 +44,6 @@ export default function LoginPage() {
     if (!fullName.trim()) { setError('Full name is required'); return }
     setLoading(true)
     try {
-      // Use the rate-limited signup Edge Function instead of direct auth.signUp
-      // This enforces server-side rate limiting and hardcodes role to 'student'
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
       const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
@@ -118,112 +119,157 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-b from-neutral-50 to-neutral-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Header */}
+        {/* Logo & Institution Name */}
         <div className="text-center mb-8">
-          <img src="/assets/LOGO_HIDAYAT.png" alt="HIDAYAT" className="w-16 h-16 mx-auto mb-3 object-contain" />
-          <h1 className="text-3xl font-bold text-primary">Hidayat</h1>
-          <p className="text-gray-500 text-sm mt-1">Learning Today, Leading Tomorrow</p>
+          <img
+            src="/assets/LOGO_HIDAYAT.png"
+            alt="Hidayat"
+            className="w-16 h-16 mx-auto mb-3 object-contain"
+          />
+          <h1 className="font-display text-[28px] font-semibold text-neutral-900">
+            Hidayat
+          </h1>
+          <p className="text-neutral-500 text-sm mt-1">Learning Today, Leading Tomorrow</p>
         </div>
 
-        {/* Card */}
-        <div className="card">
-          <h2 className="text-xl font-semibold text-primary mb-6">
+        {/* Card with fade-up entrance */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: [0, 0, 0.2, 1] }}
+          className="bg-white border border-neutral-200 rounded-xl p-8 shadow-sm"
+        >
+          <h2 className="text-xl font-semibold text-neutral-900 mb-6">
             {isSignUp ? 'Create Account' : 'Sign In'}
           </h2>
 
           <form onSubmit={isSignUp ? handleSignUp : handleSignIn} className="space-y-4">
             {isSignUp && (
-              <div className="form-group">
-                <label htmlFor="fullName" className="form-label">Full Name</label>
-                <input
-                  id="fullName"
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required
-                  placeholder="Enter your full name"
-                  className="form-input"
-                />
+              <div className="space-y-1.5">
+                <Label htmlFor="fullName">Full Name</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                  <Input
+                    id="fullName"
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required
+                    placeholder="Enter your full name"
+                    className="pl-9 min-h-[44px]"
+                  />
+                </div>
               </div>
             )}
 
-            <div className="form-group">
-              <label htmlFor="email" className="form-label">Email</label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                placeholder="Enter your email"
-                className="form-input"
-              />
+            <div className="space-y-1.5">
+              <Label htmlFor="email">Email</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  placeholder="Enter your email"
+                  className="pl-9 min-h-[44px]"
+                />
+              </div>
             </div>
 
-            <div className="form-group">
-              <label htmlFor="password" className="form-label">Password</label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                placeholder={isSignUp ? 'At least 6 characters' : 'Enter your password'}
-                className="form-input"
-              />
+            <div className="space-y-1.5">
+              <Label htmlFor="password">Password</Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  placeholder={isSignUp ? 'At least 6 characters' : 'Enter your password'}
+                  className="pl-9 min-h-[44px]"
+                />
+              </div>
             </div>
 
             {isSignUp && (
-              <div className="form-group">
-                <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
-                <input
-                  id="confirmPassword"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  placeholder="Confirm your password"
-                  className="form-input"
-                />
+              <div className="space-y-1.5">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    placeholder="Confirm your password"
+                    className="pl-9 min-h-[44px]"
+                  />
+                </div>
               </div>
             )}
 
-            {error && <div className="alert-error text-sm">{error}</div>}
-            {success && <div className="alert-success text-sm">{success}</div>}
+            {/* Error Alert */}
+            {error && (
+              <div className="bg-error-light text-error-dark rounded-lg p-4 text-sm" role="alert">
+                {error}
+              </div>
+            )}
+
+            {/* Success Alert */}
+            {success && (
+              <div className="bg-success-light text-success-dark rounded-lg p-4 text-sm" role="alert">
+                {success}
+              </div>
+            )}
 
             {/* Resend verification email section */}
             {showResendVerification && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3">
-                <p className="text-sm text-blue-800">
+              <div className="bg-info-light border border-info/20 rounded-lg p-4 space-y-3">
+                <p className="text-sm text-info-dark">
                   Didn't receive the verification email? Check your spam folder or resend it.
                 </p>
-                <button
+                <Button
                   type="button"
                   onClick={handleResendVerification}
-                  disabled={resending}
-                  className="w-full py-2 px-4 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                  loading={resending}
+                  variant="primary"
+                  size="md"
+                  className="w-full min-h-[44px]"
                 >
-                  {resending ? 'Sending…' : 'Resend Verification Email'}
-                </button>
+                  Resend Verification Email
+                </Button>
               </div>
             )}
 
-            <button type="submit" disabled={loading} className="btn-primary w-full">
-              {loading
-                ? (isSignUp ? 'Creating account…' : 'Signing in…')
-                : (isSignUp ? 'Create Account' : 'Sign In')}
-            </button>
+            <Button
+              type="submit"
+              loading={loading}
+              variant="primary"
+              size="md"
+              className="w-full min-h-[44px]"
+            >
+              {isSignUp ? 'Create Account' : 'Sign In'}
+            </Button>
           </form>
 
-          <div className="mt-6 pt-5 border-t border-gray-100 text-center">
-            <p className="text-sm text-gray-500 mb-3">
+          <div className="mt-6 pt-5 border-t border-neutral-100 text-center">
+            <p className="text-sm text-neutral-500 mb-3">
               {isSignUp ? 'Already have an account?' : "Don't have an account?"}
             </p>
-            <button onClick={switchMode} className="btn-outline w-full">
+            <Button
+              onClick={switchMode}
+              variant="outline"
+              size="md"
+              className="w-full min-h-[44px]"
+            >
               {isSignUp ? 'Sign In' : 'Create Account'}
-            </button>
+            </Button>
 
             {/* Resend verification link on sign-in side */}
             {!isSignUp && (
@@ -233,7 +279,7 @@ export default function LoginPage() {
                   setShowResendVerification(true)
                   setResendEmail(email)
                 }}
-                className="mt-3 text-sm text-blue-600 hover:text-blue-800 underline underline-offset-2"
+                className="mt-3 text-sm text-primary-500 hover:text-primary-700 underline underline-offset-2 min-h-[44px] inline-flex items-center"
               >
                 Didn't get verification email?
               </button>
@@ -241,27 +287,29 @@ export default function LoginPage() {
 
             {/* Resend verification panel (shown on sign-in side) */}
             {!isSignUp && showResendVerification && !success && (
-              <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3 text-left">
-                <label className="form-label text-sm text-blue-800">Enter your email to resend verification</label>
-                <input
+              <div className="mt-4 bg-info-light border border-info/20 rounded-lg p-4 space-y-3 text-left">
+                <Label className="text-sm text-info-dark">Enter your email to resend verification</Label>
+                <Input
                   type="email"
                   value={resendEmail}
                   onChange={(e) => setResendEmail(e.target.value)}
                   placeholder="your@email.com"
-                  className="form-input text-sm"
+                  className="min-h-[44px]"
                 />
-                <button
+                <Button
                   type="button"
                   onClick={handleResendVerification}
-                  disabled={resending}
-                  className="w-full py-2 px-4 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                  loading={resending}
+                  variant="primary"
+                  size="md"
+                  className="w-full min-h-[44px]"
                 >
-                  {resending ? 'Sending…' : 'Resend Verification Email'}
-                </button>
+                  Resend Verification Email
+                </Button>
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   )

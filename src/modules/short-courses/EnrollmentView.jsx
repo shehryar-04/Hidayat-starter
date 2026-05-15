@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useRole } from '../../app/RoleProvider'
+import { Button, Input, Label, Textarea, Spinner, EmptyState, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../shared/ui'
+import { ClipboardList } from 'lucide-react'
 
 const STATUS_STYLES = {
   pending:   'bg-yellow-100 text-yellow-700',
@@ -170,11 +172,11 @@ export function EnrollmentView({ course, onBack }) {
   const completedCount = enrollments.filter(e => e.status === 'completed').length
 
   return (
-    <div className="page max-w-4xl">
-      <button onClick={onBack} className="btn-ghost text-sm mb-4">← Back to Courses</button>
+    <div className="max-w-[1280px] mx-auto px-4 py-6 md:px-6 md:py-8 max-w-4xl">
+      <Button variant="ghost" size="sm" onClick={onBack} className="mb-4">← Back to Courses</Button>
 
       {/* Course header */}
-      <div className="card mb-6">
+      <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6 mb-6">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="font-serif text-xl text-primary font-bold mb-1">{course.title}</h1>
@@ -197,63 +199,66 @@ export function EnrollmentView({ course, onBack }) {
         </div>
       </div>
 
-      {error && <div className="alert-error mb-4 text-sm">{error}</div>}
-      {msg && <div className="alert-success mb-4 text-sm">{msg}</div>}
+      {error && <div className="bg-error-light text-error-dark rounded-lg p-4 text-sm mb-4">{error}</div>}
+      {msg && <div className="bg-success-light text-success-dark rounded-lg p-4 text-sm mb-4">{msg}</div>}
 
       {/* Enroll button / form */}
       {!showForm ? (
-        <button onClick={() => setShowForm(true)} className="btn-primary mb-6">+ Enroll Student</button>
+        <Button variant="primary" onClick={() => setShowForm(true)} className="mb-6">+ Enroll Student</Button>
       ) : (
-        <div className="card mb-6">
-          <h3 className="mb-4">Enroll a Student</h3>
+        <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6 mb-6">
+          <h3 className="font-semibold text-neutral-700 mb-4">Enroll a Student</h3>
           <form onSubmit={handleEnroll} className="flex flex-col sm:flex-row gap-3">
-            <select className="form-input flex-1" value={selectedStudent} onChange={e => setSelectedStudent(e.target.value)} required>
+            <select className="h-10 flex-1 rounded-lg border border-neutral-200 px-3 text-sm shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] transition-all duration-150 outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500" value={selectedStudent} onChange={e => setSelectedStudent(e.target.value)} required>
               <option value="">Select student…</option>
               {availableStudents.map(s => (
                 <option key={s.id} value={s.id}>{s.profiles?.full_name} ({s.enrollment_number})</option>
               ))}
             </select>
-            <input className="form-input sm:w-48" value={paymentRef} onChange={e => setPaymentRef(e.target.value)}
+            <Input className="sm:w-48" value={paymentRef} onChange={e => setPaymentRef(e.target.value)}
               placeholder="Payment ref (optional)" />
-            <button type="submit" disabled={enrolling || !selectedStudent} className="btn-primary flex-shrink-0">
+            <Button type="submit" variant="primary" disabled={enrolling || !selectedStudent} className="flex-shrink-0">
               {enrolling ? 'Enrolling…' : 'Enroll'}
-            </button>
-            <button type="button" onClick={() => setShowForm(false)} className="btn-ghost flex-shrink-0">Cancel</button>
+            </Button>
+            <Button type="button" variant="ghost" onClick={() => setShowForm(false)} className="flex-shrink-0">Cancel</Button>
           </form>
         </div>
       )}
 
       {/* Enrollments table */}
       {loading ? (
-        <div className="loading">Loading enrollments…</div>
-      ) : enrollments.length === 0 ? (
-        <div className="card text-center py-12 text-gray-400">
-          <div className="text-4xl mb-3">📋</div>
-          <p className="text-sm">No students enrolled yet.</p>
+        <div className="flex items-center justify-center py-16">
+          <Spinner size="lg" />
         </div>
+      ) : enrollments.length === 0 ? (
+        <EmptyState
+          icon={ClipboardList}
+          title="No students enrolled yet"
+          description="Use the button above to enroll students in this course."
+        />
       ) : (
-        <div className="table-container">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Student</th>
-                <th>Enrollment #</th>
-                <th>Enrolled</th>
-                <th>Payment</th>
-                <th>Status</th>
-                <th>Completed</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
+        <div className="bg-white border border-neutral-200 rounded-xl shadow-sm overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Student</TableHead>
+                <TableHead>Enrollment #</TableHead>
+                <TableHead>Enrolled</TableHead>
+                <TableHead>Payment</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Completed</TableHead>
+                <TableHead></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {enrollments.map(e => {
                 const inv = invoices[e.id]
                 return (
-                  <tr key={e.id}>
-                    <td className="font-medium">{e.students?.profiles?.full_name || '—'}</td>
-                    <td className="text-gray-500 text-xs font-mono">{e.students?.enrollment_number || '—'}</td>
-                    <td className="text-gray-500 text-xs">{new Date(e.enrolled_at).toLocaleDateString()}</td>
-                    <td>
+                  <TableRow key={e.id}>
+                    <TableCell className="font-medium">{e.students?.profiles?.full_name || '—'}</TableCell>
+                    <TableCell className="text-gray-500 text-xs font-mono">{e.students?.enrollment_number || '—'}</TableCell>
+                    <TableCell className="text-gray-500 text-xs">{new Date(e.enrolled_at).toLocaleDateString()}</TableCell>
+                    <TableCell>
                       {inv ? (
                         <div className="space-y-1">
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${PAYMENT_STATUS_STYLES[inv.status]}`}>
@@ -267,47 +272,46 @@ export function EnrollmentView({ course, onBack }) {
                       ) : (
                         <span className="text-xs text-gray-400">{e.payment_ref || '—'}</span>
                       )}
-                    </td>
-                    <td>
+                    </TableCell>
+                    <TableCell>
                       <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${STATUS_STYLES[e.status] || 'bg-gray-100 text-gray-600'}`}>
                         {e.status}
                       </span>
-                    </td>
-                    <td className="text-gray-500 text-xs">{e.completed_at ? new Date(e.completed_at).toLocaleDateString() : '—'}</td>
-                    <td>
+                    </TableCell>
+                    <TableCell className="text-gray-500 text-xs">{e.completed_at ? new Date(e.completed_at).toLocaleDateString() : '—'}</TableCell>
+                    <TableCell>
                       <div className="flex gap-2 justify-end">
                         {e.status === 'pending' && (
                           <>
-                            <button onClick={() => handleApprove(e.id)} className="bg-primary text-white text-xs py-1 px-3 rounded-lg font-bold hover:bg-primary-600">
+                            <Button variant="primary" size="sm" onClick={() => handleApprove(e.id)}>
                               ✓ Approve
-                            </button>
+                            </Button>
                             {inv ? (
-                              <button onClick={() => { setRejectingInvoice(inv); setRejectionReason('') }}
-                                className="text-xs text-tertiary hover:underline">
+                              <Button variant="destructive" size="sm" onClick={() => { setRejectingInvoice(inv); setRejectionReason('') }}>
                                 Reject Payment
-                              </button>
+                              </Button>
                             ) : (
-                              <button onClick={() => handleReject(e.id)} className="text-xs text-tertiary hover:underline">
+                              <Button variant="destructive" size="sm" onClick={() => handleReject(e.id)}>
                                 Reject
-                              </button>
+                              </Button>
                             )}
                           </>
                         )}
                         {e.status === 'active' && (
-                          <button onClick={() => handleMarkComplete(e.id)} className="btn-outline text-xs py-1 px-2">
+                          <Button variant="outline" size="sm" onClick={() => handleMarkComplete(e.id)}>
                             ✓ Complete
-                          </button>
+                          </Button>
                         )}
-                        <button onClick={() => handleRemove(e.id)} className="text-xs text-tertiary hover:underline">
+                        <Button variant="destructive" size="sm" onClick={() => handleRemove(e.id)}>
                           Remove
-                        </button>
+                        </Button>
                       </div>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 )
               })}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       )}
       
@@ -320,10 +324,9 @@ export function EnrollmentView({ course, onBack }) {
               Invoice: <span className="font-mono">{rejectingInvoice.invoice_number}</span><br />
               TXN: <span className="font-mono">{rejectingInvoice.transaction_id}</span> · Rs. {rejectingInvoice.amount}
             </p>
-            <div>
-              <label className="form-label text-sm">Reason for rejection</label>
-              <textarea
-                className="form-input w-full"
+            <div className="space-y-2">
+              <Label>Reason for rejection</Label>
+              <Textarea
                 rows={3}
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
@@ -331,10 +334,10 @@ export function EnrollmentView({ course, onBack }) {
               />
             </div>
             <div className="flex gap-3 justify-end">
-              <button onClick={() => setRejectingInvoice(null)} className="btn-ghost text-sm">Cancel</button>
-              <button onClick={handleRejectPayment} className="bg-red-600 text-white text-sm py-2 px-4 rounded-lg font-bold hover:bg-red-700">
+              <Button variant="ghost" size="sm" onClick={() => setRejectingInvoice(null)}>Cancel</Button>
+              <Button variant="destructive" onClick={handleRejectPayment}>
                 Reject Payment
-              </button>
+              </Button>
             </div>
           </div>
         </div>

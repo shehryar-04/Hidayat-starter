@@ -1,18 +1,20 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
+import { Button, Badge, Spinner, EmptyState } from '../../shared/ui'
+import { GraduationCap } from 'lucide-react'
 
 const LEVEL_COLORS = {
-  Beginner: 'badge-green',
-  Intermediate: 'badge-yellow',
-  Advanced: 'badge-red',
-  'All levels': 'badge-blue',
+  Beginner: 'bg-green-100 text-green-700',
+  Intermediate: 'bg-yellow-100 text-yellow-700',
+  Advanced: 'bg-red-100 text-red-700',
+  'All levels': 'bg-blue-100 text-blue-700',
 }
 
 const STATUS_COLORS = {
-  draft: 'badge-gray',
-  pending_approval: 'badge-yellow',
-  published: 'badge-green',
-  archived: 'badge-red',
+  draft: 'bg-gray-100 text-gray-600',
+  pending_approval: 'bg-yellow-100 text-yellow-700',
+  published: 'bg-green-100 text-green-700',
+  archived: 'bg-red-100 text-red-700',
 }
 
 export function CourseList({ onSelectCourse, onEditCourse }) {
@@ -48,17 +50,24 @@ export function CourseList({ onSelectCourse, onEditCourse }) {
     setCourses(c => c.filter(x => x.id !== id))
   }
 
-  if (loading) return <div className="loading">Loading courses…</div>
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Spinner size="lg" />
+      </div>
+    )
+  }
 
   return (
-    <div className="page">
-      {error && <div className="alert-error mb-4">{error}</div>}
+    <div className="max-w-[1280px] mx-auto px-4 py-6 md:px-6 md:py-8">
+      {error && <div className="bg-error-light text-error-dark rounded-lg p-4 text-sm mb-4">{error}</div>}
 
       {courses.length === 0 ? (
-        <div className="card text-center py-16 text-gray-400">
-          <div className="text-4xl mb-3">🎓</div>
-          <p className="text-sm">No courses yet. Create your first course.</p>
-        </div>
+        <EmptyState
+          icon={GraduationCap}
+          title="No courses yet"
+          description="Create your first course to get started."
+        />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {courses.map(course => {
@@ -68,7 +77,7 @@ export function CourseList({ onSelectCourse, onEditCourse }) {
             const timeStatus = !start ? null : start > now ? 'Upcoming' : end && end < now ? 'Ended' : 'Active'
 
             return (
-              <div key={course.id} className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow">
+              <div key={course.id} className="bg-white rounded-xl border border-neutral-200 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow">
                 {/* Thumbnail */}
                 <div className="h-36 bg-neutral-100 flex items-center justify-center overflow-hidden">
                   {course.thumbnail_url
@@ -79,9 +88,9 @@ export function CourseList({ onSelectCourse, onEditCourse }) {
                 <div className="p-4 flex flex-col flex-1">
                   {/* Badges */}
                   <div className="flex flex-wrap gap-1.5 mb-2">
-                    <span className={`badge ${STATUS_COLORS[course.status] || 'badge-gray'}`}>{course.status}</span>
-                    {course.level && <span className={`badge ${LEVEL_COLORS[course.level] || 'badge-gray'}`}>{course.level}</span>}
-                    {timeStatus && <span className="badge badge-blue">{timeStatus}</span>}
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${STATUS_COLORS[course.status] || 'bg-gray-100 text-gray-600'}`}>{course.status}</span>
+                    {course.level && <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${LEVEL_COLORS[course.level] || 'bg-gray-100 text-gray-600'}`}>{course.level}</span>}
+                    {timeStatus && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">{timeStatus}</span>}
                   </div>
 
                   <h3 className="font-semibold text-gray-800 text-sm leading-snug mb-1 line-clamp-2">{course.title}</h3>
@@ -98,17 +107,17 @@ export function CourseList({ onSelectCourse, onEditCourse }) {
 
                   {/* Actions */}
                   <div className="mt-3 flex gap-2">
-                    <button onClick={() => onSelectCourse(course)} className="btn-primary flex-1 text-xs py-1.5">
+                    <Button variant="primary" size="sm" className="flex-1" onClick={() => onSelectCourse(course)}>
                       Enrollments
-                    </button>
+                    </Button>
                     {onEditCourse && (
-                      <button onClick={() => onEditCourse(course)} className="btn-outline text-xs py-1.5 px-3">
+                      <Button variant="outline" size="sm" onClick={() => onEditCourse(course)}>
                         Edit
-                      </button>
+                      </Button>
                     )}
-                    <button onClick={() => handleDelete(course.id)} className="btn-danger text-xs py-1.5 px-3">
+                    <Button variant="destructive" size="sm" onClick={() => handleDelete(course.id)}>
                       Delete
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>

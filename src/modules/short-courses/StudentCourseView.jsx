@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useRole } from '../../app/RoleProvider'
+import { Button, Input, Label, Spinner } from '../../shared/ui'
 
 function getYouTubeId(url) {
   if (!url) return null
@@ -14,15 +15,12 @@ function getYouTubeId(url) {
 }
 
 // ─── Protected Video Player ──────────────────────────────────
-// Overlays the YouTube iframe to prevent access to "Watch on YouTube" button
-// and other YouTube UI elements. Only enrolled users get the actual embed.
 function ProtectedVideoPlayer({ url, title, isEnrolled }) {
   const [playing, setPlaying] = useState(false)
   const [showControls, setShowControls] = useState(true)
   const controlsTimer = useRef(null)
   const id = getYouTubeId(url)
 
-  // If not enrolled, don't render the iframe at all — show locked state
   if (!isEnrolled || !id) {
     return (
       <div className="aspect-video bg-gray-900 rounded-xl flex items-center justify-center relative overflow-hidden">
@@ -36,7 +34,6 @@ function ProtectedVideoPlayer({ url, title, isEnrolled }) {
     )
   }
 
-  // Embed URL with controls disabled and YouTube branding minimized
   const embedUrl = `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1&showinfo=0&iv_load_policy=3&disablekb=0&fs=1&playsinline=1&enablejsapi=1${playing ? '&autoplay=1' : ''}`
 
   const handleMouseMove = () => {
@@ -52,7 +49,6 @@ function ProtectedVideoPlayer({ url, title, isEnrolled }) {
       onMouseLeave={() => setShowControls(false)}
       onTouchStart={() => setShowControls(true)}
     >
-      {/* YouTube iframe — sits behind the overlay */}
       {playing ? (
         <iframe
           className="w-full h-full absolute inset-0 z-0"
@@ -63,7 +59,6 @@ function ProtectedVideoPlayer({ url, title, isEnrolled }) {
           referrerPolicy="strict-origin-when-cross-origin"
         />
       ) : (
-        /* Thumbnail before play */
         <div className="w-full h-full absolute inset-0 z-0 bg-black">
           <img
             src={`https://img.youtube.com/vi/${id}/maxresdefault.jpg`}
@@ -74,15 +69,10 @@ function ProtectedVideoPlayer({ url, title, isEnrolled }) {
         </div>
       )}
 
-      {/* Protective overlay — blocks YouTube's "Watch on YouTube" button and logo */}
-      {/* Covers the top-right area where YouTube places its branding/link */}
       <div className="absolute top-0 right-0 w-[180px] h-[50px] z-20 bg-transparent" />
-      {/* Covers the bottom-right where "Watch on YouTube" appears */}
       <div className="absolute bottom-0 right-0 w-[160px] h-[40px] z-20 bg-transparent" />
-      {/* Top-left YouTube logo area */}
       <div className="absolute top-0 left-0 w-[120px] h-[40px] z-20 bg-transparent" />
 
-      {/* Custom play button overlay (before playing) */}
       {!playing && (
         <div
           className="absolute inset-0 z-10 flex items-center justify-center cursor-pointer bg-black/20 hover:bg-black/30 transition-colors"
@@ -101,7 +91,6 @@ function ProtectedVideoPlayer({ url, title, isEnrolled }) {
         </div>
       )}
 
-      {/* Watermark / branding overlay to discourage screen recording */}
       {playing && (
         <div className="absolute top-3 left-3 z-20 pointer-events-none opacity-40">
           <span className="text-white text-[10px] font-bold tracking-wider bg-black/30 px-2 py-0.5 rounded">
@@ -113,7 +102,6 @@ function ProtectedVideoPlayer({ url, title, isEnrolled }) {
   )
 }
 
-// Legacy embed for promo videos (no protection needed)
 function YouTubeEmbed({ url, title }) {
   const id = getYouTubeId(url)
   if (!id) return (
@@ -135,6 +123,7 @@ const LEVEL_COLORS = {
   Advanced: 'bg-red-100 text-red-700',
   'All levels': 'bg-blue-100 text-blue-700',
 }
+
 
 // ─── Payment Paywall Modal ───────────────────────────────────
 function PaymentPaywall({ course, onSubmit, submitting, error, onClose }) {
@@ -197,7 +186,7 @@ function PaymentPaywall({ course, onSubmit, submitting, error, onClose }) {
           {/* Payment Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Payment Method</label>
+              <Label className="mb-1.5">Payment Method</Label>
               <div className="grid grid-cols-2 gap-2">
                 <button type="button"
                   onClick={() => setPaymentMethod('easypaisa')}
@@ -221,30 +210,31 @@ function PaymentPaywall({ course, onSubmit, submitting, error, onClose }) {
             </div>
 
             <div>
-              <label htmlFor="txnId" className="block text-sm font-medium text-gray-700 mb-1.5">
+              <Label htmlFor="txnId" className="mb-1.5">
                 Transaction ID / Reference Number
-              </label>
-              <input
+              </Label>
+              <Input
                 id="txnId"
                 type="text"
                 value={transactionId}
                 onChange={(e) => setTransactionId(e.target.value)}
                 placeholder="e.g. 1234567890"
                 required
-                className="form-input w-full"
               />
               <p className="text-xs text-gray-400 mt-1">You'll find this in your payment confirmation SMS or app notification.</p>
             </div>
 
-            {error && <div className="alert-error text-sm">{error}</div>}
+            {error && <div className="bg-error-light text-error-dark rounded-lg p-4 text-sm">{error}</div>}
 
-            <button
+            <Button
               type="submit"
+              variant="primary"
               disabled={submitting || !transactionId.trim()}
-              className="btn-primary w-full py-3 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+              loading={submitting}
+              className="w-full py-3 font-bold"
             >
               {submitting ? 'Submitting Payment…' : 'Submit Payment Proof'}
-            </button>
+            </Button>
 
             <p className="text-[10px] text-gray-400 text-center">
               Your enrollment will be activated once an admin verifies your payment.
@@ -273,8 +263,7 @@ function InvoiceCard({ invoice }) {
   }
 
   return (
-    <div ref={invoiceRef} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      {/* Invoice Header */}
+    <div ref={invoiceRef} className="bg-white rounded-xl border border-neutral-200 overflow-hidden">
       <div className="bg-primary p-4 flex items-center justify-between">
         <div>
           <h3 className="text-white font-bold text-sm">Payment Invoice</h3>
@@ -367,7 +356,6 @@ export function StudentCourseView({ course, onBack }) {
             if (enrollment) {
               if (enrollment.status === 'pending') {
                 setPendingEnrollment(true)
-                // Check if there's an existing invoice
                 const { data: existingInvoice } = await supabase
                   .from('payment_invoices')
                   .select('*')
@@ -420,7 +408,6 @@ export function StudentCourseView({ course, onBack }) {
     init()
   }, [course.id, userId])
 
-  // Enroll handler — for FREE courses, enroll directly. For PAID, show paywall.
   const handleEnroll = () => {
     if (enrolling || pendingEnrollment || enrolled) return
     if (!course.is_free && course.fee) {
@@ -430,7 +417,6 @@ export function StudentCourseView({ course, onBack }) {
     }
   }
 
-  // Free course enrollment
   const enrollFree = async () => {
     setEnrolling(true); setEnrollError(null)
     try {
@@ -483,14 +469,12 @@ export function StudentCourseView({ course, onBack }) {
     }
   }
 
-  // Paid course — submit payment proof
   const handlePaymentSubmit = async ({ transactionId, paymentMethod }) => {
     setPaymentSubmitting(true); setPaymentError(null)
     try {
       const sid = studentId || (await supabase.from('students').select('id').eq('profile_id', userId).single()).data?.id
       if (!sid) throw new Error('No student record found.')
 
-      // Check for existing enrollment
       let enrollmentId
       const { data: existing } = await supabase
         .from('short_course_enrollments')
@@ -508,7 +492,6 @@ export function StudentCourseView({ course, onBack }) {
           return
         }
       } else {
-        // Create enrollment with pending status
         const { data: newEnrollment, error: eErr } = await supabase
           .from('short_course_enrollments')
           .insert({
@@ -540,10 +523,8 @@ export function StudentCourseView({ course, onBack }) {
 
       if (!enrollmentId) throw new Error('Failed to create enrollment.')
 
-      // Generate invoice number
       const invoiceNumber = 'INV-' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '-' + Math.floor(Math.random() * 9000 + 1000)
 
-      // Create payment invoice
       const { data: newInvoice, error: invErr } = await supabase
         .from('payment_invoices')
         .insert({
@@ -561,7 +542,6 @@ export function StudentCourseView({ course, onBack }) {
 
       if (invErr) throw invErr
 
-      // Create admin notification
       await supabase.from('admin_notifications').insert({
         type: 'payment_submitted',
         title: 'New Payment Submission',
@@ -606,6 +586,7 @@ export function StudentCourseView({ course, onBack }) {
     setActiveLecture(lecture)
   }
 
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Paywall Modal */}
@@ -620,8 +601,8 @@ export function StudentCourseView({ course, onBack }) {
       )}
 
       {/* Back bar */}
-      <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-2 sm:py-3 flex items-center gap-2 sm:gap-3 overflow-x-auto">
-        <button onClick={onBack} className="btn-ghost text-sm">← Back to Courses</button>
+      <div className="bg-white border-b border-neutral-200 px-4 sm:px-6 py-2 sm:py-3 flex items-center gap-2 sm:gap-3 overflow-x-auto">
+        <Button variant="ghost" size="sm" onClick={onBack}>← Back to Courses</Button>
         <span className="text-gray-300">|</span>
         <span className="text-xs sm:text-sm text-gray-600 font-medium truncate max-w-[150px] sm:max-w-none">{course.title}</span>
         {enrolled && (
@@ -675,7 +656,7 @@ export function StudentCourseView({ course, onBack }) {
             </div>
           )}
 
-          {enrollError && <div className="alert-error text-sm">{enrollError}</div>}
+          {enrollError && <div className="bg-error-light text-error-dark rounded-lg p-4 text-sm">{enrollError}</div>}
           {enrollSuccess && (
             <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-sm text-green-700">
               {invoice
@@ -719,7 +700,7 @@ export function StudentCourseView({ course, onBack }) {
           )}
 
           {/* Course header */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <div className="bg-white rounded-xl border border-neutral-200 p-6">
             <div className="flex flex-wrap gap-2 mb-3">
               {course.level && (
                 <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${LEVEL_COLORS[course.level] || 'bg-gray-100 text-gray-600'}`}>
@@ -749,7 +730,7 @@ export function StudentCourseView({ course, onBack }) {
 
           {/* Learning objectives */}
           {course.learning_objectives?.length > 0 && (
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <div className="bg-white rounded-xl border border-neutral-200 p-6">
               <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
                 <span className="text-secondary">✓</span> What You'll Learn
               </h3>
@@ -764,7 +745,7 @@ export function StudentCourseView({ course, onBack }) {
           )}
 
           {course.requirements?.length > 0 && (
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <div className="bg-white rounded-xl border border-neutral-200 p-6">
               <h3 className="font-semibold text-gray-800 mb-4">Requirements</h3>
               <ul className="space-y-2">
                 {course.requirements.map((req, i) => (
@@ -777,32 +758,34 @@ export function StudentCourseView({ course, onBack }) {
           )}
         </div>
 
+
         {/* ── Right: curriculum sidebar ── */}
         <div className="lg:col-span-1">
           {/* Enroll CTA card */}
           {!checkingEnrollment && !enrolled && !pendingEnrollment && (
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-5 mb-4 lg:sticky lg:top-6 z-10">
+            <div className="bg-white rounded-xl border border-neutral-200 shadow-sm p-4 sm:p-5 mb-4 lg:sticky lg:top-6 z-10">
               <div className="text-center mb-3">
                 <span className="font-serif text-2xl font-bold text-primary">
                   {course.is_free ? 'Free' : `Rs. ${course.fee}`}
                 </span>
               </div>
-              <button onClick={handleEnroll} disabled={enrolling || pendingEnrollment}
-                className="btn-primary w-full py-3 text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed">
+              <Button variant="primary" className="w-full py-3 font-bold" onClick={handleEnroll} disabled={enrolling || pendingEnrollment}>
                 {enrolling ? 'Enrolling…' : 'Enroll Now'}
-              </button>
+              </Button>
               <p className="text-[10px] text-gray-400 text-center mt-2">Full access to all lectures and materials</p>
             </div>
           )}
 
-          <div className="bg-white rounded-xl border border-gray-200 lg:sticky lg:top-6 overflow-hidden">
+          <div className="bg-white rounded-xl border border-neutral-200 lg:sticky lg:top-6 overflow-hidden">
             <div className="px-5 py-4 border-b border-gray-100 bg-primary">
               <h3 className="font-semibold text-white text-sm">Course Curriculum</h3>
               <p className="text-primary-200 text-xs mt-0.5">{totalLectures} lectures · {Math.floor(totalMinutes / 60)}h {totalMinutes % 60}m</p>
             </div>
 
             {loading ? (
-              <div className="p-6 text-center text-gray-400 text-sm">Loading curriculum…</div>
+              <div className="p-6 flex items-center justify-center">
+                <Spinner size="md" />
+              </div>
             ) : sections.length === 0 ? (
               <div className="p-6 text-center text-gray-400 text-sm">No curriculum added yet.</div>
             ) : (

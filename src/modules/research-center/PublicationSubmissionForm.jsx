@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
+import { CloudUpload } from 'lucide-react'
+import { Button, Input, Textarea, Label } from '../../shared/ui'
 
 /**
  * Publication Submission Form — admin/scholar only.
@@ -88,13 +90,13 @@ export function PublicationSubmissionForm({ onComplete }) {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="card">
-        <h2 className="text-headline-md font-serif text-primary mb-1">Submit Publication</h2>
+      <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6">
+        <h2 className="text-xl font-bold font-serif text-primary mb-1">Submit Publication</h2>
         <p className="text-sm text-gray-500 mb-6">Upload a research paper, book, or article for review</p>
 
-        {error && <div className="alert-error mb-4">{error}</div>}
+        {error && <div className="bg-red-50 text-red-700 rounded-lg p-4 text-sm mb-4">{error}</div>}
         {success && (
-          <div className="alert-success mb-4">
+          <div className="bg-green-50 text-green-700 rounded-lg p-4 text-sm mb-4">
             Publication submitted successfully! It will be reviewed before publishing.
           </div>
         )}
@@ -102,12 +104,11 @@ export function PublicationSubmissionForm({ onComplete }) {
         {!success && (
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Title */}
-            <div className="form-group">
-              <label className="form-label">Publication Title *</label>
-              <input
+            <div className="space-y-2">
+              <Label>Publication Title *</Label>
+              <Input
                 type="text"
                 name="title"
-                className="form-input"
                 value={formData.title}
                 onChange={handleChange}
                 required
@@ -116,11 +117,11 @@ export function PublicationSubmissionForm({ onComplete }) {
             </div>
 
             {/* Abstract */}
-            <div className="form-group">
-              <label className="form-label">Abstract</label>
-              <textarea
+            <div className="space-y-2">
+              <Label>Abstract</Label>
+              <Textarea
                 name="abstract"
-                className="form-input min-h-[100px]"
+                className="min-h-[100px]"
                 value={formData.abstract}
                 onChange={handleChange}
                 placeholder="Enter publication abstract"
@@ -129,11 +130,11 @@ export function PublicationSubmissionForm({ onComplete }) {
             </div>
 
             {/* Type */}
-            <div className="form-group">
-              <label className="form-label">Publication Type *</label>
+            <div className="space-y-2">
+              <Label>Publication Type *</Label>
               <select
                 name="publication_type"
-                className="form-input"
+                className="flex h-10 w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                 value={formData.publication_type}
                 onChange={handleChange}
               >
@@ -145,30 +146,30 @@ export function PublicationSubmissionForm({ onComplete }) {
             </div>
 
             {/* Authors */}
-            <div className="form-group">
-              <label className="form-label">Authors</label>
+            <div className="space-y-2">
+              <Label>Authors</Label>
               <div className="flex gap-2">
-                <input
+                <Input
                   type="text"
-                  className="form-input flex-1"
+                  className="flex-1"
                   value={newAuthor}
                   onChange={e => setNewAuthor(e.target.value)}
                   placeholder="Add author name"
                   onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addAuthor() } }}
                 />
-                <button type="button" onClick={addAuthor} className="btn-outline whitespace-nowrap">
+                <Button variant="outline" type="button" onClick={addAuthor} className="whitespace-nowrap">
                   Add
-                </button>
+                </Button>
               </div>
               {formData.authors.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
                   {formData.authors.map((author, idx) => (
-                    <span key={idx} className="badge-green flex items-center gap-1 pr-1">
+                    <span key={idx} className="inline-flex items-center gap-1 bg-green-50 text-green-700 text-xs font-medium px-2 py-1 rounded-full pr-1">
                       {author}
                       <button
                         type="button"
                         onClick={() => removeAuthor(idx)}
-                        className="ml-1 text-primary hover:text-tertiary transition-colors"
+                        className="ml-1 text-green-600 hover:text-red-500 transition-colors"
                       >
                         ×
                       </button>
@@ -179,10 +180,10 @@ export function PublicationSubmissionForm({ onComplete }) {
             </div>
 
             {/* File upload */}
-            <div className="form-group">
-              <label className="form-label">Publication File (PDF) *</label>
-              <div className="border-2 border-dashed border-outline rounded-lg p-6 text-center hover:border-primary transition-colors">
-                <span className="material-symbols-outlined text-3xl text-gray-400 mb-2 block">cloud_upload</span>
+            <div className="space-y-2">
+              <Label>Publication File (PDF) *</Label>
+              <div className="border-2 border-dashed border-neutral-200 rounded-lg p-6 text-center hover:border-primary transition-colors">
+                <CloudUpload className="w-8 h-8 text-gray-400 mb-2 mx-auto" />
                 <input
                   type="file"
                   onChange={handleFileChange}
@@ -205,13 +206,14 @@ export function PublicationSubmissionForm({ onComplete }) {
 
             {/* Submit */}
             <div className="flex gap-3 pt-2">
-              <button
+              <Button
+                variant="primary"
                 type="submit"
-                className="btn-primary flex-1"
+                className="flex-1"
                 disabled={loading || !formData.title.trim()}
               >
                 {loading ? 'Submitting…' : 'Submit for Review'}
-              </button>
+              </Button>
             </div>
           </form>
         )}

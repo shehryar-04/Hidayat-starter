@@ -35,9 +35,9 @@ describe('LoginPage', () => {
     )
 
     expect(screen.getByText('Hidayat')).toBeInTheDocument()
-    expect(screen.getByText('Sign In')).toBeInTheDocument()
-    expect(screen.getByLabelText('Email:')).toBeInTheDocument()
-    expect(screen.getByLabelText('Password:')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Sign In' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Email')).toBeInTheDocument()
+    expect(screen.getByLabelText('Password')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Sign In/i })).toBeInTheDocument()
   })
 
@@ -53,8 +53,8 @@ describe('LoginPage', () => {
       </BrowserRouter>
     )
 
-    const emailInput = screen.getByLabelText('Email:')
-    const passwordInput = screen.getByLabelText('Password:')
+    const emailInput = screen.getByLabelText('Email')
+    const passwordInput = screen.getByLabelText('Password')
     const submitButton = screen.getByRole('button', { name: /Sign In/i })
 
     fireEvent.change(emailInput, { target: { value: 'test@example.com' } })
@@ -77,8 +77,8 @@ describe('LoginPage', () => {
       </BrowserRouter>
     )
 
-    const emailInput = screen.getByLabelText('Email:')
-    const passwordInput = screen.getByLabelText('Password:')
+    const emailInput = screen.getByLabelText('Email')
+    const passwordInput = screen.getByLabelText('Password')
     const submitButton = screen.getByRole('button', { name: /Sign In/i })
 
     fireEvent.change(emailInput, { target: { value: 'test@example.com' } })

@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
+import { Card, CardContent, Spinner, EmptyState, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../shared/ui'
+import { DollarSign, Users, BookOpen } from 'lucide-react'
 
 /**
  * Revenue View Component
@@ -76,66 +78,93 @@ export function RevenueView() {
   }
 
   if (loading) {
-    return <div className="loading">Loading revenue data...</div>
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Spinner size="lg" />
+      </div>
+    )
   }
 
+  const activeCourses = courses.filter((c) => {
+    const now = new Date()
+    const start = new Date(c.start_date)
+    const end = new Date(c.end_date)
+    return start <= now && now <= end
+  })
+
   return (
-    <div className="revenue-view">
-      <h2>Revenue & Analytics</h2>
+    <div className="max-w-[1280px] mx-auto px-4 py-6 md:px-6 md:py-8">
+      <h2 className="text-xl font-bold text-neutral-800 mb-6">Revenue & Analytics</h2>
 
-      {error && <div className="error-message">{error}</div>}
+      {error && <div className="bg-error-light text-error-dark rounded-lg p-4 text-sm mb-4">{error}</div>}
 
-      <div className="summary-cards">
-        <div className="summary-card">
-          <h3>Total Revenue</h3>
-          <p className="amount">${totalRevenue.toFixed(2)}</p>
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+              <DollarSign className="w-5 h-5 text-green-600" />
+            </div>
+            <h3 className="text-sm font-medium text-neutral-500">Total Revenue</h3>
+          </div>
+          <p className="text-2xl font-bold text-neutral-800">${totalRevenue.toFixed(2)}</p>
         </div>
 
-        <div className="summary-card">
-          <h3>Total Enrollments</h3>
-          <p className="amount">{totalEnrollments}</p>
+        <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+              <Users className="w-5 h-5 text-blue-600" />
+            </div>
+            <h3 className="text-sm font-medium text-neutral-500">Total Enrollments</h3>
+          </div>
+          <p className="text-2xl font-bold text-neutral-800">{totalEnrollments}</p>
         </div>
 
-        <div className="summary-card">
-          <h3>Active Courses</h3>
-          <p className="amount">
-            {courses.filter((c) => {
-              const now = new Date()
-              const start = new Date(c.start_date)
-              const end = new Date(c.end_date)
-              return start <= now && now <= end
-            }).length}
-          </p>
+        <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+              <BookOpen className="w-5 h-5 text-purple-600" />
+            </div>
+            <h3 className="text-sm font-medium text-neutral-500">Active Courses</h3>
+          </div>
+          <p className="text-2xl font-bold text-neutral-800">{activeCourses.length}</p>
         </div>
       </div>
 
-      <div className="courses-analytics">
-        <h3>Course Analytics</h3>
+      {/* Course Analytics Table */}
+      <div className="bg-white border border-neutral-200 rounded-xl shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-neutral-100">
+          <h3 className="font-semibold text-neutral-700">Course Analytics</h3>
+        </div>
         {courses.length === 0 ? (
-          <p>No courses available</p>
+          <EmptyState
+            icon={BookOpen}
+            title="No courses available"
+            description="Create courses to see analytics here."
+          />
         ) : (
-          <table className="analytics-table">
-            <thead>
-              <tr>
-                <th>Course Title</th>
-                <th>Fee</th>
-                <th>Total Enrolled</th>
-                <th>Completed</th>
-                <th>Course Revenue</th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Course Title</TableHead>
+                <TableHead>Fee</TableHead>
+                <TableHead>Total Enrolled</TableHead>
+                <TableHead>Completed</TableHead>
+                <TableHead>Course Revenue</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {courses.map((course) => (
-                <tr key={course.id}>
-                  <td>{course.title}</td>
-                  <td>${course.fee || 0}</td>
-                  <td>{course.totalEnrolled}</td>
-                  <td>{course.completedEnrolled}</td>
-                  <td>${course.courseRevenue.toFixed(2)}</td>
-                </tr>
+                <TableRow key={course.id}>
+                  <TableCell className="font-medium">{course.title}</TableCell>
+                  <TableCell>${course.fee || 0}</TableCell>
+                  <TableCell>{course.totalEnrolled}</TableCell>
+                  <TableCell>{course.completedEnrolled}</TableCell>
+                  <TableCell className="font-semibold">${course.courseRevenue.toFixed(2)}</TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         )}
       </div>
     </div>

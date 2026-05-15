@@ -1,5 +1,16 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
+import { Button, Badge, Spinner, EmptyState } from '../../shared/ui'
+import { Scale } from 'lucide-react'
+
+const STATUS_VARIANT = {
+  pending: 'warning',
+  assigned: 'info',
+  under_review: 'default',
+  approved: 'success',
+  published: 'success',
+  closed: 'error',
+}
 
 /**
  * Question List Component
@@ -82,7 +93,6 @@ export function QuestionList({ onSelectQuestion }) {
     try {
       const { data: user } = await supabase.auth.getUser()
 
-      // Update question status
       const { error: err1 } = await supabase
         .from('fatwa_questions')
         .update({
@@ -93,7 +103,6 @@ export function QuestionList({ onSelectQuestion }) {
 
       if (err1) throw err1
 
-      // Log to audit
       const { error: err2 } = await supabase
         .from('fatwa_audit_log')
         .insert({
@@ -113,41 +122,31 @@ export function QuestionList({ onSelectQuestion }) {
     }
   }
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'pending':
-        return '#fff3cd'
-      case 'assigned':
-        return '#cfe2ff'
-      case 'under_review':
-        return '#e2e3e5'
-      case 'approved':
-        return '#d1e7dd'
-      case 'published':
-        return '#d1e7dd'
-      case 'closed':
-        return '#f8d7da'
-      default:
-        return '#e0e0e0'
-    }
-  }
-
   if (loading) {
-    return <div className="loading">Loading questions...</div>
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Spinner size="lg" />
+      </div>
+    )
   }
 
   return (
-    <div className="question-list">
-      <h2>Fatwa Questions</h2>
+    <div className="space-y-6">
+      <h2 className="text-xl font-semibold text-neutral-800">Fatwa Questions</h2>
 
-      {error && <div className="error-message">{error}</div>}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg p-3" role="alert">
+          {error}
+        </div>
+      )}
 
-      <div className="filter-section">
-        <label htmlFor="status-filter">Filter by Status:</label>
+      <div className="flex items-center gap-3">
+        <label htmlFor="status-filter" className="text-sm font-medium text-neutral-700">Filter by Status:</label>
         <select
           id="status-filter"
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
+          className="h-10 rounded-lg border border-neutral-200 px-3 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
         >
           <option value="all">All</option>
           <option value="pending">Pending</option>
@@ -159,61 +158,57 @@ export function QuestionList({ onSelectQuestion }) {
         </select>
       </div>
 
-      <div className="questions-list">
+      <div className="space-y-4">
         {questions.length === 0 ? (
-          <p>No questions found</p>
+          <EmptyState
+            icon={Scale}
+            title="No questions found"
+            description="No fatwa questions match the current filter."
+          />
         ) : (
           questions.map((question) => (
             <div
               key={question.id}
-              className="question-card"
-              style={{ borderLeftColor: getStatusColor(question.status) }}
+              className={`bg-white rounded-xl border border-neutral-200 shadow-sm overflow-hidden border-l-4 border-l-${STATUS_VARIANT[question.status] === 'warning' ? 'amber-400' : STATUS_VARIANT[question.status] === 'info' ? 'blue-400' : STATUS_VARIANT[question.status] === 'success' ? 'green-400' : STATUS_VARIANT[question.status] === 'error' ? 'red-400' : 'neutral-300'}`}
             >
-              <div className="question-header">
-                <div className="question-meta">
-                  <span className="reference-number">
-                    {question.reference_number}
-                  </span>
-                  <span className={`status-badge ${question.status}`}>
-                    {question.status}
+              <div className="px-5 py-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span className="font-mono text-xs font-bold text-neutral-500">
+                      {question.reference_number}
+                    </span>
+                    <Badge variant={STATUS_VARIANT[question.status] || 'default'}>
+                      {question.status}
+                    </Badge>
+                  </div>
+                  <span className="text-xs text-neutral-400">
+                    {new Date(question.created_at).toLocaleDateString()}
                   </span>
                 </div>
-                <small className="submitted-date">
-                  {new Date(question.created_at).toLocaleDateString()}
-                </small>
-              </div>
 
-              <div className="question-content">
-                <p className="question-text">{question.question_text}</p>
+                <p className="text-sm font-medium text-neutral-800 mb-1">{question.question_text}</p>
                 {question.context && (
-                  <p className="question-context">
-                    <strong>Context:</strong> {question.context}
+                  <p className="text-xs text-neutral-500 mt-1">
+                    <span className="font-semibold">Context:</span> {question.context}
                   </p>
                 )}
-              </div>
 
-              <div className="question-footer">
-                <div className="question-info">
-                  <small>
-                    <strong>Submitted by:</strong>{' '}
-                    {question.profiles?.full_name || 'Anonymous'}
-                  </small>
-                  {question.assigned_profiles && (
-                    <small>
-                      <strong>Assigned to:</strong>{' '}
-                      {question.assigned_profiles.full_name}
-                    </small>
-                  )}
-                </div>
+                <div className="flex items-center justify-between mt-3 pt-3 border-t border-neutral-100">
+                  <div className="text-xs text-neutral-500 space-y-0.5">
+                    <p>Submitted by: {question.profiles?.full_name || 'Anonymous'}</p>
+                    {question.assigned_profiles && (
+                      <p>Assigned to: {question.assigned_profiles.full_name}</p>
+                    )}
+                  </div>
 
-                <div className="question-actions">
                   {(userRole === 'admin' || userRole === 'mufti') && (
-                    <button
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => onSelectQuestion(question)}
-                      className="respond-button"
                     >
                       {question.status === 'pending' ? 'Assign & Respond' : 'View'}
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useRole } from '../../app/RoleProvider'
+import { Button, Input, Textarea, Label, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../../shared/ui'
 
 const STATUSES = ['pending', 'assigned', 'under_review', 'approved', 'published', 'closed']
 
@@ -181,23 +182,23 @@ export function FatwaEditor({ fatwa, onComplete, onCancel }) {
   }
 
   return (
-    <div className="page max-w-3xl">
+    <div className="max-w-3xl mx-auto px-4 py-6 md:px-6 md:py-8">
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={onCancel} className="btn-ghost text-sm">← Back</button>
-        <h1 className="page-title mb-0">{isEdit ? `Edit Fatwa — ${fatwa.reference_number}` : 'Create New Fatwa'}</h1>
+        <Button variant="ghost" size="sm" onClick={onCancel}>← Back</Button>
+        <h1 className="text-xl font-bold text-neutral-800">{isEdit ? `Edit Fatwa — ${fatwa.reference_number}` : 'Create New Fatwa'}</h1>
       </div>
 
-      {error && <div className="alert-error mb-4 text-sm">{error}</div>}
-      {msg && <div className="alert-success mb-4 text-sm">{msg}</div>}
+      {error && <div className="bg-red-50 text-red-700 rounded-lg p-4 text-sm mb-4">{error}</div>}
+      {msg && <div className="bg-green-50 text-green-700 rounded-lg p-4 text-sm mb-4">{msg}</div>}
 
       {/* ── Question form ── */}
-      <div className="card mb-6">
-        <h3 className="mb-4">Question Details</h3>
+      <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6 mb-6">
+        <h3 className="text-lg font-semibold text-neutral-800 mb-4">Question Details</h3>
         <form onSubmit={handleSaveQuestion} className="space-y-4">
-          <div className="form-group">
-            <label className="form-label">Question <span className="text-tertiary">*</span></label>
-            <textarea
-              className="form-input"
+          <div className="space-y-2">
+            <Label htmlFor="questionText">Question <span className="text-red-500">*</span></Label>
+            <Textarea
+              id="questionText"
               rows={5}
               value={questionText}
               onChange={e => setQuestionText(e.target.value)}
@@ -205,10 +206,10 @@ export function FatwaEditor({ fatwa, onComplete, onCancel }) {
               required
             />
           </div>
-          <div className="form-group">
-            <label className="form-label">Context / Background <span className="text-gray-400 font-normal">(optional)</span></label>
-            <textarea
-              className="form-input"
+          <div className="space-y-2">
+            <Label htmlFor="context">Context / Background <span className="text-gray-400 font-normal">(optional)</span></Label>
+            <Textarea
+              id="context"
               rows={3}
               value={context}
               onChange={e => setContext(e.target.value)}
@@ -216,23 +217,28 @@ export function FatwaEditor({ fatwa, onComplete, onCancel }) {
             />
           </div>
           {isEdit && (
-            <div className="form-group">
-              <label className="form-label">Status</label>
-              <select className="form-input" value={status} onChange={e => setStatus(e.target.value)}>
-                {STATUSES.map(s => (
-                  <option key={s} value={s}>{s.replace('_', ' ')}</option>
-                ))}
-              </select>
+            <div className="space-y-2">
+              <Label htmlFor="status">Status</Label>
+              <Select value={status} onValueChange={setStatus}>
+                <SelectTrigger id="status">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {STATUSES.map(s => (
+                    <SelectItem key={s} value={s}>{s.replace('_', ' ')}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           )}
           <div className="flex items-center gap-3">
-            <button type="submit" disabled={saving || !questionText.trim()} className="btn-primary">
-              {saving ? 'Saving…' : isEdit ? 'Update Question' : 'Create Fatwa'}
-            </button>
+            <Button type="submit" variant="primary" disabled={saving || !questionText.trim()} loading={saving}>
+              {isEdit ? 'Update Question' : 'Create Fatwa'}
+            </Button>
             {isEdit && status === 'under_review' && role === 'admin' && (
-              <button type="button" onClick={handlePublish} disabled={saving} className="btn-secondary">
+              <Button type="button" variant="secondary" onClick={handlePublish} disabled={saving}>
                 🌐 Publish Fatwa
-              </button>
+              </Button>
             )}
           </div>
         </form>
@@ -240,46 +246,49 @@ export function FatwaEditor({ fatwa, onComplete, onCancel }) {
 
       {/* ── Answers section (edit mode only) ── */}
       {isEdit && (
-        <div className="card">
-          <h3 className="mb-4">Answer</h3>
+        <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6">
+          <h3 className="text-lg font-semibold text-neutral-800 mb-4">Answer</h3>
 
           {/* Existing answer — only one allowed */}
           {existingResponses.length > 0 && (
             <div className="space-y-3 mb-6">
               {existingResponses.slice(0, 1).map(resp => (
-                <div key={resp.id} className="bg-neutral-50 rounded-lg border border-gray-200 p-4">
+                <div key={resp.id} className="bg-neutral-50 rounded-lg border border-neutral-200 p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-semibold text-primary">Fatwa Answer</span>
-                    <div className="flex items-center gap-3">
+                    <span className="text-xs font-semibold text-primary-600">Fatwa Answer</span>
+                    <div className="flex items-center gap-2">
                       <span className="text-xs text-gray-400">
                         Answered {new Date(resp.submitted_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                       </span>
-                      <button
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => { setEditingResponseId(resp.id); setEditingResponseText(resp.response_text); setEditingResponseRefs(resp.quotes || '') }}
-                        className="text-xs text-primary hover:underline"
-                      >Edit</button>
-                      <button onClick={() => handleDeleteAnswer(resp.id)} className="text-xs text-tertiary hover:underline">Delete</button>
+                      >Edit</Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDeleteAnswer(resp.id)}
+                      >Delete</Button>
                     </div>
                   </div>
 
                   {editingResponseId === resp.id ? (
                     <div className="space-y-2">
-                      <textarea
-                        className="form-input text-sm"
+                      <Textarea
                         rows={4}
                         value={editingResponseText}
                         onChange={e => setEditingResponseText(e.target.value)}
                         placeholder="Answer text…"
                       />
-                      <input
-                        className="form-input text-sm"
+                      <Input
                         value={editingResponseRefs}
                         onChange={e => setEditingResponseRefs(e.target.value)}
                         placeholder="Quotes (e.g. Quran 2:275, Sahih Bukhari 2083)…"
                       />
                       <div className="flex gap-2">
-                        <button onClick={() => handleUpdateAnswer(resp.id)} disabled={saving} className="btn-primary text-xs py-1.5 px-3">Save</button>
-                        <button onClick={() => setEditingResponseId(null)} className="btn-ghost text-xs py-1.5 px-3">Cancel</button>
+                        <Button variant="primary" size="sm" onClick={() => handleUpdateAnswer(resp.id)} disabled={saving}>Save</Button>
+                        <Button variant="ghost" size="sm" onClick={() => setEditingResponseId(null)}>Cancel</Button>
                       </div>
                     </div>
                   ) : (
@@ -301,29 +310,29 @@ export function FatwaEditor({ fatwa, onComplete, onCancel }) {
           {/* Add answer — only if no answer exists yet */}
           {existingResponses.length === 0 && status !== 'published' && status !== 'closed' && (
             <form onSubmit={handleAddAnswer} className="space-y-3">
-              <div className="form-group">
-                <label className="form-label">Write Answer</label>
-                <textarea
-                  className="form-input"
+              <div className="space-y-2">
+                <Label htmlFor="answerText">Write Answer</Label>
+                <Textarea
+                  id="answerText"
                   rows={5}
                   value={answerText}
                   onChange={e => setAnswerText(e.target.value)}
                   placeholder="Write the fatwa answer / ruling here…"
                 />
               </div>
-              <div className="form-group">
-                <label className="form-label">Quotes <span className="text-gray-400 font-normal">(optional)</span></label>
-                <input
-                  className="form-input"
+              <div className="space-y-2">
+                <Label htmlFor="answerRefs">Quotes <span className="text-gray-400 font-normal">(optional)</span></Label>
+                <Input
+                  id="answerRefs"
                   value={answerRefs}
                   onChange={e => setAnswerRefs(e.target.value)}
                   placeholder="e.g. Quran 2:275, Sahih Bukhari 2083, Ibn Qudama al-Mughni…"
                 />
                 <p className="text-xs text-gray-400 mt-1">Cite Quranic verses, Hadith, or scholarly sources that support this ruling.</p>
               </div>
-              <button type="submit" disabled={saving || !answerText.trim()} className="btn-primary">
-                {saving ? 'Saving…' : 'Add Answer'}
-              </button>
+              <Button type="submit" variant="primary" disabled={saving || !answerText.trim()} loading={saving}>
+                Add Answer
+              </Button>
             </form>
           )}
 

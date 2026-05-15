@@ -93,7 +93,7 @@ export default function ProfileModal({ onClose }) {
         {/* Header */}
         <div className="bg-primary px-6 py-4 flex items-center justify-between">
           <h2 className="text-white font-semibold text-lg">My Profile</h2>
-          <button onClick={onClose} className="text-primary-200 hover:text-white text-xl leading-none">✕</button>
+          <button onClick={onClose} className="text-primary-200 hover:text-white text-xl leading-none" aria-label="Close profile">✕</button>
         </div>
 
         {loading ? (

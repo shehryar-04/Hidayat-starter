@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
+import { Spinner } from '../../shared/ui'
 
 /**
  * Disbursement Report Component
@@ -107,7 +108,7 @@ export function DisbursementReport() {
   }
 
   if (loading) {
-    return <div className="loading">Loading disbursement report...</div>
+    return <div className="flex items-center justify-center py-16"><Spinner size="lg" /></div>
   }
 
   return (

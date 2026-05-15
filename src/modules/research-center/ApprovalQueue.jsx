@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
+import { CheckCircle2, Eye } from 'lucide-react'
+import { Button } from '../../shared/ui'
 
 /**
  * Approval Queue — admin only.
@@ -63,15 +65,15 @@ export function ApprovalQueue() {
     return map[t] || t
   }
 
-  if (loading) return <div className="loading">Loading approval queue…</div>
+  if (loading) return <div className="text-center py-12 text-gray-500">Loading approval queue…</div>
 
   return (
     <div>
-      {error && <div className="alert-error mb-4">{error}</div>}
+      {error && <div className="bg-red-50 text-red-700 rounded-lg p-4 text-sm mb-4">{error}</div>}
 
       {publications.length === 0 ? (
         <div className="text-center py-16">
-          <span className="material-symbols-outlined text-5xl text-gray-300 mb-4 block">task_alt</span>
+          <CheckCircle2 className="w-12 h-12 text-gray-300 mb-4 mx-auto" />
           <p className="text-gray-500 font-medium">No publications pending approval</p>
           <p className="text-gray-400 text-sm mt-1">All caught up!</p>
         </div>
@@ -80,12 +82,12 @@ export function ApprovalQueue() {
           <p className="text-sm text-gray-500 mb-2">{publications.length} publication(s) awaiting review</p>
 
           {publications.map(pub => (
-            <div key={pub.id} className="card flex flex-col sm:flex-row gap-4">
+            <div key={pub.id} className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6 flex flex-col sm:flex-row gap-4">
               {/* Info */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-start gap-2 mb-2">
                   <h3 className="font-serif font-semibold text-primary text-lg truncate">{pub.title}</h3>
-                  <span className="badge-yellow whitespace-nowrap text-xs">{typeLabel(pub.publication_type)}</span>
+                  <span className="inline-block bg-yellow-50 text-yellow-700 text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap">{typeLabel(pub.publication_type)}</span>
                 </div>
 
                 {pub.abstract && (
@@ -102,26 +104,32 @@ export function ApprovalQueue() {
               {/* Actions */}
               <div className="flex sm:flex-col gap-2 sm:items-end justify-end shrink-0">
                 {pub.file_path && (
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={() => handlePreview(pub)}
-                    className="btn-ghost text-xs flex items-center gap-1"
+                    className="text-xs flex items-center gap-1"
                   >
-                    <span className="material-symbols-outlined text-sm">visibility</span>
+                    <Eye className="w-4 h-4" />
                     Preview
-                  </button>
+                  </Button>
                 )}
-                <button
+                <Button
+                  variant="primary"
+                  size="sm"
                   onClick={() => handleAction(pub.id, 'published')}
-                  className="btn-primary text-xs px-4"
+                  className="text-xs"
                 >
                   Approve
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
                   onClick={() => handleAction(pub.id, 'rejected')}
-                  className="btn-danger text-xs px-4"
+                  className="text-xs"
                 >
                   Reject
-                </button>
+                </Button>
               </div>
             </div>
           ))}

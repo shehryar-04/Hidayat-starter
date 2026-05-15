@@ -1,4 +1,6 @@
 import { useState, useRef } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ChevronLeft, ChevronRight, HelpCircle, Lightbulb } from 'lucide-react'
 
 const flashcards = [
   { q: "According to the teachings of Islam, what is the consequence of injustice (Zulm) in the Hereafter?", a: "It becomes a source of ruin and severe distress." },
@@ -44,17 +46,18 @@ const flashcards = [
 ]
 
 const cardColors = [
-  { front: 'bg-pink-100 border-pink-200', back: 'bg-pink-500', label: 'text-pink-600', hint: 'text-pink-400' },
-  { front: 'bg-emerald-100 border-emerald-200', back: 'bg-emerald-500', label: 'text-emerald-600', hint: 'text-emerald-400' },
-  { front: 'bg-amber-100 border-amber-200', back: 'bg-amber-500', label: 'text-amber-600', hint: 'text-amber-400' },
-  { front: 'bg-blue-100 border-blue-200', back: 'bg-blue-500', label: 'text-blue-600', hint: 'text-blue-400' },
-  { front: 'bg-purple-100 border-purple-200', back: 'bg-purple-500', label: 'text-purple-600', hint: 'text-purple-400' },
-  { front: 'bg-rose-100 border-rose-200', back: 'bg-rose-500', label: 'text-rose-600', hint: 'text-rose-400' },
-  { front: 'bg-teal-100 border-teal-200', back: 'bg-teal-500', label: 'text-teal-600', hint: 'text-teal-400' },
-  { front: 'bg-orange-100 border-orange-200', back: 'bg-orange-500', label: 'text-orange-600', hint: 'text-orange-400' },
-  { front: 'bg-indigo-100 border-indigo-200', back: 'bg-indigo-500', label: 'text-indigo-600', hint: 'text-indigo-400' },
-  { front: 'bg-cyan-100 border-cyan-200', back: 'bg-cyan-500', label: 'text-cyan-600', hint: 'text-cyan-400' },
+  { front: 'bg-pink-50 border-pink-200', back: 'bg-pink-500', label: 'text-pink-600', hint: 'text-pink-400' },
+  { front: 'bg-emerald-50 border-emerald-200', back: 'bg-emerald-500', label: 'text-emerald-600', hint: 'text-emerald-400' },
+  { front: 'bg-amber-50 border-amber-200', back: 'bg-amber-500', label: 'text-amber-600', hint: 'text-amber-400' },
+  { front: 'bg-blue-50 border-blue-200', back: 'bg-blue-500', label: 'text-blue-600', hint: 'text-blue-400' },
+  { front: 'bg-purple-50 border-purple-200', back: 'bg-purple-500', label: 'text-purple-600', hint: 'text-purple-400' },
+  { front: 'bg-rose-50 border-rose-200', back: 'bg-rose-500', label: 'text-rose-600', hint: 'text-rose-400' },
+  { front: 'bg-teal-50 border-teal-200', back: 'bg-teal-500', label: 'text-teal-600', hint: 'text-teal-400' },
+  { front: 'bg-orange-50 border-orange-200', back: 'bg-orange-500', label: 'text-orange-600', hint: 'text-orange-400' },
+  { front: 'bg-indigo-50 border-indigo-200', back: 'bg-indigo-500', label: 'text-indigo-600', hint: 'text-indigo-400' },
+  { front: 'bg-cyan-50 border-cyan-200', back: 'bg-cyan-500', label: 'text-cyan-600', hint: 'text-cyan-400' },
 ]
+
 
 function Flashcard({ card, index }) {
   const [flipped, setFlipped] = useState(false)
@@ -62,36 +65,51 @@ function Flashcard({ card, index }) {
 
   return (
     <div
-      className="flex-shrink-0 w-[280px] sm:w-[320px] h-[220px] sm:h-[240px] cursor-pointer perspective-[1000px]"
+      className="flex-shrink-0 w-[280px] sm:w-[320px] h-[220px] sm:h-[240px] cursor-pointer"
+      style={{ perspective: '1000px' }}
       onClick={() => setFlipped(f => !f)}
     >
-      <div
-        className={`relative w-full h-full transition-transform duration-500 transform-style-3d ${flipped ? 'rotate-y-180' : ''}`}
-      >
-        {/* Front — Question */}
-        <div className={`absolute inset-0 backface-hidden rounded-2xl border shadow-md p-6 flex flex-col justify-between ${color.front}`}>
-          <div className={`flex items-center gap-2 mb-3 ${color.label}`}>
-            <span className="material-symbols-outlined text-lg">help</span>
-            <span className="text-[10px] font-bold uppercase tracking-widest">Question</span>
-          </div>
-          <p className="font-serif text-sm sm:text-base text-gray-800 leading-relaxed line-clamp-5 flex-1">
-            {card.q}
-          </p>
-          <p className={`text-[10px] mt-2 text-center ${color.hint}`}>Tap to reveal answer</p>
-        </div>
-
-        {/* Back — Answer */}
-        <div className={`absolute inset-0 backface-hidden rotate-y-180 rounded-2xl text-white shadow-md p-6 flex flex-col justify-between ${color.back}`}>
-          <div className="flex items-center gap-2 text-white/80 mb-3">
-            <span className="material-symbols-outlined text-lg">lightbulb</span>
-            <span className="text-[10px] font-bold uppercase tracking-widest">Answer</span>
-          </div>
-          <p className="font-serif text-sm sm:text-base leading-relaxed line-clamp-5 flex-1">
-            {card.a}
-          </p>
-          <p className="text-[10px] text-white/50 mt-2 text-center">Tap to see question</p>
-        </div>
-      </div>
+      <AnimatePresence initial={false} mode="wait">
+        {!flipped ? (
+          <motion.div
+            key="front"
+            className={`absolute inset-0 rounded-xl border shadow-sm p-6 flex flex-col justify-between ${color.front}`}
+            initial={{ rotateY: 180, opacity: 0 }}
+            animate={{ rotateY: 0, opacity: 1 }}
+            exit={{ rotateY: -90, opacity: 0 }}
+            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+            style={{ backfaceVisibility: 'hidden' }}
+          >
+            <div className={`flex items-center gap-2 mb-3 ${color.label}`}>
+              <HelpCircle className="w-4 h-4" />
+              <span className="text-[10px] font-bold uppercase tracking-widest">Question</span>
+            </div>
+            <p className="font-display text-sm sm:text-base text-gray-800 leading-relaxed line-clamp-5 flex-1">
+              {card.q}
+            </p>
+            <p className={`text-[10px] mt-2 text-center ${color.hint}`}>Tap to reveal answer</p>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="back"
+            className={`absolute inset-0 rounded-xl text-white shadow-sm p-6 flex flex-col justify-between ${color.back}`}
+            initial={{ rotateY: -180, opacity: 0 }}
+            animate={{ rotateY: 0, opacity: 1 }}
+            exit={{ rotateY: 90, opacity: 0 }}
+            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+            style={{ backfaceVisibility: 'hidden' }}
+          >
+            <div className="flex items-center gap-2 text-white/80 mb-3">
+              <Lightbulb className="w-4 h-4" />
+              <span className="text-[10px] font-bold uppercase tracking-widest">Answer</span>
+            </div>
+            <p className="font-display text-sm sm:text-base leading-relaxed line-clamp-5 flex-1">
+              {card.a}
+            </p>
+            <p className="text-[10px] text-white/50 mt-2 text-center">Tap to see question</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
@@ -107,29 +125,29 @@ export default function FlashcardSlider() {
   }
 
   return (
-    <section className="py-16 sm:py-24 bg-background overflow-hidden">
+    <section className="py-16 sm:py-24 bg-neutral-50 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 sm:mb-12 gap-4">
           <div>
-            <span className="text-[10px] sm:text-label-sm text-secondary tracking-[0.3em] uppercase font-bold">Test Your Knowledge</span>
-            <h2 className="font-serif text-2xl sm:text-headline-lg text-primary mt-2">Islamic Knowledge Flashcards</h2>
-            <p className="text-sm text-slate-500 mt-2">Click any card to reveal the answer. Swipe or use arrows to browse all 40 cards.</p>
+            <span className="text-[10px] sm:text-xs text-primary-500 tracking-[0.3em] uppercase font-bold">Test Your Knowledge</span>
+            <h2 className="font-display font-bold text-2xl sm:text-3xl text-neutral-900 mt-2">Islamic Knowledge Flashcards</h2>
+            <p className="text-sm text-neutral-500 mt-2">Click any card to reveal the answer. Swipe or use arrows to browse all 40 cards.</p>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => scroll('left')}
-              className="w-10 h-10 rounded-full border border-outline bg-white flex items-center justify-center hover:bg-primary hover:text-white hover:border-primary transition-all"
+              className="w-10 h-10 rounded-full border border-neutral-200 bg-white flex items-center justify-center hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-all duration-150"
               aria-label="Scroll left"
             >
-              <span className="material-symbols-outlined text-lg">chevron_left</span>
+              <ChevronLeft className="w-5 h-5" />
             </button>
             <button
               onClick={() => scroll('right')}
-              className="w-10 h-10 rounded-full border border-outline bg-white flex items-center justify-center hover:bg-primary hover:text-white hover:border-primary transition-all"
+              className="w-10 h-10 rounded-full border border-neutral-200 bg-white flex items-center justify-center hover:bg-primary-500 hover:text-white hover:border-primary-500 transition-all duration-150"
               aria-label="Scroll right"
             >
-              <span className="material-symbols-outlined text-lg">chevron_right</span>
+              <ChevronRight className="w-5 h-5" />
             </button>
           </div>
         </div>
@@ -137,11 +155,11 @@ export default function FlashcardSlider() {
         {/* Slider */}
         <div
           ref={scrollRef}
-          className="flex gap-4 sm:gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory"
+          className="flex gap-4 sm:gap-6 overflow-x-auto pb-4 snap-x snap-mandatory"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {flashcards.map((card, i) => (
-            <div key={i} className="snap-start">
+            <div key={i} className="snap-start relative">
               <Flashcard card={card} index={i} />
             </div>
           ))}

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { StudentCourseView } from './StudentCourseView'
+import { Button, Spinner, EmptyState } from '../../shared/ui'
+import { CheckCircle } from 'lucide-react'
 
 const LEVEL_COLORS = {
   Beginner: 'bg-green-100 text-green-700',
@@ -75,15 +77,15 @@ export function AdminCourseReview() {
             <span className="text-sm text-gray-600">by {previewing.profiles?.full_name || 'Unknown'}</span>
           </div>
           <div className="flex gap-2">
-            <button onClick={() => handleApprove(previewing.id)} className="btn-primary text-sm py-1.5 px-4">
+            <Button variant="primary" size="sm" onClick={() => handleApprove(previewing.id)}>
               ✓ Approve & Publish
-            </button>
-            <button onClick={() => handleReject(previewing.id)} className="btn-danger text-sm py-1.5 px-4">
+            </Button>
+            <Button variant="destructive" size="sm" onClick={() => handleReject(previewing.id)}>
               ✕ Reject
-            </button>
-            <button onClick={() => setPreviewing(null)} className="btn-ghost text-sm py-1.5 px-4">
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => setPreviewing(null)}>
               ← Back to Queue
-            </button>
+            </Button>
           </div>
         </div>
         {/* Render the student course view for preview */}
@@ -92,18 +94,25 @@ export function AdminCourseReview() {
     )
   }
 
-  if (loading) return <div className="loading">Loading pending courses…</div>
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Spinner size="lg" />
+      </div>
+    )
+  }
 
   return (
-    <div className="page">
-      {error && <div className="alert-error mb-4 text-sm">{error}</div>}
-      {msg && <div className="alert-success mb-4 text-sm">{msg}</div>}
+    <div className="max-w-[1280px] mx-auto px-4 py-6 md:px-6 md:py-8">
+      {error && <div className="bg-error-light text-error-dark rounded-lg p-4 text-sm mb-4">{error}</div>}
+      {msg && <div className="bg-success-light text-success-dark rounded-lg p-4 text-sm mb-4">{msg}</div>}
 
       {courses.length === 0 ? (
-        <div className="card text-center py-16 text-gray-400">
-          <div className="text-4xl mb-3">✅</div>
-          <p className="text-sm">No courses pending approval. All clear!</p>
-        </div>
+        <EmptyState
+          icon={CheckCircle}
+          title="All clear!"
+          description="No courses pending approval."
+        />
       ) : (
         <div className="space-y-4">
           <p className="text-sm text-gray-500 mb-2">{courses.length} course{courses.length !== 1 ? 's' : ''} awaiting your review.</p>
@@ -140,15 +149,15 @@ export function AdminCourseReview() {
 
                 {/* Actions */}
                 <div className="mt-3 flex gap-2">
-                  <button onClick={() => setPreviewing(course)} className="btn-outline flex-1 text-xs py-1.5">
+                  <Button variant="outline" size="sm" className="flex-1" onClick={() => setPreviewing(course)}>
                     👁 Preview Course
-                  </button>
-                  <button onClick={() => handleApprove(course.id)} className="btn-primary text-xs py-1.5 px-4">
+                  </Button>
+                  <Button variant="primary" size="sm" onClick={() => handleApprove(course.id)}>
                     ✓ Approve
-                  </button>
-                  <button onClick={() => handleReject(course.id)} className="btn-danger text-xs py-1.5 px-4">
+                  </Button>
+                  <Button variant="destructive" size="sm" onClick={() => handleReject(course.id)}>
                     ✕ Reject
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>

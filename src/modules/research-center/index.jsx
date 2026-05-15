@@ -3,10 +3,7 @@ import { useRole } from '../../app/RoleProvider'
 import { PublicationSubmissionForm } from './PublicationSubmissionForm'
 import { PublicationRepository } from './PublicationRepository'
 import { ApprovalQueue } from './ApprovalQueue'
-
-function Icon({ name, className = '' }) {
-  return <span className={`material-symbols-outlined ${className}`}>{name}</span>
-}
+import { Tabs } from '../../shared/ui'
 
 // ─── Hero Section ────────────────────────────────────────────
 function ResearchCenterHero() {
@@ -49,40 +46,19 @@ export default function ResearchCenterModule() {
   const isAdmin = role === 'admin'
   const isScholar = role === 'scholar' || role === 'mufti'
 
-  const [view, setView] = useState('repository')
-
   // Build tabs based on role
-  const tabs = [['repository', 'Publications']]
-  if (isAdmin || isScholar) tabs.push(['submit', 'Submit Publication'])
-  if (isAdmin) tabs.push(['approval', 'Approval Queue'])
+  const tabItems = [{ label: 'Publications', content: <PublicationRepository /> }]
+  if (isAdmin || isScholar) tabItems.push({ label: 'Submit Publication', content: <PublicationSubmissionForm onComplete={() => {}} /> })
+  if (isAdmin) tabItems.push({ label: 'Approval Queue', content: <ApprovalQueue /> })
 
   return (
     <div>
       {/* Hero */}
       <ResearchCenterHero />
 
-      {/* Tab bar */}
-      <div id="publications" className="bg-white border-b border-outline px-6 md:px-8 pt-6 pb-0">
-        <div className="tab-bar">
-          {tabs.map(([key, label]) => (
-            <button
-              key={key}
-              onClick={() => setView(key)}
-              className={`tab ${view === key ? 'active' : ''}`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="p-6 md:p-8">
-        {view === 'repository' && <PublicationRepository />}
-        {view === 'submit' && (isAdmin || isScholar) && (
-          <PublicationSubmissionForm onComplete={() => setView('repository')} />
-        )}
-        {view === 'approval' && isAdmin && <ApprovalQueue />}
+      {/* Tabs + Content */}
+      <div id="publications" className="p-6 md:p-8">
+        <Tabs items={tabItems} />
       </div>
     </div>
   )

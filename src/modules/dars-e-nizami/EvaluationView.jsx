@@ -1,5 +1,11 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
+import {
+  Button, Input, Card, CardContent,
+  Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
+  Badge, Spinner, EmptyState, Modal
+} from '../../shared/ui'
+import { ClipboardList } from 'lucide-react'
 
 /**
  * Evaluation View Component
@@ -93,7 +99,6 @@ export function EvaluationView({ selectedStudent, selectedLevel }) {
     if (!selectedStudent || !selectedLevel) return
 
     try {
-      // Get all subjects for this level
       const { data: levelSubjects, error: err1 } = await supabase
         .from('dars_e_nizami_subjects')
         .select('id')
@@ -106,7 +111,6 @@ export function EvaluationView({ selectedStudent, selectedLevel }) {
         return
       }
 
-      // Get evaluations for this student in this level
       const { data: evals, error: err2 } = await supabase
         .from('evaluations')
         .select('subject_id, score, flagged')
@@ -115,7 +119,6 @@ export function EvaluationView({ selectedStudent, selectedLevel }) {
 
       if (err2) throw err2
 
-      // Check if all subjects have passing evaluations
       const passingThreshold = selectedLevel.passing_threshold || 50
       const allSubjectsEvaluated = levelSubjects.every((subject) => {
         const evaluation = evals?.find((e) => e.subject_id === subject.id)
@@ -177,7 +180,6 @@ export function EvaluationView({ selectedStudent, selectedLevel }) {
 
     setLoading(true)
     try {
-      // Call the promote-student Edge Function
       const { data: user } = await supabase.auth.getUser()
 
       const response = await supabase.functions.invoke('promote-student', {
@@ -202,52 +204,64 @@ export function EvaluationView({ selectedStudent, selectedLevel }) {
 
   if (!selectedStudent || !selectedLevel) {
     return (
-      <div className="evaluation-view">
-        <p>Please select a student and level to view evaluations</p>
-      </div>
+      <EmptyState
+        icon={ClipboardList}
+        title="No selection"
+        description="Please select a student and level to view evaluations."
+      />
     )
   }
 
   return (
-    <div className="evaluation-view">
-      <h2>
+    <div className="space-y-6">
+      <h2 className="text-xl font-semibold text-neutral-800">
         Evaluations for {selectedStudent.profiles?.full_name} - {selectedLevel.name}
       </h2>
 
-      {error && <div className="error-message">{error}</div>}
-
-      {levelCompletion === 'complete' && (
-        <div className="success-message">
-          <strong>Level Complete!</strong> This student has passed all subjects
-          and is eligible for promotion.
-          <button
-            onClick={handlePromoteStudent}
-            disabled={loading}
-            className="promote-button"
-          >
-            {loading ? 'Promoting...' : 'Promote to Next Level'}
-          </button>
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg p-3" role="alert">
+          {error}
         </div>
       )}
 
-      <button
+      {levelCompletion === 'complete' && (
+        <Card className="border-l-4 border-l-green-500 bg-green-50">
+          <CardContent>
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div>
+                <p className="font-semibold text-green-800">Level Complete!</p>
+                <p className="text-sm text-green-700">This student has passed all subjects and is eligible for promotion.</p>
+              </div>
+              <Button
+                onClick={handlePromoteStudent}
+                loading={loading}
+                variant="primary"
+              >
+                Promote to Next Level
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      <Button
         onClick={() => setShowEvaluationForm(!showEvaluationForm)}
-        className="add-evaluation-button"
+        variant={showEvaluationForm ? 'outline' : 'primary'}
       >
         {showEvaluationForm ? 'Cancel' : 'Record Evaluation'}
-      </button>
+      </Button>
 
-      {showEvaluationForm && (
-        <form onSubmit={handleRecordEvaluation} className="evaluation-form">
-          <div className="form-group">
-            <label htmlFor="subject-select">Subject</label>
+      <Modal open={showEvaluationForm} onClose={() => setShowEvaluationForm(false)} size="sm">
+        <h3 className="text-lg font-semibold text-neutral-800 mb-4">Record Evaluation</h3>
+        <form onSubmit={handleRecordEvaluation} className="space-y-4">
+          <div className="space-y-2">
+            <label htmlFor="subject-select" className="text-sm font-medium text-neutral-700">Subject</label>
             <select
               id="subject-select"
               value={formData.subject_id}
-              onChange={(e) =>
-                setFormData({ ...formData, subject_id: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, subject_id: e.target.value })}
               required
+              className="h-10 w-full rounded-lg border border-neutral-200 px-3 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             >
               <option value="">Select a subject...</option>
               {subjects.map((subject) => (
@@ -258,70 +272,72 @@ export function EvaluationView({ selectedStudent, selectedLevel }) {
             </select>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="score-input">Score</label>
-            <input
+          <div className="space-y-2">
+            <label htmlFor="score-input" className="text-sm font-medium text-neutral-700">Score</label>
+            <Input
               id="score-input"
               type="number"
               min="0"
               max="100"
               step="0.5"
               value={formData.score}
-              onChange={(e) =>
-                setFormData({ ...formData, score: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, score: e.target.value })}
               required
               placeholder="Enter score (0-100)"
             />
           </div>
 
-          <button type="submit" disabled={loading}>
-            {loading ? 'Recording...' : 'Record Evaluation'}
-          </button>
+          <Button type="submit" loading={loading} className="w-full">
+            Record Evaluation
+          </Button>
         </form>
-      )}
+      </Modal>
 
-      {loading ? (
-        <div className="loading">Loading evaluations...</div>
+      {loading && !showEvaluationForm ? (
+        <div className="flex items-center justify-center py-16">
+          <Spinner size="lg" />
+        </div>
       ) : (
-        <div className="evaluations-list">
+        <div>
           {evaluations.length === 0 ? (
-            <p>No evaluations recorded</p>
+            <EmptyState
+              icon={ClipboardList}
+              title="No evaluations"
+              description="No evaluations have been recorded yet."
+            />
           ) : (
-            <table className="evaluations-table">
-              <thead>
-                <tr>
-                  <th>Subject</th>
-                  <th>Score</th>
-                  <th>Evaluated By</th>
-                  <th>Date</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Subject</TableHead>
+                  <TableHead>Score</TableHead>
+                  <TableHead>Evaluated By</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {evaluations.map((evaluation) => (
-                  <tr key={evaluation.id}>
-                    <td>{evaluation.dars_e_nizami_subjects?.name}</td>
-                    <td>{evaluation.score}</td>
-                    <td>
+                  <TableRow key={evaluation.id}>
+                    <TableCell>{evaluation.dars_e_nizami_subjects?.name}</TableCell>
+                    <TableCell>{evaluation.score}</TableCell>
+                    <TableCell>
                       {evaluation.scholars?.profiles?.full_name || 'Unknown'}
-                    </td>
-                    <td>
+                    </TableCell>
+                    <TableCell>
                       {new Date(evaluation.evaluated_at).toLocaleDateString()}
-                    </td>
-                    <td>
+                    </TableCell>
+                    <TableCell>
                       {evaluation.flagged ? (
-                        <span className="status-badge flagged">
-                          Below Threshold
-                        </span>
+                        <Badge variant="error">Below Threshold</Badge>
                       ) : (
-                        <span className="status-badge passing">Passing</span>
+                        <Badge variant="success">Passing</Badge>
                       )}
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           )}
         </div>
       )}

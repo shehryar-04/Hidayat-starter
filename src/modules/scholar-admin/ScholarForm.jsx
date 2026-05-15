@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
+import { Button, Input, Label, Textarea, Badge, Spinner } from '../../shared/ui'
 
 /**
  * Reusable tag list editor (qualifications, specializations)
@@ -13,17 +14,16 @@ function TagListEditor({ label, placeholder, items, onChange }) {
   }
 
   return (
-    <div className="form-group">
-      <label className="form-label">{label}</label>
+    <div className="space-y-2">
+      <Label>{label}</Label>
       <div className="flex gap-2 mb-2">
-        <input
-          className="form-input"
+        <Input
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), add())}
           placeholder={placeholder}
         />
-        <button type="button" onClick={add} className="btn-secondary px-4 flex-shrink-0">Add</button>
+        <Button type="button" variant="secondary" size="sm" onClick={add} className="flex-shrink-0">Add</Button>
       </div>
       {items.length > 0 && (
         <div className="flex flex-wrap gap-2">
@@ -166,8 +166,8 @@ export function ScholarForm({ onComplete }) {
   // ── Success screen ────────────────────────────────────────
   if (created) {
     return (
-      <div className="page max-w-lg">
-        <div className="card text-center py-10">
+      <div className="max-w-[1280px] mx-auto px-4 py-6 md:px-6 md:py-8 max-w-lg">
+        <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6 text-center py-10">
           <div className="text-4xl mb-4">✅</div>
           <h2 className="font-serif text-xl text-primary mb-2">Scholar Added</h2>
           <p className="text-sm text-gray-600 mb-1">
@@ -178,9 +178,8 @@ export function ScholarForm({ onComplete }) {
             They should use "Forgot Password" to set their password on first login.
           </p>
           <div className="flex gap-3 justify-center">
-            <button onClick={() => { setCreated(null); setFullName(''); setEmail(''); setTitle(''); setBio(''); setQualifications([]); setSpecializations([]); setPhone(''); setAddress('') }}
-              className="btn-outline">Add Another</button>
-            <button onClick={onComplete} className="btn-primary">Done</button>
+            <Button variant="outline" onClick={() => { setCreated(null); setFullName(''); setEmail(''); setTitle(''); setBio(''); setQualifications([]); setSpecializations([]); setPhone(''); setAddress('') }}>Add Another</Button>
+            <Button variant="primary" onClick={onComplete}>Done</Button>
           </div>
         </div>
       </div>
@@ -188,41 +187,41 @@ export function ScholarForm({ onComplete }) {
   }
 
   return (
-    <div className="page max-w-2xl">
+    <div className="max-w-[1280px] mx-auto px-4 py-6 md:px-6 md:py-8 max-w-2xl">
       <div className="page-header">
         <h1 className="page-title">Add New Scholar</h1>
         <p className="page-subtitle">Create a scholar account. They will receive an email to set their password.</p>
       </div>
 
-      {error && <div className="alert-error mb-4 text-sm">{error}</div>}
+      {error && <div className="bg-red-50 text-red-700 rounded-lg p-4 text-sm mb-4">{error}</div>}
 
       <form onSubmit={handleSubmit} className="space-y-6">
 
         {/* ── Identity ── */}
-        <div className="card">
+        <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6">
           <h3 className="mb-4">Identity</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="form-group sm:col-span-2">
-              <label className="form-label">Full Name <span className="text-tertiary">*</span></label>
-              <input className="form-input" value={fullName} onChange={e => setFullName(e.target.value)}
+            <div className="space-y-2 sm:col-span-2">
+              <Label>Full Name <span className="text-tertiary">*</span></Label>
+              <Input value={fullName} onChange={e => setFullName(e.target.value)}
                 placeholder="e.g. Sheikh Abdullah Al-Farouqi" required />
             </div>
-            <div className="form-group sm:col-span-2">
-              <label className="form-label">Email Address <span className="text-tertiary">*</span></label>
-              <input className="form-input" type="email" value={email} onChange={e => setEmail(e.target.value)}
+            <div className="space-y-2 sm:col-span-2">
+              <Label>Email Address <span className="text-tertiary">*</span></Label>
+              <Input type="email" value={email} onChange={e => setEmail(e.target.value)}
                 placeholder="scholar@institution.edu" required />
               <p className="text-xs text-gray-400 mt-1">Used for login. Scholar will receive a password-reset email.</p>
             </div>
-            <div className="form-group">
-              <label className="form-label">Role</label>
-              <select className="form-input" value={role} onChange={e => setRole(e.target.value)}>
+            <div className="space-y-2">
+              <Label>Role</Label>
+              <select className="h-10 w-full rounded-lg border border-neutral-200 px-3 text-sm shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500" value={role} onChange={e => setRole(e.target.value)}>
                 <option value="scholar">Scholar</option>
                 <option value="mufti">Mufti</option>
               </select>
             </div>
-            <div className="form-group">
-              <label className="form-label">Employment Status</label>
-              <select className="form-input" value={employmentStatus} onChange={e => setEmploymentStatus(e.target.value)}>
+            <div className="space-y-2">
+              <Label>Employment Status</Label>
+              <select className="h-10 w-full rounded-lg border border-neutral-200 px-3 text-sm shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500" value={employmentStatus} onChange={e => setEmploymentStatus(e.target.value)}>
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
               </select>
@@ -231,44 +230,48 @@ export function ScholarForm({ onComplete }) {
         </div>
 
         {/* ── Academic profile ── */}
-        <div className="card">
+        <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6">
           <h3 className="mb-4">Academic Profile</h3>
-          <div className="form-group">
-            <label className="form-label">Title / Honorific</label>
-            <input className="form-input" value={title} onChange={e => setTitle(e.target.value)}
+          <div className="space-y-2">
+            <Label>Title / Honorific</Label>
+            <Input value={title} onChange={e => setTitle(e.target.value)}
               placeholder="e.g. Sheikh, Dr., Ustadh, Mufti" />
           </div>
-          <div className="form-group">
-            <label className="form-label">Biography</label>
-            <textarea className="form-input" rows={4} value={bio} onChange={e => setBio(e.target.value)}
+          <div className="space-y-2 mt-4">
+            <Label>Biography</Label>
+            <Textarea rows={4} value={bio} onChange={e => setBio(e.target.value)}
               placeholder="A brief biography of the scholar's background and expertise…" />
           </div>
-          <TagListEditor
-            label="Qualifications"
-            placeholder="e.g. PhD Islamic Studies, Ijazah in Hadith — press Enter or Add"
-            items={qualifications}
-            onChange={setQualifications}
-          />
-          <TagListEditor
-            label="Specializations"
-            placeholder="e.g. Fiqh, Tafsir, Hadith, Aqeedah — press Enter or Add"
-            items={specializations}
-            onChange={setSpecializations}
-          />
+          <div className="mt-4">
+            <TagListEditor
+              label="Qualifications"
+              placeholder="e.g. PhD Islamic Studies, Ijazah in Hadith — press Enter or Add"
+              items={qualifications}
+              onChange={setQualifications}
+            />
+          </div>
+          <div className="mt-4">
+            <TagListEditor
+              label="Specializations"
+              placeholder="e.g. Fiqh, Tafsir, Hadith, Aqeedah — press Enter or Add"
+              items={specializations}
+              onChange={setSpecializations}
+            />
+          </div>
         </div>
 
         {/* ── Contact ── */}
-        <div className="card">
+        <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6">
           <h3 className="mb-4">Contact Information</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="form-group">
-              <label className="form-label">Phone</label>
-              <input className="form-input" type="tel" value={phone} onChange={e => setPhone(e.target.value)}
+            <div className="space-y-2">
+              <Label>Phone</Label>
+              <Input type="tel" value={phone} onChange={e => setPhone(e.target.value)}
                 placeholder="+1 555 000 0000" />
             </div>
-            <div className="form-group sm:col-span-2">
-              <label className="form-label">Address</label>
-              <textarea className="form-input" rows={2} value={address} onChange={e => setAddress(e.target.value)}
+            <div className="space-y-2 sm:col-span-2">
+              <Label>Address</Label>
+              <Textarea rows={2} value={address} onChange={e => setAddress(e.target.value)}
                 placeholder="Office or mailing address" />
             </div>
           </div>
@@ -276,10 +279,10 @@ export function ScholarForm({ onComplete }) {
 
         {/* ── Actions ── */}
         <div className="flex gap-3">
-          <button type="submit" disabled={saving || !fullName.trim() || !email.trim()} className="btn-primary">
+          <Button type="submit" variant="primary" disabled={saving || !fullName.trim() || !email.trim()}>
             {saving ? 'Creating Scholar…' : 'Create Scholar'}
-          </button>
-          <button type="button" onClick={onComplete} className="btn-ghost">Cancel</button>
+          </Button>
+          <Button type="button" variant="ghost" size="sm" onClick={onComplete}>Cancel</Button>
         </div>
       </form>
     </div>

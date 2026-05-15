@@ -1,5 +1,11 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
+import {
+  Button, Card, CardContent,
+  Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
+  Badge, Spinner, EmptyState, Modal
+} from '../../shared/ui'
+import { Users } from 'lucide-react'
 
 /**
  * Student Enrollment View Component
@@ -142,29 +148,33 @@ export function StudentEnrollmentView({ selectedLevel, onSelectStudent }) {
   }
 
   return (
-    <div className="enrollment-view">
-      <h2>Student Enrollments</h2>
+    <div className="space-y-6">
+      <h2 className="text-xl font-semibold text-neutral-800">Student Enrollments</h2>
 
-      {error && <div className="error-message">{error}</div>}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg p-3" role="alert">
+          {error}
+        </div>
+      )}
 
-      <button
+      <Button
         onClick={() => setShowEnrollmentForm(!showEnrollmentForm)}
-        className="add-enrollment-button"
+        variant={showEnrollmentForm ? 'outline' : 'primary'}
       >
         {showEnrollmentForm ? 'Cancel' : 'Enroll Student'}
-      </button>
+      </Button>
 
-      {showEnrollmentForm && (
-        <form onSubmit={handleEnroll} className="enrollment-form">
-          <div className="form-group">
-            <label htmlFor="student-select">Student</label>
+      <Modal open={showEnrollmentForm} onClose={() => setShowEnrollmentForm(false)} size="sm">
+        <h3 className="text-lg font-semibold text-neutral-800 mb-4">Enroll Student</h3>
+        <form onSubmit={handleEnroll} className="space-y-4">
+          <div className="space-y-2">
+            <label htmlFor="student-select" className="text-sm font-medium text-neutral-700">Student</label>
             <select
               id="student-select"
               value={formData.student_id}
-              onChange={(e) =>
-                setFormData({ ...formData, student_id: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, student_id: e.target.value })}
               required
+              className="h-10 w-full rounded-lg border border-neutral-200 px-3 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             >
               <option value="">Select a student...</option>
               {students.map((student) => (
@@ -175,15 +185,14 @@ export function StudentEnrollmentView({ selectedLevel, onSelectStudent }) {
             </select>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="level-select">Academic Level</label>
+          <div className="space-y-2">
+            <label htmlFor="level-select" className="text-sm font-medium text-neutral-700">Academic Level</label>
             <select
               id="level-select"
               value={formData.level_id}
-              onChange={(e) =>
-                setFormData({ ...formData, level_id: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, level_id: e.target.value })}
               required
+              className="h-10 w-full rounded-lg border border-neutral-200 px-3 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             >
               <option value="">Select a level...</option>
               {levels.map((level) => (
@@ -194,51 +203,57 @@ export function StudentEnrollmentView({ selectedLevel, onSelectStudent }) {
             </select>
           </div>
 
-          <button type="submit" disabled={loading}>
-            {loading ? 'Enrolling...' : 'Enroll'}
-          </button>
+          <Button type="submit" loading={loading} className="w-full">
+            Enroll
+          </Button>
         </form>
-      )}
+      </Modal>
 
       {loading ? (
-        <div className="loading">Loading enrollments...</div>
+        <div className="flex items-center justify-center py-16">
+          <Spinner size="lg" />
+        </div>
       ) : (
-        <div className="enrollments-list">
+        <div>
           {enrollments.length === 0 ? (
-            <p>No enrollments found</p>
+            <EmptyState
+              icon={Users}
+              title="No enrollments"
+              description="No students have been enrolled yet."
+            />
           ) : (
-            <table className="enrollments-table">
-              <thead>
-                <tr>
-                  <th>Student Name</th>
-                  <th>Enrollment Number</th>
-                  <th>Level</th>
-                  <th>Enrolled Date</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Student Name</TableHead>
+                  <TableHead>Enrollment Number</TableHead>
+                  <TableHead>Level</TableHead>
+                  <TableHead>Enrolled Date</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {enrollments.map((enrollment) => (
-                  <tr
+                  <TableRow
                     key={enrollment.id}
                     onClick={() => onSelectStudent(enrollment.students)}
-                    className="clickable-row"
+                    className="cursor-pointer"
                   >
-                    <td>{enrollment.students?.profiles?.full_name}</td>
-                    <td>{enrollment.students?.enrollment_number}</td>
-                    <td>{enrollment.dars_e_nizami_levels?.name}</td>
-                    <td>
+                    <TableCell>{enrollment.students?.profiles?.full_name}</TableCell>
+                    <TableCell>{enrollment.students?.enrollment_number}</TableCell>
+                    <TableCell>{enrollment.dars_e_nizami_levels?.name}</TableCell>
+                    <TableCell>
                       {new Date(enrollment.enrolled_at).toLocaleDateString()}
-                    </td>
-                    <td>
-                      <span className={`status-badge ${enrollment.status}`}>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={enrollment.status === 'active' ? 'success' : 'default'}>
                         {enrollment.status}
-                      </span>
-                    </td>
-                  </tr>
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           )}
         </div>
       )}

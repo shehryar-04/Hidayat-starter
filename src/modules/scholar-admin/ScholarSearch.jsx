@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
+import { Button, Input, Label, Spinner } from '../../shared/ui'
 
 export function ScholarSearch({ onSelectScholar }) {
   const [name, setName] = useState('')
@@ -93,44 +94,44 @@ export function ScholarSearch({ onSelectScholar }) {
   }
 
   return (
-    <div className="page">
+    <div className="max-w-[1280px] mx-auto px-4 py-6 md:px-6 md:py-8">
       {/* Search form */}
-      <div className="card mb-6">
+      <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6 mb-6">
         <form onSubmit={handleSearch}>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-            <div className="form-group">
-              <label className="form-label">Name</label>
-              <input className="form-input" value={name} onChange={e => setName(e.target.value)}
+            <div className="space-y-2">
+              <Label>Name</Label>
+              <Input value={name} onChange={e => setName(e.target.value)}
                 placeholder="Search by name…" />
             </div>
-            <div className="form-group">
-              <label className="form-label">Specialization</label>
-              <select className="form-input" value={specialization} onChange={e => setSpecialization(e.target.value)}>
+            <div className="space-y-2">
+              <Label>Specialization</Label>
+              <select className="h-10 w-full rounded-lg border border-neutral-200 px-3 text-sm shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500" value={specialization} onChange={e => setSpecialization(e.target.value)}>
                 <option value="">All Specializations</option>
                 {allSpecializations.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
-            <div className="form-group">
-              <label className="form-label">Status</label>
-              <select className="form-input" value={status} onChange={e => setStatus(e.target.value)}>
+            <div className="space-y-2">
+              <Label>Status</Label>
+              <select className="h-10 w-full rounded-lg border border-neutral-200 px-3 text-sm shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500" value={status} onChange={e => setStatus(e.target.value)}>
                 <option value="">All Statuses</option>
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
               </select>
             </div>
           </div>
-          <button type="submit" disabled={loading} className="btn-primary">
+          <Button type="submit" variant="primary" disabled={loading}>
             {loading ? 'Searching…' : 'Search'}
-          </button>
+          </Button>
         </form>
       </div>
 
-      {error && <div className="alert-error mb-4">{error}</div>}
+      {error && <div className="bg-red-50 text-red-700 rounded-lg p-4 text-sm mb-4">{error}</div>}
 
       {/* Results */}
       {searched && (
         results.length === 0 ? (
-          <div className="card text-center py-16 text-gray-400">
+          <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6 text-center py-16 text-gray-400">
             <div className="text-4xl mb-3">👨‍🏫</div>
             <p className="text-sm">No scholars found matching your criteria.</p>
           </div>

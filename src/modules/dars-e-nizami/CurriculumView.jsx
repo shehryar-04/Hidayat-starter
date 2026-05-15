@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
+import { Card, CardContent, Badge, Spinner, EmptyState } from '../../shared/ui'
+import { BookOpen } from 'lucide-react'
 
 /**
  * Curriculum View Component
@@ -55,50 +57,67 @@ export function CurriculumView({ onSelectLevel }) {
   }
 
   return (
-    <div className="curriculum-view">
-      <h2>Curriculum Structure</h2>
+    <div className="space-y-6">
+      <h2 className="text-xl font-semibold text-neutral-800">Curriculum Structure</h2>
 
-      {error && <div className="error-message">{error}</div>}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg p-3" role="alert">
+          {error}
+        </div>
+      )}
 
       {loading ? (
-        <div className="loading">Loading curriculum...</div>
+        <div className="flex items-center justify-center py-16">
+          <Spinner size="lg" />
+        </div>
       ) : (
-        <div className="curriculum-grid">
-          <div className="levels-list">
-            <h3>Academic Levels</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-3">
+            <h3 className="text-lg font-medium text-neutral-700">Academic Levels</h3>
             {levels.length === 0 ? (
-              <p>No levels configured</p>
+              <EmptyState
+                icon={BookOpen}
+                title="No levels configured"
+                description="Academic levels have not been set up yet."
+              />
             ) : (
-              <div className="level-items">
+              <div className="space-y-2">
                 {levels.map((level) => (
-                  <div
+                  <Card
                     key={level.id}
-                    className={`level-item ${
-                      selectedLevel?.id === level.id ? 'selected' : ''
-                    }`}
+                    interactive
+                    className={selectedLevel?.id === level.id ? 'ring-2 ring-primary-500' : ''}
                     onClick={() => handleSelectLevel(level)}
                   >
-                    <div className="level-name">{level.name}</div>
-                    <div className="level-meta">
-                      <small>Passing: {level.passing_threshold}%</small>
-                    </div>
-                  </div>
+                    <CardContent className="py-3">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium text-neutral-800">{level.name}</span>
+                        <Badge variant="info">Passing: {level.passing_threshold}%</Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
             )}
           </div>
 
           {selectedLevel && (
-            <div className="subjects-list">
-              <h3>Subjects in {selectedLevel.name}</h3>
+            <div className="space-y-3">
+              <h3 className="text-lg font-medium text-neutral-700">Subjects in {selectedLevel.name}</h3>
               {subjects.length === 0 ? (
-                <p>No subjects in this level</p>
+                <EmptyState
+                  icon={BookOpen}
+                  title="No subjects"
+                  description="No subjects in this level yet."
+                />
               ) : (
-                <div className="subject-items">
+                <div className="space-y-2">
                   {subjects.map((subject) => (
-                    <div key={subject.id} className="subject-item">
-                      <div className="subject-name">{subject.name}</div>
-                    </div>
+                    <Card key={subject.id}>
+                      <CardContent className="py-3">
+                        <span className="text-neutral-700">{subject.name}</span>
+                      </CardContent>
+                    </Card>
                   ))}
                 </div>
               )}

@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
+import { Button, Input, Card, CardContent, Badge, Spinner, EmptyState, Modal } from '../../shared/ui'
+import { ArrowLeft, BookOpen, CheckCircle } from 'lucide-react'
 
 /**
  * Nazra Progress View Component
@@ -63,14 +65,12 @@ export function NazraProgressView({ student, onBack }) {
 
       if (err) throw err
 
-      // Build progress map
       const progressMap = {}
       data?.forEach((p) => {
         progressMap[p.lesson_id] = p
       })
       setProgress(progressMap)
 
-      // Check if all lessons are completed
       if (lessons.length > 0 && data && data.length === lessons.length) {
         setNazraStatus('complete')
       }
@@ -133,7 +133,11 @@ export function NazraProgressView({ student, onBack }) {
   }
 
   if (loading) {
-    return <div className="loading">Loading Nazra progress...</div>
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Spinner size="lg" />
+      </div>
+    )
   }
 
   const completedCount = Object.keys(progress).length
@@ -142,61 +146,76 @@ export function NazraProgressView({ student, onBack }) {
     totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0
 
   return (
-    <div className="nazra-progress-view">
-      <button onClick={onBack} className="back-button">
-        ← Back to Search
-      </button>
+    <div className="space-y-6">
+      <Button variant="ghost" onClick={onBack} size="sm">
+        <ArrowLeft className="w-4 h-4 mr-2" />
+        Back to Search
+      </Button>
 
-      <div className="progress-header">
-        <h2>Nazra Progress - {student.profiles?.full_name}</h2>
-        <div className="status-info">
-          <p>
-            <strong>Enrollment:</strong> {student.enrollment_number}
-          </p>
-          <p>
-            <strong>Overall Status:</strong>{' '}
-            <span className={`status-badge ${nazraStatus}`}>
-              {nazraStatus === 'complete' ? 'Complete' : 'In Progress'}
-            </span>
-          </p>
-          <p>
-            <strong>Progress:</strong> {completedCount} / {totalLessons} lessons
-            ({progressPercentage}%)
-          </p>
-        </div>
-      </div>
+      <Card>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-semibold text-neutral-800">
+                Nazra Progress - {student.profiles?.full_name}
+              </h2>
+              <p className="text-sm text-neutral-500 mt-1">
+                Enrollment: {student.enrollment_number}
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <Badge variant={nazraStatus === 'complete' ? 'success' : 'warning'} dot>
+                {nazraStatus === 'complete' ? 'Complete' : 'In Progress'}
+              </Badge>
+              <span className="text-sm text-neutral-600">
+                {completedCount} / {totalLessons} ({progressPercentage}%)
+              </span>
+            </div>
+          </div>
 
-      {error && <div className="error-message">{error}</div>}
+          {/* Progress bar */}
+          <div className="mt-4 h-2 bg-neutral-100 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-primary-500 rounded-full transition-all duration-300"
+              style={{ width: `${progressPercentage}%` }}
+            />
+          </div>
+        </CardContent>
+      </Card>
 
-      {nazraStatus === 'complete' && (
-        <div className="success-message">
-          <strong>Nazra Complete!</strong> All lessons have been completed.
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg p-3" role="alert">
+          {error}
         </div>
       )}
 
-      <div className="progress-bar">
-        <div
-          className="progress-fill"
-          style={{ width: `${progressPercentage}%` }}
-        />
-      </div>
+      {nazraStatus === 'complete' && (
+        <Card className="border-l-4 border-l-green-500 bg-green-50">
+          <CardContent>
+            <p className="font-semibold text-green-800">Nazra Complete!</p>
+            <p className="text-sm text-green-700">All lessons have been completed.</p>
+          </CardContent>
+        </Card>
+      )}
 
-      <button
+      <Button
         onClick={() => setShowCompletionForm(!showCompletionForm)}
-        className="add-completion-button"
+        variant={showCompletionForm ? 'outline' : 'primary'}
       >
         {showCompletionForm ? 'Cancel' : 'Mark Lesson Complete'}
-      </button>
+      </Button>
 
-      {showCompletionForm && (
-        <form onSubmit={handleMarkComplete} className="completion-form">
-          <div className="form-group">
-            <label htmlFor="lesson-select">Lesson</label>
+      <Modal open={showCompletionForm} onClose={() => setShowCompletionForm(false)} size="sm">
+        <h3 className="text-lg font-semibold text-neutral-800 mb-4">Mark Lesson Complete</h3>
+        <form onSubmit={handleMarkComplete} className="space-y-4">
+          <div className="space-y-2">
+            <label htmlFor="lesson-select" className="text-sm font-medium text-neutral-700">Lesson</label>
             <select
               id="lesson-select"
               value={selectedLesson || ''}
               onChange={(e) => setSelectedLesson(e.target.value)}
               required
+              className="h-10 w-full rounded-lg border border-neutral-200 px-3 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             >
               <option value="">Select a lesson...</option>
               {lessons
@@ -209,76 +228,81 @@ export function NazraProgressView({ student, onBack }) {
             </select>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="quality-note">Quality Note (Optional)</label>
+          <div className="space-y-2">
+            <label htmlFor="quality-note" className="text-sm font-medium text-neutral-700">Quality Note (Optional)</label>
             <textarea
               id="quality-note"
               value={qualityNote}
               onChange={(e) => setQualityNote(e.target.value)}
               placeholder="Add notes about recitation quality..."
               rows="3"
+              className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
             />
           </div>
 
-          <button type="submit">Mark Complete</button>
+          <Button type="submit" className="w-full">
+            Mark Complete
+          </Button>
         </form>
-      )}
+      </Modal>
 
-      <div className="lessons-list">
-        <h3>Lessons</h3>
+      <div className="space-y-3">
+        <h3 className="text-lg font-semibold text-neutral-800">Lessons</h3>
         {lessons.length === 0 ? (
-          <p>No lessons configured</p>
+          <EmptyState
+            icon={BookOpen}
+            title="No lessons configured"
+            description="Nazra lessons have not been set up yet."
+          />
         ) : (
-          <div className="lesson-items">
+          <div className="space-y-2">
             {lessons.map((lesson) => {
               const lessonProgress = progress[lesson.id]
               const isCompleted = !!lessonProgress
 
               return (
-                <div
+                <Card
                   key={lesson.id}
-                  className={`lesson-item ${isCompleted ? 'completed' : ''}`}
+                  className={isCompleted ? 'border-l-4 border-l-green-400 bg-green-50/30' : ''}
                 >
-                  <div className="lesson-info">
-                    <div className="lesson-number">
-                      {lesson.sequence_order}
-                    </div>
-                    <div className="lesson-details">
-                      <h4>{lesson.title}</h4>
-                      {isCompleted && (
-                        <>
-                          <p className="completed-date">
-                            Completed:{' '}
-                            {new Date(
-                              lessonProgress.completed_at
-                            ).toLocaleDateString()}
-                          </p>
-                          {lessonProgress.quality_note && (
-                            <p className="quality-note">
-                              Note: {lessonProgress.quality_note}
-                            </p>
+                  <CardContent className="py-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="flex-shrink-0 w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-sm font-medium text-neutral-600">
+                          {lesson.sequence_order}
+                        </span>
+                        <div className="min-w-0">
+                          <h4 className="font-medium text-neutral-800 truncate">{lesson.title}</h4>
+                          {isCompleted && (
+                            <div className="text-xs text-neutral-500 mt-0.5 space-y-0.5">
+                              <p>Completed: {new Date(lessonProgress.completed_at).toLocaleDateString()}</p>
+                              {lessonProgress.quality_note && (
+                                <p className="italic">Note: {lessonProgress.quality_note}</p>
+                              )}
+                              <p>By: {lessonProgress.scholars?.profiles?.full_name}</p>
+                            </div>
                           )}
-                          <p className="scholar-name">
-                            By: {lessonProgress.scholars?.profiles?.full_name}
-                          </p>
-                        </>
-                      )}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {isCompleted && (
+                          <>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleRemoveCompletion(lesson.id)}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              Remove
+                            </Button>
+                            <CheckCircle className="w-5 h-5 text-green-500" />
+                          </>
+                        )}
+                      </div>
                     </div>
-                  </div>
-
-                  {isCompleted && (
-                    <button
-                      onClick={() => handleRemoveCompletion(lesson.id)}
-                      className="remove-button"
-                    >
-                      Remove
-                    </button>
-                  )}
-
-                  {isCompleted && (
-                    <div className="completion-badge">✓</div>
-                  )}
-                </div>
+                  </CardContent>
+                </Card>
               )
             })}
           </div>

@@ -8,6 +8,7 @@ import { RevenueView } from './RevenueView'
 import { AdminCourseReview } from './AdminCourseReview'
 import { StudentCourseList } from './StudentCourseList'
 import { StudentCourseView } from './StudentCourseView'
+import { cn } from '../../shared/ui'
 
 // ─── Student view ─────────────────────────────────────────────
 function StudentShortCourses() {
@@ -46,15 +47,22 @@ function AdminShortCourses() {
     }
   }
 
+  const isActive = (key) => view === key || (view === 'enrollment' && key === 'courses') || (view === 'edit' && key === 'courses')
+
   return (
     <div>
-      <div className="bg-white border-b border-gray-200 px-8 pt-6 pb-0">
+      <div className="bg-white border-b border-neutral-200 px-8 pt-6 pb-0">
         <h1 className="text-xl font-bold text-primary mb-4">Short Courses</h1>
-        <div className="tab-bar">
+        <div className="flex border-b border-neutral-200 overflow-x-auto">
           {tabs.map(([key, label]) => (
             <button key={key}
               onClick={() => { setView(key); setSelectedCourse(null); setEditingCourse(null) }}
-              className={`tab ${view === key || (view === 'enrollment' && key === 'courses') || (view === 'edit' && key === 'courses') ? 'active' : ''}`}>
+              className={cn(
+                'relative px-4 py-2.5 text-sm font-medium transition-colors duration-150 whitespace-nowrap outline-none',
+                isActive(key)
+                  ? 'text-primary-500 font-semibold border-b-2 border-primary-500'
+                  : 'text-neutral-500 hover:text-neutral-800'
+              )}>
               {label}
             </button>
           ))}
@@ -96,15 +104,22 @@ function ScholarShortCourses() {
     if (data) { setEditingCourse(data); setView('edit') }
   }
 
+  const isActive = (key) => view === key || (view === 'enrollment' && key === 'courses') || (view === 'edit' && key === 'courses')
+
   return (
     <div>
-      <div className="bg-white border-b border-gray-200 px-8 pt-6 pb-0">
+      <div className="bg-white border-b border-neutral-200 px-8 pt-6 pb-0">
         <h1 className="text-xl font-bold text-primary mb-4">Short Courses</h1>
-        <div className="tab-bar">
+        <div className="flex border-b border-neutral-200 overflow-x-auto">
           {tabs.map(([key, label]) => (
             <button key={key}
               onClick={() => { setView(key); setSelectedCourse(null); setEditingCourse(null) }}
-              className={`tab ${view === key || (view === 'enrollment' && key === 'courses') || (view === 'edit' && key === 'courses') ? 'active' : ''}`}>
+              className={cn(
+                'relative px-4 py-2.5 text-sm font-medium transition-colors duration-150 whitespace-nowrap outline-none',
+                isActive(key)
+                  ? 'text-primary-500 font-semibold border-b-2 border-primary-500'
+                  : 'text-neutral-500 hover:text-neutral-800'
+              )}>
               {label}
             </button>
           ))}

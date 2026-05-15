@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useRole } from '../../app/RoleProvider'
-
-function Icon({ name, className = '' }) {
-  return <span className={`material-symbols-outlined ${className}`}>{name}</span>
-}
+import { GraduationCap, Search, Signal, Landmark } from 'lucide-react'
+import { Button, Input, Badge, EmptyState, Spinner } from '../../shared/ui'
 
 export function StudentCourseList({ onSelectCourse }) {
   const { userId } = useRole()
@@ -61,7 +59,7 @@ export function StudentCourseList({ onSelectCourse }) {
     return true
   })
 
-  if (loading) return <div className="flex items-center justify-center py-24 text-slate-400 text-sm">Loading courses…</div>
+  if (loading) return <div className="flex items-center justify-center py-24"><Spinner size="lg" /></div>
 
   return (
     <div className="bg-background min-h-screen">
@@ -70,7 +68,7 @@ export function StudentCourseList({ onSelectCourse }) {
         <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
           <div className="flex-1 space-y-4 sm:space-y-6 text-center lg:text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-secondary text-white rounded-full text-[10px] sm:text-label-sm uppercase tracking-widest">
-              <Icon name="school" className="text-[14px] sm:text-[16px]" />
+              <GraduationCap className="w-4 h-4" />
               Specialized Learning
             </div>
             <h1 className="font-serif text-2xl sm:text-4xl lg:text-headline-xl text-primary leading-tight">Short Courses </h1>
@@ -125,21 +123,22 @@ export function StudentCourseList({ onSelectCourse }) {
       {/* Search */}
       <section className="max-w-7xl mx-auto px-4 sm:px-8 pt-6 sm:pt-8">
         <div className="relative max-w-md">
-          <Icon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px] sm:text-[20px]" />
-          <input className="pl-9 sm:pl-10 pr-4 py-2 sm:py-2.5 bg-white border border-outline rounded-full text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary w-full transition-all"
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-neutral-400" />
+          <Input className="pl-9 sm:pl-10 pr-4 rounded-full"
             placeholder="Search courses..." value={search} onChange={e => setSearch(e.target.value)} />
         </div>
       </section>
 
       {/* Course Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
-        {error && <div className="alert-error mb-6 text-sm">{error}</div>}
+        {error && <div className="bg-red-50 text-red-700 rounded-lg p-4 text-sm mb-6">{error}</div>}
 
         {filtered.length === 0 ? (
-          <div className="text-center py-16 sm:py-20 text-slate-400">
-            <Icon name="school" className="text-5xl sm:text-6xl text-slate-200 mb-4 block mx-auto" />
-            <p className="text-xs sm:text-sm">{tab === 'enrolled' ? "You haven't enrolled in any courses yet." : courses.length === 0 ? 'No courses available yet.' : 'No courses match your filters.'}</p>
-          </div>
+          <EmptyState
+            icon={GraduationCap}
+            title={tab === 'enrolled' ? "No enrolled courses" : courses.length === 0 ? 'No courses available' : 'No matches'}
+            description={tab === 'enrolled' ? "You haven't enrolled in any courses yet." : courses.length === 0 ? 'No courses available yet.' : 'No courses match your filters.'}
+          />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {filtered.map(course => {
@@ -155,7 +154,7 @@ export function StudentCourseList({ onSelectCourse }) {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-primary-800 to-primary-600 flex items-center justify-center">
-                        <Icon name="school" className="text-white/30 text-4xl sm:text-6xl" />
+                        <GraduationCap className="w-10 h-10 sm:w-14 sm:h-14 text-white/30" />
                       </div>
                     )}
                     {course.category && (
@@ -184,7 +183,7 @@ export function StudentCourseList({ onSelectCourse }) {
                     <div className="flex items-center justify-between pt-3 sm:pt-4 border-t border-background text-xs sm:text-sm">
                       {course.level && (
                         <div className="flex items-center gap-1 sm:gap-2 text-slate-400">
-                          <Icon name="signal_cellular_alt" className="text-[14px] sm:text-[18px]" />
+                          <Signal className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                           <span className="hidden sm:inline">{course.level}</span>
                           <span className="sm:hidden text-[10px]">{course.level}</span>
                         </div>
@@ -213,11 +212,11 @@ export function StudentCourseList({ onSelectCourse }) {
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <input className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 sm:px-6 py-3 sm:py-4 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none placeholder:text-white/40 text-white text-sm"
                 placeholder="Your email address" type="email" />
-              <button className="bg-secondary text-white px-6 sm:px-10 py-3 sm:py-4 rounded-xl font-serif font-bold hover:bg-secondary/90 transition-all text-sm sm:text-base">Subscribe</button>
+              <Button variant="secondary" size="lg" className="bg-secondary text-white px-6 sm:px-10 rounded-xl font-bold hover:bg-secondary/90">Subscribe</Button>
             </div>
           </div>
           <div className="absolute right-0 bottom-0 opacity-10 pointer-events-none transform translate-x-1/4 translate-y-1/4 scale-100 sm:scale-150 hidden sm:block">
-            <Icon name="mosque" className="text-[150px] sm:text-[300px]" />
+            <Landmark className="w-36 h-36 sm:w-72 sm:h-72" />
           </div>
         </div>
       </section>

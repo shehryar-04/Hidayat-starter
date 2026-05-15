@@ -1,23 +1,56 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { Menu, X, ChevronDown, User, LogOut } from 'lucide-react'
 import { useRole } from './RoleProvider'
 import { useProfile } from './useProfile'
 import Logo from './Logo'
 import ProfileModal from './ProfileModal'
+import { Button, cn } from '../shared/ui'
 
 function AvatarCircle({ avatarUrl, initials }) {
   const [err, setErr] = useState(false)
   if (avatarUrl && !err) {
     return (
-      <img src={avatarUrl} alt="avatar"
+      <img
+        src={avatarUrl}
+        alt="avatar"
         className="w-8 h-8 rounded-full object-cover ring-2 ring-white/30"
-        onError={() => setErr(true)} />
+        onError={() => setErr(true)}
+      />
     )
   }
   return (
-    <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-white text-xs font-bold ring-2 ring-white/30">
+    <div className="w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center text-white text-xs font-bold ring-2 ring-white/30">
       {initials}
     </div>
+  )
+}
+
+/**
+ * NavLink item with hover underline animation (slides in from left, 0→100% width, 250ms).
+ * Active route shows primary color text + 2px bottom border.
+ */
+function NavItem({ to, onClick, children, isActive }) {
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        'relative font-medium text-sm cursor-pointer transition-colors duration-normal whitespace-nowrap py-1 group',
+        isActive
+          ? 'text-primary-500 font-semibold'
+          : 'text-neutral-600 hover:text-neutral-800'
+      )}
+    >
+      {children}
+      {/* Active indicator: 2px bottom border in primary */}
+      {isActive && (
+        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500 rounded-full" />
+      )}
+      {/* Hover underline animation: slides from left 0→100% */}
+      {!isActive && (
+        <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-primary-500 rounded-full transition-all duration-[250ms] ease-out group-hover:w-full" />
+      )}
+    </button>
   )
 }
 
@@ -25,6 +58,9 @@ function AvatarCircle({ avatarUrl, initials }) {
  * Single navbar for the entire app — same links for guest and logged-in users.
  * Protected pages redirect guests to /login. Public pages work for everyone.
  * Right side: Login button (guest) or profile dropdown (authenticated).
+ *
+ * Design: Frosted-glass effect, hover underline animations, active route indicator,
+ * mobile hamburger at md breakpoint with slide-down drawer, max-width 1280px, 64px height, sticky.
  */
 export default function PublicTopNav() {
   const navigate = useNavigate()
@@ -59,25 +95,24 @@ export default function PublicTopNav() {
 
   // Primary links shown directly in navbar
   const primaryLinks = [
-    { label: 'Home',           href: '/',                protected: false },
-    { label: 'Darse Nizami',   href: '/dars-e-nizami',   protected: false },
-    { label: 'Hifz & Nazrah',  href: '/hifz',            protected: false },
-    { label: 'Short Courses',  href: '/short-courses',   protected: true },
-    { label: 'Darul Ifta',     href: '/darul-ifta',      protected: false },
+    { label: 'Home',          href: '/',              protected: false },
+    { label: 'Darse Nizami',  href: '/dars-e-nizami', protected: false },
+    { label: 'Hifz & Nazrah', href: '/hifz',          protected: false },
+    { label: 'Short Courses', href: '/short-courses', protected: true },
+    { label: 'Darul Ifta',    href: '/darul-ifta',    protected: false },
   ]
 
   // Secondary links grouped under "More" dropdown
   const moreLinks = [
     { label: 'Research Center', href: '/research-center', protected: false },
-    { label: 'Articles',       href: '/articles',        protected: false },
-    { label: 'Downloads',      href: '/downloads',       protected: false },
+    { label: 'Articles',        href: '/articles',        protected: false },
+    { label: 'Downloads',       href: '/downloads',       protected: false },
   ]
 
   // All links combined (for mobile drawer)
   const navLinks = [...primaryLinks, ...moreLinks]
 
-  const handleLinkClick = (e, link) => {
-    e.preventDefault()
+  const handleLinkClick = (link) => {
     if (link.protected && !role) {
       navigate('/login')
     } else {
@@ -98,100 +133,133 @@ export default function PublicTopNav() {
 
   return (
     <>
-      <nav className="fixed top-0 w-full z-50 border-b border-outline bg-background/95 backdrop-blur-md">
-        <div className="flex justify-between items-center w-full px-4 sm:px-8 py-3 sm:py-4 max-w-7xl mx-auto">
-          <a href="/" onClick={(e) => { e.preventDefault(); navigate('/') }} className="flex items-center">
-            <Logo size="lg" />
+      {/* Frosted-glass navbar: backdrop-blur-xl, bg-white/80, 1px bottom border gray-200, sticky, h-16, z-50 */}
+      <nav className="sticky top-0 w-full z-50 border-b border-gray-200 bg-white/80 backdrop-blur-xl h-16 flex items-center">
+        <div className="flex justify-between items-center w-full px-4 sm:px-6 max-w-[1280px] mx-auto">
+          {/* Logo */}
+          <a
+            href="/"
+            onClick={(e) => { e.preventDefault(); navigate('/') }}
+            className="flex items-center shrink-0"
+          >
+            <Logo size="md" />
           </a>
 
-          {/* Desktop nav */}
-          <div className="hidden lg:flex items-center space-x-4 xl:space-x-6 flex-1 justify-center">
+          {/* Desktop nav — hidden below md (768px) */}
+          <div className="hidden md:flex items-center gap-6 lg:gap-8 flex-1 justify-center">
             {primaryLinks.map((link) => (
-              <a
+              <NavItem
                 key={link.label}
-                href={link.href}
-                onClick={(e) => handleLinkClick(e, link)}
-                className={`font-serif font-medium text-sm cursor-pointer transition-colors whitespace-nowrap ${
-                  isActive(link.href) ? 'text-primary border-b-2 border-primary pb-1 font-bold' : 'text-slate-600 hover:text-primary'
-                }`}
+                to={link.href}
+                isActive={isActive(link.href)}
+                onClick={() => handleLinkClick(link)}
               >
                 {link.label}
-              </a>
+              </NavItem>
             ))}
+
             {/* More dropdown */}
             <div className="relative" ref={moreMenuRef}>
               <button
-                onClick={() => setMoreMenuOpen(o => !o)}
-                className={`font-serif font-medium text-sm cursor-pointer transition-colors whitespace-nowrap flex items-center gap-1 ${
-                  moreLinks.some(l => isActive(l.href)) ? 'text-primary font-bold' : 'text-slate-600 hover:text-primary'
-                }`}
+                onClick={() => setMoreMenuOpen((o) => !o)}
+                className={cn(
+                  'relative font-medium text-sm cursor-pointer transition-colors duration-normal whitespace-nowrap flex items-center gap-1 py-1 group',
+                  moreLinks.some((l) => isActive(l.href))
+                    ? 'text-primary-500 font-semibold'
+                    : 'text-neutral-600 hover:text-neutral-800'
+                )}
               >
                 More
-                <svg className={`w-3.5 h-3.5 transition-transform ${moreMenuOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
+                <ChevronDown
+                  className={cn(
+                    'w-3.5 h-3.5 transition-transform duration-fast',
+                    moreMenuOpen && 'rotate-180'
+                  )}
+                />
+                {/* Hover underline for More button */}
+                {!moreLinks.some((l) => isActive(l.href)) && (
+                  <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-primary-500 rounded-full transition-all duration-[250ms] ease-out group-hover:w-full" />
+                )}
+                {moreLinks.some((l) => isActive(l.href)) && (
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500 rounded-full" />
+                )}
               </button>
+
               {moreMenuOpen && (
-                <div className="absolute left-1/2 -translate-x-1/2 top-full mt-3 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+                <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-48 bg-white/90 backdrop-blur-xl rounded-xl shadow-lg border border-neutral-200 py-1.5 z-50">
                   {moreLinks.map((link) => (
-                    <a
+                    <button
                       key={link.label}
-                      href={link.href}
-                      onClick={(e) => { handleLinkClick(e, link); setMoreMenuOpen(false) }}
-                      className={`block px-4 py-2.5 text-sm font-serif font-medium transition-colors ${
-                        isActive(link.href) ? 'text-primary bg-primary/5' : 'text-slate-600 hover:text-primary hover:bg-neutral-50'
-                      }`}
+                      onClick={() => { handleLinkClick(link); setMoreMenuOpen(false) }}
+                      className={cn(
+                        'block w-full text-left px-4 py-2.5 text-sm font-medium transition-colors rounded-md mx-auto',
+                        isActive(link.href)
+                          ? 'text-primary-500 bg-primary-50'
+                          : 'text-neutral-600 hover:text-neutral-800 hover:bg-neutral-50'
+                      )}
                     >
                       {link.label}
-                    </a>
+                    </button>
                   ))}
                 </div>
               )}
             </div>
           </div>
 
+          {/* Right side: Login / User menu + Hamburger */}
           <div className="flex items-center gap-3">
             {!role ? (
-              <button
+              <Button
+                variant="primary"
+                size="sm"
                 onClick={() => navigate('/login')}
-                className="bg-primary text-white px-4 sm:px-6 py-2 rounded-lg font-serif font-medium text-sm hover:opacity-90 transition-all active:scale-95"
+                className="font-medium"
               >
                 Login
-              </button>
+              </Button>
             ) : (
               <div className="relative" ref={userMenuRef}>
+                {/* Avatar trigger with hover background transition 150–200ms */}
                 <button
-                  onClick={() => setUserMenuOpen(o => !o)}
-                  className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-surface-high transition-colors"
+                  onClick={() => setUserMenuOpen((o) => !o)}
+                  className="flex items-center gap-2 px-2 py-1.5 rounded-lg transition-colors duration-[175ms] hover:bg-neutral-100"
                 >
                   <AvatarCircle avatarUrl={avatarUrl} initials={initials} />
                   <div className="hidden sm:block text-left">
-                    <div className="text-xs font-semibold text-gray-800 leading-tight max-w-[120px] truncate">{displayName}</div>
-                    <div className="text-[10px] text-gray-400 capitalize">{role}</div>
+                    <div className="text-xs font-semibold text-neutral-800 leading-tight max-w-[120px] truncate">
+                      {displayName}
+                    </div>
+                    <div className="text-[10px] text-neutral-400 capitalize">{role}</div>
                   </div>
-                  <svg className={`w-3.5 h-3.5 text-gray-400 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  <ChevronDown
+                    className={cn(
+                      'w-3.5 h-3.5 text-neutral-400 transition-transform duration-fast',
+                      userMenuOpen && 'rotate-180'
+                    )}
+                  />
                 </button>
 
+                {/* User dropdown */}
                 {userMenuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
-                    <div className="px-4 py-3 border-b border-gray-100">
-                      <div className="text-sm font-semibold text-gray-800 truncate">{displayName}</div>
-                      <div className="text-xs text-gray-400 capitalize mt-0.5">{role}</div>
+                  <div className="absolute right-0 top-full mt-2 w-52 bg-white/90 backdrop-blur-xl rounded-xl shadow-lg border border-neutral-200 py-1 z-50">
+                    <div className="px-4 py-3 border-b border-neutral-100">
+                      <div className="text-sm font-semibold text-neutral-800 truncate">{displayName}</div>
+                      <div className="text-xs text-neutral-400 capitalize mt-0.5">{role}</div>
                     </div>
                     <button
                       onClick={() => { setUserMenuOpen(false); setProfileOpen(true) }}
-                      className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-neutral-50 flex items-center gap-2.5 transition-colors"
+                      className="w-full text-left px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50 flex items-center gap-2.5 transition-colors duration-fast rounded-md"
                     >
-                      <span className="text-base">👤</span> My Profile
+                      <User className="w-4 h-4 text-neutral-500" />
+                      My Profile
                     </button>
-                    <div className="border-t border-gray-100 mt-1 pt-1">
+                    <div className="border-t border-neutral-100 mt-1 pt-1">
                       <button
                         onClick={handleSignOut}
-                        className="w-full text-left px-4 py-2.5 text-sm text-tertiary hover:bg-red-50 flex items-center gap-2.5 transition-colors"
+                        className="w-full text-left px-4 py-2.5 text-sm text-error hover:bg-error-light flex items-center gap-2.5 transition-colors duration-fast rounded-md"
                       >
-                        <span className="text-base">🚪</span> Sign Out
+                        <LogOut className="w-4 h-4" />
+                        Sign Out
                       </button>
                     </div>
                   </div>
@@ -199,34 +267,45 @@ export default function PublicTopNav() {
               </div>
             )}
 
-            {/* Hamburger */}
-            <button onClick={() => setMobileOpen(o => !o)} className="lg:hidden p-2 rounded-lg hover:bg-surface-high transition-colors" aria-label="Menu">
-              <svg className="w-5 h-5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                {mobileOpen
-                  ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />}
-              </svg>
+            {/* Hamburger — visible below md (768px) */}
+            <button
+              onClick={() => setMobileOpen((o) => !o)}
+              className="md:hidden p-2 rounded-lg transition-colors duration-[175ms] hover:bg-neutral-100"
+              aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            >
+              {mobileOpen ? (
+                <X className="w-5 h-5 text-neutral-600" />
+              ) : (
+                <Menu className="w-5 h-5 text-neutral-600" />
+              )}
             </button>
           </div>
         </div>
 
-        {/* Mobile drawer */}
-        {mobileOpen && (
-          <div className="lg:hidden border-t border-outline bg-background px-4 py-3 space-y-1">
+        {/* Mobile drawer — slide-down animation 200–300ms */}
+        <div
+          className={cn(
+            'md:hidden absolute top-16 left-0 right-0 border-b border-gray-200 bg-white/95 backdrop-blur-xl overflow-hidden transition-all duration-[250ms] ease-out',
+            mobileOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+          )}
+        >
+          <div className="px-4 py-3 space-y-1 max-w-[1280px] mx-auto">
             {navLinks.map((link) => (
-              <a
+              <button
                 key={link.label}
-                href={link.href}
-                onClick={(e) => handleLinkClick(e, link)}
-                className={`block px-3 py-2.5 rounded-lg text-sm font-serif font-medium transition-colors ${
-                  isActive(link.href) ? 'bg-primary/10 text-primary' : 'text-slate-600 hover:bg-surface-high hover:text-primary'
-                }`}
+                onClick={() => handleLinkClick(link)}
+                className={cn(
+                  'block w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-fast',
+                  isActive(link.href)
+                    ? 'bg-primary-50 text-primary-500 border-l-2 border-primary-500'
+                    : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-800'
+                )}
               >
                 {link.label}
-              </a>
+              </button>
             ))}
           </div>
-        )}
+        </div>
       </nav>
 
       {profileOpen && <ProfileModal onClose={() => setProfileOpen(false)} />}

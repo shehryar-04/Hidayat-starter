@@ -6,10 +6,8 @@ import { FatwaEditor } from './FatwaEditor'
 import { PublicFatwaList } from './PublicFatwaList'
 import { QuestionSubmitForm } from './QuestionSubmitForm'
 import { WhatsAppButton } from '../../shared/WhatsAppButton'
-
-function Icon({ name, className = '' }) {
-  return <span className={`material-symbols-outlined ${className}`}>{name}</span>
-}
+import { Star, PenLine, BookOpen, BadgeCheck } from 'lucide-react'
+import { Button, Card, CardContent, Tabs } from '../../shared/ui'
 
 // ─── Hero Section (shared by guest + scholar/student) ────────
 function DarulIftaHero({ showSubmitBtn = false, onSubmitClick }) {
@@ -40,7 +38,7 @@ function DarulIftaHero({ showSubmitBtn = false, onSubmitClick }) {
         <div className="flex-1 flex justify-center">
           <div className="w-80 h-80 rounded-3xl bg-primary-700 border border-secondary/30 flex items-center justify-center p-8 backdrop-blur-sm shadow-2xl relative">
             <div className="absolute -top-4 -right-4 w-12 h-12 bg-secondary rounded-full flex items-center justify-center text-primary-900">
-              <Icon name="star" />
+              <Star className="w-5 h-5" />
             </div>
             <div className="text-center">
               <div className="text-6xl mb-4 text-secondary font-serif">دار الإفتاء</div>
@@ -57,20 +55,22 @@ function DarulIftaHero({ showSubmitBtn = false, onSubmitClick }) {
 // ─── Process Steps ───────────────────────────────────────────
 function ProcessSteps() {
   const steps = [
-    { icon: 'edit_note', title: '1. Inquiry Submission', desc: 'Submit your question with full context. Our team ensures complete confidentiality for every seeker of guidance.' },
-    { icon: 'menu_book', title: '2. Juridical Review', desc: 'Muftis analyze the question through the lens of Quran, Sunnah, and classical Fiqh principles (Madahib).' },
-    { icon: 'verified', title: '3. Final Vetting', desc: 'The response is verified by a senior scholarly committee before being dispatched to you.' },
+    { Icon: PenLine, title: '1. Inquiry Submission', desc: 'Submit your question with full context. Our team ensures complete confidentiality for every seeker of guidance.' },
+    { Icon: BookOpen, title: '2. Juridical Review', desc: 'Muftis analyze the question through the lens of Quran, Sunnah, and classical Fiqh principles (Madahib).' },
+    { Icon: BadgeCheck, title: '3. Final Vetting', desc: 'The response is verified by a senior scholarly committee before being dispatched to you.' },
   ]
   return (
     <section className="max-w-screen-xl mx-auto px-8 py-24">
-      <h2 className="font-serif text-3xl font-bold text-primary mb-12 text-center">The Scholarly Vetting Process</h2>
+      <h2 className="font-display text-3xl font-bold text-primary-600 mb-12 text-center">The Scholarly Vetting Process</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {steps.map(({ icon, title, desc }) => (
-          <div key={title} className="bg-white p-8 rounded-2xl shadow-sm border border-outline hover:border-secondary transition-all">
-            <Icon name={icon} className="text-primary text-4xl mb-4" />
-            <h3 className="font-serif text-xl font-bold text-primary mb-3">{title}</h3>
-            <p className="text-slate-600 text-body-md">{desc}</p>
-          </div>
+        {steps.map(({ Icon, title, desc }) => (
+          <Card key={title} interactive>
+            <CardContent className="p-8">
+              <Icon className="w-9 h-9 text-primary-500 mb-4" />
+              <h3 className="font-display text-xl font-bold text-primary-600 mb-3">{title}</h3>
+              <p className="text-neutral-600 text-sm">{desc}</p>
+            </CardContent>
+          </Card>
         ))}
       </div>
     </section>
@@ -82,27 +82,25 @@ function AdminMuftiView() {
   const [view, setView] = useState('list')
   const [selected, setSelected] = useState(null)
 
+  const tabItems = [
+    { label: 'All Fatwas', content: <FatwaList onEdit={q => { setSelected(q); setView('edit') }} canManage /> },
+    { label: '+ New Fatwa', content: <FatwaEditor onComplete={() => setView('list')} onCancel={() => setView('list')} /> },
+  ]
+
   return (
-    <div className="bg-background min-h-screen">
-      <div className="bg-white border-b border-outline px-8 pt-6 pb-0">
-        <h1 className="font-serif text-xl font-bold text-primary mb-4">Darul Ifta — Fatwa Management</h1>
-        <div className="tab-bar">
-          {[['list', 'All Fatwas'], ['create', '+ New Fatwa']].map(([key, label]) => (
-            <button key={key}
-              onClick={() => { setView(key); setSelected(null) }}
-              className={`tab ${view === key || (view === 'edit' && key === 'list') ? 'active' : ''}`}>
-              {label}
-            </button>
-          ))}
-        </div>
+    <div className="bg-neutral-50 min-h-screen">
+      <div className="bg-white border-b border-neutral-200 px-8 pt-6 pb-0">
+        <h1 className="font-display text-xl font-bold text-primary-600 mb-4">Darul Ifta — Fatwa Management</h1>
       </div>
-      {view === 'list' && !selected && <FatwaList onEdit={q => { setSelected(q); setView('edit') }} canManage />}
-      {view === 'create' && <FatwaEditor onComplete={() => setView('list')} onCancel={() => setView('list')} />}
-      {view === 'edit' && selected && (
-        <FatwaEditor fatwa={selected}
-          onComplete={() => { setSelected(null); setView('list') }}
-          onCancel={() => { setSelected(null); setView('list') }} />
-      )}
+      <div className="p-6">
+        {view === 'edit' && selected ? (
+          <FatwaEditor fatwa={selected}
+            onComplete={() => { setSelected(null); setView('list') }}
+            onCancel={() => { setSelected(null); setView('list') }} />
+        ) : (
+          <Tabs items={tabItems} />
+        )}
+      </div>
     </div>
   )
 }

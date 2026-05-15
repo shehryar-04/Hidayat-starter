@@ -1,5 +1,11 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
+import {
+  Button, Card, CardContent,
+  Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
+  Badge, Spinner, EmptyState
+} from '../../shared/ui'
+import { ArrowLeft, History } from 'lucide-react'
 
 /**
  * Hifz Progress Grid Component
@@ -21,7 +27,6 @@ export function HifzProgressGrid({ student, onBack }) {
   const loadProgress = async () => {
     setLoading(true)
     try {
-      // Load Hifz progress for all 30 Juz
       const { data, error: err } = await supabase
         .from('hifz_progress')
         .select('*')
@@ -29,7 +34,6 @@ export function HifzProgressGrid({ student, onBack }) {
 
       if (err) throw err
 
-      // Initialize progress object with all 30 Juz
       const progressObj = {}
       for (let i = 1; i <= 30; i++) {
         const juzData = data?.find((d) => d.juz_number === i)
@@ -42,7 +46,6 @@ export function HifzProgressGrid({ student, onBack }) {
       }
       setProgress(progressObj)
 
-      // Load audit log
       const { data: auditData, error: auditErr } = await supabase
         .from('hifz_audit_log')
         .select(
@@ -64,7 +67,6 @@ export function HifzProgressGrid({ student, onBack }) {
       if (auditErr) throw auditErr
       setAuditLog(auditData || [])
 
-      // Check if all 30 Juz are memorized
       const allMemorized = Object.values(progressObj).every(
         (juz) => juz.status === 'memorized'
       )
@@ -89,7 +91,6 @@ export function HifzProgressGrid({ student, onBack }) {
       const currentJuz = progress[juzNumber]
       const oldStatus = currentJuz.status
 
-      // Update or insert hifz_progress
       if (currentJuz.id) {
         const { error: err } = await supabase
           .from('hifz_progress')
@@ -121,7 +122,6 @@ export function HifzProgressGrid({ student, onBack }) {
         if (err) throw err
       }
 
-      // Log to audit table
       const { error: auditErr } = await supabase
         .from('hifz_audit_log')
         .insert({
@@ -135,7 +135,6 @@ export function HifzProgressGrid({ student, onBack }) {
 
       if (auditErr) throw auditErr
 
-      // Update local state
       setProgress((prev) => ({
         ...prev,
         [juzNumber]: {
@@ -149,7 +148,6 @@ export function HifzProgressGrid({ student, onBack }) {
         },
       }))
 
-      // Check if all 30 Juz are now memorized
       const allMemorized = Object.values(progress).every(
         (juz) => juz.status === 'memorized' || juz.juz_number === juzNumber
       )
@@ -166,68 +164,83 @@ export function HifzProgressGrid({ student, onBack }) {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'not_started':
-        return '#e0e0e0'
-      case 'in_progress':
-        return '#fff3cd'
-      case 'memorized':
-        return '#d4edda'
-      case 'revised':
-        return '#cfe2ff'
-      default:
-        return '#e0e0e0'
+      case 'not_started': return 'bg-neutral-100'
+      case 'in_progress': return 'bg-amber-50'
+      case 'memorized': return 'bg-green-50'
+      case 'revised': return 'bg-blue-50'
+      default: return 'bg-neutral-100'
     }
   }
 
   const getStatusLabel = (status) => {
     switch (status) {
-      case 'not_started':
-        return 'Not Started'
-      case 'in_progress':
-        return 'In Progress'
-      case 'memorized':
-        return 'Memorized'
-      case 'revised':
-        return 'Revised'
-      default:
-        return status
+      case 'not_started': return 'Not Started'
+      case 'in_progress': return 'In Progress'
+      case 'memorized': return 'Memorized'
+      case 'revised': return 'Revised'
+      default: return status
+    }
+  }
+
+  const getStatusBadgeVariant = (status) => {
+    switch (status) {
+      case 'not_started': return 'default'
+      case 'in_progress': return 'warning'
+      case 'memorized': return 'success'
+      case 'revised': return 'info'
+      default: return 'default'
     }
   }
 
   if (loading) {
-    return <div className="loading">Loading Hifz progress...</div>
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Spinner size="lg" />
+      </div>
+    )
   }
 
   return (
-    <div className="hifz-progress-grid">
-      <button onClick={onBack} className="back-button">
-        ← Back to Search
-      </button>
+    <div className="space-y-6">
+      <Button variant="ghost" onClick={onBack} size="sm">
+        <ArrowLeft className="w-4 h-4 mr-2" />
+        Back to Search
+      </Button>
 
-      <div className="progress-header">
-        <h2>Hifz Progress - {student.profiles?.full_name}</h2>
-        <div className="status-info">
-          <p>
-            <strong>Enrollment:</strong> {student.enrollment_number}
-          </p>
-          <p>
-            <strong>Overall Status:</strong>{' '}
-            <span className={`status-badge ${hifzStatus}`}>
+      <Card>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-semibold text-neutral-800">
+                Hifz Progress - {student.profiles?.full_name}
+              </h2>
+              <p className="text-sm text-neutral-500 mt-1">
+                Enrollment: {student.enrollment_number}
+              </p>
+            </div>
+            <Badge variant={hifzStatus === 'complete' ? 'success' : 'warning'} dot>
               {hifzStatus === 'complete' ? 'Complete' : 'In Progress'}
-            </span>
-          </p>
-        </div>
-      </div>
+            </Badge>
+          </div>
+        </CardContent>
+      </Card>
 
-      {error && <div className="error-message">{error}</div>}
-
-      {hifzStatus === 'complete' && (
-        <div className="success-message">
-          <strong>Hifz Complete!</strong> All 30 Juz have been memorized.
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg p-3" role="alert">
+          {error}
         </div>
       )}
 
-      <div className="juz-grid">
+      {hifzStatus === 'complete' && (
+        <Card className="border-l-4 border-l-green-500 bg-green-50">
+          <CardContent>
+            <p className="font-semibold text-green-800">Hifz Complete!</p>
+            <p className="text-sm text-green-700">All 30 Juz have been memorized.</p>
+          </CardContent>
+        </Card>
+      )}
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-3">
         {Array.from({ length: 30 }, (_, i) => i + 1).map((juzNumber) => {
           const juzData = progress[juzNumber]
           const status = juzData?.status || 'not_started'
@@ -235,99 +248,118 @@ export function HifzProgressGrid({ student, onBack }) {
           return (
             <div
               key={juzNumber}
-              className="juz-card"
-              style={{ backgroundColor: getStatusColor(status) }}
+              className={`rounded-xl border border-neutral-200 p-3 ${getStatusColor(status)} transition-all`}
             >
-              <div className="juz-number">Juz {juzNumber}</div>
-              <div className="juz-status">{getStatusLabel(status)}</div>
+              <div className="text-sm font-semibold text-neutral-700 mb-1">Juz {juzNumber}</div>
+              <Badge variant={getStatusBadgeVariant(status)} className="text-[10px] mb-2">
+                {getStatusLabel(status)}
+              </Badge>
 
-              <div className="status-buttons">
+              <div className="flex gap-1 flex-wrap">
                 <button
                   onClick={() => handleStatusChange(juzNumber, 'not_started')}
-                  className={`status-btn ${
-                    status === 'not_started' ? 'active' : ''
+                  className={`w-6 h-6 rounded-full border text-xs flex items-center justify-center transition-all ${
+                    status === 'not_started' ? 'bg-neutral-300 border-neutral-400' : 'border-neutral-200 hover:border-neutral-400'
                   }`}
                   title="Not Started"
+                  aria-label={`Mark Juz ${juzNumber} as Not Started`}
                 >
                   ○
                 </button>
                 <button
                   onClick={() => handleStatusChange(juzNumber, 'in_progress')}
-                  className={`status-btn ${
-                    status === 'in_progress' ? 'active' : ''
+                  className={`w-6 h-6 rounded-full border text-xs flex items-center justify-center transition-all ${
+                    status === 'in_progress' ? 'bg-amber-300 border-amber-400' : 'border-neutral-200 hover:border-amber-400'
                   }`}
                   title="In Progress"
+                  aria-label={`Mark Juz ${juzNumber} as In Progress`}
                 >
                   ◐
                 </button>
                 <button
                   onClick={() => handleStatusChange(juzNumber, 'memorized')}
-                  className={`status-btn ${
-                    status === 'memorized' ? 'active' : ''
+                  className={`w-6 h-6 rounded-full border text-xs flex items-center justify-center transition-all ${
+                    status === 'memorized' ? 'bg-green-300 border-green-400' : 'border-neutral-200 hover:border-green-400'
                   }`}
                   title="Memorized"
+                  aria-label={`Mark Juz ${juzNumber} as Memorized`}
                 >
                   ●
                 </button>
                 <button
                   onClick={() => handleStatusChange(juzNumber, 'revised')}
-                  className={`status-btn ${
-                    status === 'revised' ? 'active' : ''
+                  className={`w-6 h-6 rounded-full border text-xs flex items-center justify-center transition-all ${
+                    status === 'revised' ? 'bg-blue-300 border-blue-400' : 'border-neutral-200 hover:border-blue-400'
                   }`}
                   title="Revised"
+                  aria-label={`Mark Juz ${juzNumber} as Revised`}
                 >
                   ✓
                 </button>
               </div>
 
               {juzData?.memorized_at && (
-                <small className="memorized-date">
+                <p className="text-[10px] text-neutral-500 mt-1">
                   {new Date(juzData.memorized_at).toLocaleDateString()}
-                </small>
+                </p>
               )}
             </div>
           )
         })}
       </div>
 
-      <div className="audit-section">
-        <button
+      <div className="space-y-4">
+        <Button
+          variant="outline"
           onClick={() => setShowAuditLog(!showAuditLog)}
-          className="toggle-audit-button"
+          size="sm"
         >
+          <History className="w-4 h-4 mr-2" />
           {showAuditLog ? 'Hide' : 'Show'} Audit Log
-        </button>
+        </Button>
 
         {showAuditLog && (
-          <div className="audit-log">
-            <h3>Change History</h3>
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold text-neutral-800">Change History</h3>
             {auditLog.length === 0 ? (
-              <p>No changes recorded</p>
+              <EmptyState
+                icon={History}
+                title="No changes"
+                description="No changes have been recorded yet."
+              />
             ) : (
-              <table className="audit-table">
-                <thead>
-                  <tr>
-                    <th>Juz</th>
-                    <th>Old Status</th>
-                    <th>New Status</th>
-                    <th>Changed By</th>
-                    <th>Date</th>
-                  </tr>
-                </thead>
-                <tbody>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Juz</TableHead>
+                    <TableHead>Old Status</TableHead>
+                    <TableHead>New Status</TableHead>
+                    <TableHead>Changed By</TableHead>
+                    <TableHead>Date</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {auditLog.map((entry) => (
-                    <tr key={entry.id}>
-                      <td>Juz {entry.juz_number}</td>
-                      <td>{getStatusLabel(entry.old_status)}</td>
-                      <td>{getStatusLabel(entry.new_status)}</td>
-                      <td>{entry.profiles?.full_name || 'Unknown'}</td>
-                      <td>
+                    <TableRow key={entry.id}>
+                      <TableCell>Juz {entry.juz_number}</TableCell>
+                      <TableCell>
+                        <Badge variant={getStatusBadgeVariant(entry.old_status)}>
+                          {getStatusLabel(entry.old_status)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={getStatusBadgeVariant(entry.new_status)}>
+                          {getStatusLabel(entry.new_status)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{entry.profiles?.full_name || 'Unknown'}</TableCell>
+                      <TableCell>
                         {new Date(entry.changed_at).toLocaleDateString()}
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             )}
           </div>
         )}

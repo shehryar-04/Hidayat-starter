@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
+import { Button, Textarea, Label, Badge, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../shared/ui'
 
 /**
  * Fatwa Response Editor Component
@@ -166,44 +167,53 @@ export function FatwaResponseEditor({ question, onBack, onComplete }) {
     }
   }
 
-  return (
-    <div className="fatwa-response-editor">
-      <button onClick={onBack} className="back-button">
-        ← Back to Questions
-      </button>
+  const statusVariant = (s) => {
+    switch (s) {
+      case 'published': return 'success'
+      case 'pending': return 'warning'
+      case 'closed': return 'default'
+      case 'under_review': return 'info'
+      default: return 'default'
+    }
+  }
 
-      <div className="question-display">
-        <h2>Question: {question.reference_number}</h2>
-        <div className="question-content">
-          <p className="question-text">{question.question_text}</p>
-          {question.context && (
-            <p className="question-context">
-              <strong>Context:</strong> {question.context}
-            </p>
-          )}
+  return (
+    <div className="max-w-3xl mx-auto px-4 py-6 md:px-6 md:py-8 space-y-6">
+      <Button variant="ghost" size="sm" onClick={onBack}>
+        ← Back to Questions
+      </Button>
+
+      {/* Question display card */}
+      <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6">
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <h2 className="text-lg font-bold text-neutral-800">Question: {question.reference_number}</h2>
+          <Badge variant={statusVariant(question.status)} dot>
+            {question.status?.replace('_', ' ')}
+          </Badge>
         </div>
-        <div className="question-status">
-          <span className={`status-badge ${question.status}`}>
-            {question.status}
-          </span>
-        </div>
+        <p className="text-sm text-neutral-700 leading-relaxed">{question.question_text}</p>
+        {question.context && (
+          <p className="text-sm text-neutral-500 mt-3">
+            <span className="font-semibold">Context:</span> {question.context}
+          </p>
+        )}
       </div>
 
-      {error && <div className="error-message">{error}</div>}
+      {error && <div className="bg-red-50 text-red-700 rounded-lg p-4 text-sm">{error}</div>}
 
       {/* Display existing responses */}
       {responses.length > 0 && (
-        <div className="responses-section">
-          <h3>Responses</h3>
+        <div className="space-y-3">
+          <h3 className="text-lg font-semibold text-neutral-800">Responses</h3>
           {responses.map((resp) => (
-            <div key={resp.id} className="response-item">
-              <div className="response-header">
-                <strong>{resp.profiles?.full_name}</strong>
-                <small>
+            <div key={resp.id} className="bg-white border border-neutral-200 rounded-xl shadow-sm p-5">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-semibold text-neutral-800">{resp.profiles?.full_name}</span>
+                <span className="text-xs text-neutral-400">
                   {new Date(resp.submitted_at).toLocaleDateString()}
-                </small>
+                </span>
               </div>
-              <p className="response-text">{resp.response_text}</p>
+              <p className="text-sm text-neutral-700 leading-relaxed">{resp.response_text}</p>
             </div>
           ))}
         </div>
@@ -212,63 +222,52 @@ export function FatwaResponseEditor({ question, onBack, onComplete }) {
       {/* Response form for Mufti */}
       {(userRole === 'mufti' || userRole === 'admin') &&
         question.status !== 'published' && (
-          <form onSubmit={handleSubmitResponse} className="response-form">
-            <h3>Submit Fatwa Response</h3>
-            <div className="form-group">
-              <label htmlFor="response">Your Response</label>
-              <textarea
-                id="response"
-                value={response}
-                onChange={(e) => setResponse(e.target.value)}
-                placeholder="Enter your fatwa response..."
-                rows="6"
-              />
-            </div>
-            <button type="submit" disabled={loading || !response.trim()}>
-              {loading ? 'Submitting...' : 'Submit Response'}
-            </button>
-          </form>
+          <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6">
+            <h3 className="text-lg font-semibold text-neutral-800 mb-4">Submit Fatwa Response</h3>
+            <form onSubmit={handleSubmitResponse} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="response">Your Response</Label>
+                <Textarea
+                  id="response"
+                  value={response}
+                  onChange={(e) => setResponse(e.target.value)}
+                  placeholder="Enter your fatwa response..."
+                  rows={6}
+                />
+              </div>
+              <Button type="submit" variant="primary" disabled={loading || !response.trim()} loading={loading}>
+                Submit Response
+              </Button>
+            </form>
+          </div>
         )}
 
       {/* Publish form for Admin */}
       {userRole === 'admin' && question.status === 'under_review' && (
-        <div className="publish-section">
+        <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6">
           {!showPublishForm ? (
-            <button
-              onClick={() => setShowPublishForm(true)}
-              className="publish-button"
-            >
+            <Button variant="primary" onClick={() => setShowPublishForm(true)}>
               Approve & Publish Fatwa
-            </button>
+            </Button>
           ) : (
-            <form onSubmit={(e) => {
-              e.preventDefault()
-              handlePublishFatwa()
-            }} className="publish-form">
-              <div className="form-group">
-                <label htmlFor="anonymize">
-                  <input
-                    id="anonymize"
-                    type="checkbox"
-                    checked={anonymizeQuestioner}
-                    onChange={(e) =>
-                      setAnonymizeQuestioner(e.target.checked)
-                    }
-                  />
-                  Anonymize Questioner
-                </label>
+            <form onSubmit={(e) => { e.preventDefault(); handlePublishFatwa() }} className="space-y-4">
+              <div className="flex items-center gap-2">
+                <input
+                  id="anonymize"
+                  type="checkbox"
+                  checked={anonymizeQuestioner}
+                  onChange={(e) => setAnonymizeQuestioner(e.target.checked)}
+                  className="rounded border-neutral-300"
+                />
+                <Label htmlFor="anonymize">Anonymize Questioner</Label>
               </div>
-              <div className="button-group">
-                <button type="submit" disabled={loading}>
-                  {loading ? 'Publishing...' : 'Publish Fatwa'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowPublishForm(false)}
-                  className="cancel-button"
-                >
+              <div className="flex items-center gap-3">
+                <Button type="submit" variant="primary" disabled={loading} loading={loading}>
+                  Publish Fatwa
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => setShowPublishForm(false)}>
                   Cancel
-                </button>
+                </Button>
               </div>
             </form>
           )}
@@ -276,42 +275,37 @@ export function FatwaResponseEditor({ question, onBack, onComplete }) {
       )}
 
       {/* Audit log */}
-      <div className="audit-section">
-        <button
-          onClick={() => setShowAuditLog(!showAuditLog)}
-          className="toggle-audit-button"
-        >
+      <div className="space-y-3">
+        <Button variant="outline" size="sm" onClick={() => setShowAuditLog(!showAuditLog)}>
           {showAuditLog ? 'Hide' : 'Show'} Audit Log
-        </button>
+        </Button>
 
         {showAuditLog && (
-          <div className="audit-log">
-            <h3>Status History</h3>
+          <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6">
+            <h3 className="text-lg font-semibold text-neutral-800 mb-4">Status History</h3>
             {auditLog.length === 0 ? (
-              <p>No status changes recorded</p>
+              <p className="text-sm text-neutral-400">No status changes recorded</p>
             ) : (
-              <table className="audit-table">
-                <thead>
-                  <tr>
-                    <th>Old Status</th>
-                    <th>New Status</th>
-                    <th>Actor</th>
-                    <th>Date</th>
-                  </tr>
-                </thead>
-                <tbody>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Old Status</TableHead>
+                    <TableHead>New Status</TableHead>
+                    <TableHead>Actor</TableHead>
+                    <TableHead>Date</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {auditLog.map((entry) => (
-                    <tr key={entry.id}>
-                      <td>{entry.old_status || 'N/A'}</td>
-                      <td>{entry.new_status}</td>
-                      <td>{entry.profiles?.full_name || 'Unknown'}</td>
-                      <td>
-                        {new Date(entry.acted_at).toLocaleDateString()}
-                      </td>
-                    </tr>
+                    <TableRow key={entry.id}>
+                      <TableCell>{entry.old_status || 'N/A'}</TableCell>
+                      <TableCell>{entry.new_status}</TableCell>
+                      <TableCell>{entry.profiles?.full_name || 'Unknown'}</TableCell>
+                      <TableCell>{new Date(entry.acted_at).toLocaleDateString()}</TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             )}
           </div>
         )}

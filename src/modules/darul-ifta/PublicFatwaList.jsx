@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
+import { Input, Spinner } from '../../shared/ui'
 
 const fmt = (d) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 
@@ -42,15 +43,21 @@ export function PublicFatwaList({ hideHeader = false }) {
     f.fatwa_responses?.[0]?.response_text?.toLowerCase().includes(search.toLowerCase())
   )
 
-  if (loading) return <div className="loading">Loading fatwas…</div>
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Spinner size="lg" />
+      </div>
+    )
+  }
 
   return (
-    <div className={hideHeader ? '' : 'page'}>
-      {error && <div className="alert-error mb-4">{error}</div>}
+    <div className={hideHeader ? '' : 'max-w-[1280px] mx-auto px-4 py-6 md:px-6 md:py-8'}>
+      {error && <div className="bg-red-50 text-red-700 rounded-lg p-4 text-sm mb-4">{error}</div>}
 
       <div className="mb-6">
-        <input
-          className="form-input max-w-lg"
+        <Input
+          className="max-w-lg"
           placeholder="Search fatwas by question or keyword…"
           value={search}
           onChange={e => setSearch(e.target.value)}
@@ -58,7 +65,7 @@ export function PublicFatwaList({ hideHeader = false }) {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="card text-center py-16 text-gray-400">
+        <div className="bg-white border border-neutral-200 rounded-xl shadow-sm text-center py-16 text-gray-400">
           <div className="text-4xl mb-3">⚖️</div>
           <p className="text-sm">{fatwas.length === 0 ? 'No published fatwas yet.' : 'No results match your search.'}</p>
         </div>
@@ -70,7 +77,7 @@ export function PublicFatwaList({ hideHeader = false }) {
             const answer = fatwa.fatwa_responses?.[0] || null
 
             return (
-              <div key={fatwa.id} className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+              <div key={fatwa.id} className="bg-white rounded-xl border border-neutral-200 shadow-sm overflow-hidden">
                 {/* Question row */}
                 <button
                   onClick={() => toggle(fatwa.id)}
@@ -81,7 +88,7 @@ export function PublicFatwaList({ hideHeader = false }) {
                       <span className="font-mono text-[10px] font-bold text-gray-400">{fatwa.reference_number}</span>
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-neutral-100 text-primary-700">Published</span>
                       {answer && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-secondary-100 text-secondary-700">Answered</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-50 text-green-700">Answered</span>
                       )}
                     </div>
                     <p className="text-sm font-medium text-gray-800 leading-snug">{fatwa.question_text}</p>
@@ -95,9 +102,9 @@ export function PublicFatwaList({ hideHeader = false }) {
 
                 {/* Expanded */}
                 {isOpen && (
-                  <div className="border-t border-gray-100">
+                  <div className="border-t border-neutral-100">
                     {fatwa.context && (
-                      <div className="px-5 py-3 bg-gray-50 border-b border-gray-100">
+                      <div className="px-5 py-3 bg-neutral-50 border-b border-neutral-100">
                         <p className="text-xs text-gray-500 leading-relaxed">
                           <span className="font-semibold">Context: </span>{fatwa.context}
                         </p>
@@ -107,15 +114,15 @@ export function PublicFatwaList({ hideHeader = false }) {
                     {answer ? (
                       <div className="px-5 py-5">
                         <div className="flex items-center gap-2 mb-3">
-                          <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                          <div className="w-7 h-7 rounded-full bg-primary-500 flex items-center justify-center flex-shrink-0">
                             <span className="text-white text-xs">⚖</span>
                           </div>
                           <div>
-                            <p className="text-xs font-semibold text-primary">Fatwa Answer</p>
+                            <p className="text-xs font-semibold text-primary-600">Fatwa Answer</p>
                             <p className="text-[10px] text-gray-400">Answered {fmt(answer.submitted_at)}</p>
                           </div>
                         </div>
-                        <div className="bg-neutral-50 rounded-lg px-4 py-4 border-l-4 border-secondary">
+                        <div className="bg-neutral-50 rounded-lg px-4 py-4 border-l-4 border-primary-500">
                           <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{answer.response_text}</p>
                           {answer.quotes && (
                             <div className="mt-3 pt-3 border-t border-gray-200">

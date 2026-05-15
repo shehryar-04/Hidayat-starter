@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
+import { Button, Label, Badge, Spinner } from '../../shared/ui'
 
 const PROGRAMS = ['dars-e-nizami', 'hifz', 'nazra', 'short-courses']
 
@@ -100,14 +101,14 @@ export function ScholarProfile({ scholar, onBack, onDeactivate }) {
   const initials = fullName.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
 
   return (
-    <div className="page max-w-3xl">
-      <button onClick={onBack} className="btn-ghost text-sm mb-4">← Back to Search</button>
+    <div className="max-w-[1280px] mx-auto px-4 py-6 md:px-6 md:py-8 max-w-3xl">
+      <Button variant="ghost" size="sm" onClick={onBack} className="text-sm mb-4">← Back to Search</Button>
 
-      {error && <div className="alert-error mb-4 text-sm">{error}</div>}
-      {msg && <div className="alert-success mb-4 text-sm">{msg}</div>}
+      {error && <div className="bg-red-50 text-red-700 rounded-lg p-4 text-sm mb-4">{error}</div>}
+      {msg && <div className="bg-green-50 text-green-700 rounded-lg p-4 text-sm mb-4">{msg}</div>}
 
       {/* ── Header card ── */}
-      <div className="card mb-6 flex items-start gap-5">
+      <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6 mb-6 flex items-start gap-5">
         {scholar.profiles?.avatar_url ? (
           <img src={scholar.profiles.avatar_url} alt={fullName}
             className="w-16 h-16 rounded-full object-cover flex-shrink-0" />
@@ -135,7 +136,7 @@ export function ScholarProfile({ scholar, onBack, onDeactivate }) {
 
       {/* ── Bio ── */}
       {scholar.bio && (
-        <div className="card mb-6">
+        <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6 mb-6">
           <h3 className="mb-2">Biography</h3>
           <p className="text-sm text-gray-600 leading-relaxed">{scholar.bio}</p>
         </div>
@@ -143,7 +144,7 @@ export function ScholarProfile({ scholar, onBack, onDeactivate }) {
 
       {/* ── Qualifications & Specializations ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-        <div className="card">
+        <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6">
           <h3 className="mb-3">Qualifications</h3>
           {scholar.qualifications?.length > 0 ? (
             <ul className="space-y-1">
@@ -155,7 +156,7 @@ export function ScholarProfile({ scholar, onBack, onDeactivate }) {
             </ul>
           ) : <p className="text-sm text-gray-400">None listed.</p>}
         </div>
-        <div className="card">
+        <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6">
           <h3 className="mb-3">Specializations</h3>
           {scholar.specializations?.length > 0 ? (
             <div className="flex flex-wrap gap-2">
@@ -169,7 +170,7 @@ export function ScholarProfile({ scholar, onBack, onDeactivate }) {
 
       {/* ── Contact ── */}
       {scholar.contact_info && Object.keys(scholar.contact_info).length > 0 && (
-        <div className="card mb-6">
+        <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6 mb-6">
           <h3 className="mb-3">Contact Information</h3>
           <div className="space-y-1 text-sm text-gray-600">
             {scholar.contact_info.email && <p>📧 {scholar.contact_info.email}</p>}
@@ -180,7 +181,7 @@ export function ScholarProfile({ scholar, onBack, onDeactivate }) {
       )}
 
       {/* ── Subject assignments ── */}
-      <div className="card mb-6">
+      <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6 mb-6">
         <h3 className="mb-4">Subject Assignments</h3>
         {subjectAssignments.length > 0 ? (
           <div className="space-y-2 mb-4">
@@ -200,20 +201,20 @@ export function ScholarProfile({ scholar, onBack, onDeactivate }) {
         ) : <p className="text-sm text-gray-400 mb-4">No subject assignments yet.</p>}
 
         <div className="flex gap-2">
-          <select className="form-input flex-1" value={selectedSubject} onChange={e => setSelectedSubject(e.target.value)}>
+          <select className="h-10 w-full rounded-lg border border-neutral-200 px-3 text-sm shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 flex-1" value={selectedSubject} onChange={e => setSelectedSubject(e.target.value)}>
             <option value="">Select a subject…</option>
             {subjects.filter(s => !subjectAssignments.some(a => a.dars_e_nizami_subjects?.id === s.id)).map(s => (
               <option key={s.id} value={s.id}>{s.name} ({s.dars_e_nizami_levels?.name})</option>
             ))}
           </select>
-          <button onClick={assignSubject} disabled={loading || !selectedSubject} className="btn-secondary flex-shrink-0">
+          <Button variant="secondary" size="sm" onClick={assignSubject} disabled={loading || !selectedSubject} className="flex-shrink-0">
             Assign
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* ── Program assignments ── */}
-      <div className="card mb-6">
+      <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6 mb-6">
         <h3 className="mb-4">Program Assignments</h3>
         {programAssignments.length > 0 ? (
           <div className="space-y-2 mb-4">
@@ -230,39 +231,39 @@ export function ScholarProfile({ scholar, onBack, onDeactivate }) {
         ) : <p className="text-sm text-gray-400 mb-4">No program assignments yet.</p>}
 
         <div className="flex gap-2">
-          <select className="form-input flex-1" value={selectedProgram} onChange={e => setSelectedProgram(e.target.value)}>
+          <select className="h-10 w-full rounded-lg border border-neutral-200 px-3 text-sm shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 flex-1" value={selectedProgram} onChange={e => setSelectedProgram(e.target.value)}>
             <option value="">Select a program…</option>
             {PROGRAMS.filter(p => !programAssignments.some(a => a.program === p)).map(p => (
               <option key={p} value={p}>{p}</option>
             ))}
           </select>
-          <button onClick={assignProgram} disabled={loading || !selectedProgram} className="btn-secondary flex-shrink-0">
+          <Button variant="secondary" size="sm" onClick={assignProgram} disabled={loading || !selectedProgram} className="flex-shrink-0">
             Assign
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* ── Deactivation ── */}
       {isActive && (
-        <div className="card border-tertiary-200">
+        <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6 border-tertiary-200">
           <h3 className="mb-2 text-tertiary">Deactivate Scholar</h3>
           <p className="text-sm text-gray-500 mb-4">
             Sets employment status to inactive and flags all active student assignments for admin review.
           </p>
           {!confirmDeactivate ? (
-            <button onClick={() => setConfirmDeactivate(true)} className="btn-danger">
+            <Button variant="destructive" onClick={() => setConfirmDeactivate(true)}>
               Deactivate Scholar
-            </button>
+            </Button>
           ) : (
             <div className="bg-red-50 rounded-lg p-4">
               <p className="text-sm font-medium text-red-700 mb-3">
                 Are you sure? This will deactivate <strong>{fullName}</strong> and flag all their active student assignments.
               </p>
               <div className="flex gap-3">
-                <button onClick={handleDeactivate} disabled={deactivating} className="btn-danger">
+                <Button variant="destructive" onClick={handleDeactivate} disabled={deactivating}>
                   {deactivating ? 'Deactivating…' : 'Confirm Deactivation'}
-                </button>
-                <button onClick={() => setConfirmDeactivate(false)} className="btn-ghost">Cancel</button>
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => setConfirmDeactivate(false)}>Cancel</Button>
               </div>
             </div>
           )}

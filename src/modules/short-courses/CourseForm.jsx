@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useCourseFormStore } from './useCourseFormStore'
 import { useRole } from '../../app/RoleProvider'
+import { Button, Input, Label, Textarea } from '../../shared/ui'
 
 // ─── Step indicator ───────────────────────────────────────────
 const STEPS = [
@@ -46,20 +47,20 @@ function ListEditor({ label, placeholder, items, onChange }) {
   }
   const remove = (i) => onChange(items.filter((_, idx) => idx !== i))
   return (
-    <div className="form-group">
-      <label className="form-label">{label}</label>
+    <div className="space-y-2">
+      <Label>{label}</Label>
       <div className="flex gap-2 mb-2">
-        <input className="form-input" value={input} onChange={e => setInput(e.target.value)}
+        <Input value={input} onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), add())}
           placeholder={placeholder} />
-        <button type="button" onClick={add} className="btn-secondary px-4 flex-shrink-0">Add</button>
+        <Button type="button" variant="secondary" size="sm" onClick={add} className="flex-shrink-0">Add</Button>
       </div>
       {items.length > 0 && (
         <ul className="space-y-1">
           {items.map((item, i) => (
             <li key={i} className="flex items-center gap-2 bg-neutral-50 px-3 py-1.5 rounded text-sm">
               <span className="flex-1">{item}</span>
-              <button type="button" onClick={() => remove(i)} className="text-tertiary hover:text-tertiary-600 text-xs">✕</button>
+              <button type="button" onClick={() => remove(i)} className="text-red-400 hover:text-red-600 text-xs" aria-label="Remove item">✕</button>
             </li>
           ))}
         </ul>
@@ -86,12 +87,12 @@ function CurriculumBuilder({ sections, onChange }) {
   return (
     <div className="space-y-4">
       {sections.map((section, si) => (
-        <div key={section.id} className="border border-gray-200 rounded-lg overflow-hidden">
+        <div key={section.id} className="border border-neutral-200 rounded-lg overflow-hidden">
           <div className="bg-neutral-50 px-4 py-3 flex items-center gap-3">
             <span className="text-xs font-bold text-primary-600 uppercase tracking-wide">Section {si + 1}</span>
-            <input className="form-input flex-1 py-1.5 text-sm" value={section.title}
+            <Input className="flex-1 py-1.5 text-sm" value={section.title}
               onChange={e => updateSection(si, e.target.value)} placeholder="Section title" />
-            <button type="button" onClick={() => removeSection(si)} className="text-tertiary text-sm px-2">✕</button>
+            <button type="button" onClick={() => removeSection(si)} className="text-red-400 hover:text-red-600 text-sm px-2" aria-label="Remove section">✕</button>
           </div>
           <div className="divide-y divide-gray-100">
             {section.lectures.map((lecture, li) => (
@@ -99,29 +100,29 @@ function CurriculumBuilder({ sections, onChange }) {
                 {/* Row 1: title, duration, free preview, remove */}
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-xs text-gray-400 w-16 flex-shrink-0">Lecture {li + 1}</span>
-                  <input className="form-input flex-1 py-1.5 text-sm" value={lecture.title}
+                  <Input className="flex-1 py-1.5 text-sm" value={lecture.title}
                     onChange={e => updateLecture(si, li, 'title', e.target.value)} placeholder="Lecture title" />
-                  <input className="form-input w-24 py-1.5 text-sm" type="number" min="1"
+                  <Input className="w-24 py-1.5 text-sm" type="number" min="1"
                     value={lecture.duration_minutes}
                     onChange={e => updateLecture(si, li, 'duration_minutes', e.target.value)} placeholder="Min" />
                   <label className="flex items-center gap-1 text-xs text-gray-500 flex-shrink-0 cursor-pointer">
-                    <input type="checkbox" className="form-checkbox" checked={lecture.is_free_preview}
+                    <input type="checkbox" className="rounded border-neutral-300 text-primary-500 focus:ring-primary-500" checked={lecture.is_free_preview}
                       onChange={e => updateLecture(si, li, 'is_free_preview', e.target.checked)} />
                     Free preview
                   </label>
-                  <button type="button" onClick={() => removeLecture(si, li)} className="text-tertiary text-sm px-1">✕</button>
+                  <button type="button" onClick={() => removeLecture(si, li)} className="text-red-400 hover:text-red-600 text-sm px-1" aria-label="Remove lecture">✕</button>
                 </div>
                 {/* Row 2: video URL */}
                 <div className="mb-2">
-                  <input
-                    className="form-input text-sm py-1.5"
+                  <Input
+                    className="text-sm py-1.5"
                     value={lecture.video_url || ''}
                     onChange={e => updateLecture(si, li, 'video_url', e.target.value)}
                     placeholder="▶ YouTube URL for this lecture (e.g. https://youtu.be/…)"
                   />
                 </div>
                 {/* Row 3: notes */}
-                <textarea className="form-input text-sm py-1.5" rows={2} value={lecture.content_text}
+                <Textarea className="text-sm py-1.5" rows={2} value={lecture.content_text}
                   onChange={e => updateLecture(si, li, 'content_text', e.target.value)}
                   placeholder="Optional lecture notes or description…" />
               </div>
@@ -133,7 +134,7 @@ function CurriculumBuilder({ sections, onChange }) {
           </div>
         </div>
       ))}
-      <button type="button" onClick={addSection} className="btn-outline w-full">+ Add Section</button>
+      <Button type="button" variant="outline" className="w-full" onClick={addSection}>+ Add Section</Button>
     </div>
   )
 }
@@ -342,12 +343,12 @@ export function CourseForm({ onComplete, editCourse = null }) {
   }
 
   return (
-    <div className="page max-w-3xl">
+    <div className="max-w-[1280px] mx-auto px-4 py-6 md:px-6 md:py-8 max-w-3xl">
       {/* Header row */}
       <div className="flex items-start justify-between mb-6">
         <div>
-          <h1 className="page-title">{isEditMode ? 'Edit Course' : 'Create New Course'}</h1>
-          <p className="page-subtitle">{isEditMode ? 'Update course details, curriculum, and media.' : 'Your progress is saved automatically as you type.'}</p>
+          <h1 className="text-xl font-bold text-neutral-800">{isEditMode ? 'Edit Course' : 'Create New Course'}</h1>
+          <p className="text-sm text-neutral-500 mt-1">{isEditMode ? 'Update course details, curriculum, and media.' : 'Your progress is saved automatically as you type.'}</p>
         </div>
         <div className="flex items-center gap-3 flex-shrink-0">
           {lastSaved && (
@@ -356,64 +357,62 @@ export function CourseForm({ onComplete, editCourse = null }) {
             </span>
           )}
           {savedMsg && <span className="text-xs text-secondary font-medium">{savedMsg}</span>}
-          <button type="button" onClick={handleSaveDraft} disabled={saving}
-            className="btn-outline text-sm py-1.5 px-4">
+          <Button type="button" variant="outline" size="sm" onClick={handleSaveDraft} disabled={saving}>
             {saving ? 'Saving…' : '💾 Save Draft'}
-          </button>
+          </Button>
           {draftId && (
-            <button type="button" onClick={reset}
-              className="btn-ghost text-xs text-gray-400 hover:text-tertiary">
+            <Button type="button" variant="ghost" size="sm" onClick={reset}>
               Clear draft
-            </button>
+            </Button>
           )}
         </div>
       </div>
 
-      <div className="card">
+      <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6">
         <StepIndicator current={step} />
 
-        {error && <div className="alert-error mb-4 text-sm">{error}</div>}
+        {error && <div className="bg-error-light text-error-dark rounded-lg p-4 text-sm mb-4">{error}</div>}
 
         {/* ── Step 1: Basic Info ── */}
         {step === 1 && (
           <div className="space-y-4">
-            <div className="form-group">
-              <label className="form-label">Course Title <span className="text-tertiary">*</span></label>
-              <input className="form-input" value={title} onChange={e => setField('title', e.target.value)}
+            <div className="space-y-2">
+              <Label>Course Title <span className="text-red-500">*</span></Label>
+              <Input value={title} onChange={e => setField('title', e.target.value)}
                 placeholder="e.g. Introduction to Islamic Jurisprudence" />
             </div>
-            <div className="form-group">
-              <label className="form-label">Subtitle</label>
-              <input className="form-input" value={subtitle} onChange={e => setField('subtitle', e.target.value)}
+            <div className="space-y-2">
+              <Label>Subtitle</Label>
+              <Input value={subtitle} onChange={e => setField('subtitle', e.target.value)}
                 placeholder="A short tagline for your course" />
             </div>
-            <div className="form-group">
-              <label className="form-label">Description <span className="text-tertiary">*</span></label>
-              <textarea className="form-input" rows={5} value={description} onChange={e => setField('description', e.target.value)}
+            <div className="space-y-2">
+              <Label>Description <span className="text-red-500">*</span></Label>
+              <Textarea rows={5} value={description} onChange={e => setField('description', e.target.value)}
                 placeholder="Describe what this course covers, who it's for, and what makes it valuable…" />
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="form-group">
-                <label className="form-label">Category</label>
-                <input className="form-input" value={category} onChange={e => setField('category', e.target.value)}
+              <div className="space-y-2">
+                <Label>Category</Label>
+                <Input value={category} onChange={e => setField('category', e.target.value)}
                   placeholder="e.g. Islamic Studies" />
               </div>
-              <div className="form-group">
-                <label className="form-label">Subcategory</label>
-                <input className="form-input" value={subcategory} onChange={e => setField('subcategory', e.target.value)}
+              <div className="space-y-2">
+                <Label>Subcategory</Label>
+                <Input value={subcategory} onChange={e => setField('subcategory', e.target.value)}
                   placeholder="e.g. Fiqh" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="form-group">
-                <label className="form-label">Language</label>
-                <select className="form-input" value={language} onChange={e => setField('language', e.target.value)}>
+              <div className="space-y-2">
+                <Label>Language</Label>
+                <select className="h-10 w-full rounded-lg border border-neutral-200 px-3 text-sm shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] transition-all duration-150 outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500" value={language} onChange={e => setField('language', e.target.value)}>
                   {['English', 'Arabic', 'Urdu', 'French', 'Turkish', 'Other'].map(l => <option key={l}>{l}</option>)}
                 </select>
               </div>
-              <div className="form-group">
-                <label className="form-label">Level</label>
-                <select className="form-input" value={level} onChange={e => setField('level', e.target.value)}>
+              <div className="space-y-2">
+                <Label>Level</Label>
+                <select className="h-10 w-full rounded-lg border border-neutral-200 px-3 text-sm shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] transition-all duration-150 outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500" value={level} onChange={e => setField('level', e.target.value)}>
                   {['Beginner', 'Intermediate', 'Advanced', 'All levels'].map(l => <option key={l}>{l}</option>)}
                 </select>
               </div>
@@ -431,7 +430,7 @@ export function CourseForm({ onComplete, editCourse = null }) {
               placeholder="e.g. Understand the four major schools of Fiqh"
               items={objectives} onChange={v => setField('objectives', v)} />
             {objectives.length < 1 && (
-              <p className="text-xs text-tertiary">Add at least 1 learning objective to continue.</p>
+              <p className="text-xs text-red-500">Add at least 1 learning objective to continue.</p>
             )}
             <ListEditor
               label="Requirements & Prerequisites"
@@ -451,10 +450,10 @@ export function CourseForm({ onComplete, editCourse = null }) {
         {/* ── Step 4: Media ── */}
         {step === 4 && (
           <div className="space-y-6">
-            <div className="form-group">
-              <label className="form-label">Course Thumbnail</label>
+            <div className="space-y-2">
+              <Label>Course Thumbnail</Label>
               <div onClick={() => thumbnailRef.current?.click()}
-                className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-primary transition-colors">
+                className="border-2 border-dashed border-neutral-300 rounded-lg p-6 text-center cursor-pointer hover:border-primary-500 transition-colors">
                 {thumbnailPreview ? (
                   <img src={thumbnailPreview} alt="Thumbnail preview" className="mx-auto max-h-48 rounded object-cover" />
                 ) : (
@@ -467,9 +466,9 @@ export function CourseForm({ onComplete, editCourse = null }) {
               </div>
               <input ref={thumbnailRef} type="file" accept="image/*" className="hidden" onChange={handleThumbnailChange} />
             </div>
-            <div className="form-group">
-              <label className="form-label">Promotional Video URL</label>
-              <input className="form-input" value={promoVideoUrl} onChange={e => setField('promoVideoUrl', e.target.value)}
+            <div className="space-y-2">
+              <Label>Promotional Video URL</Label>
+              <Input value={promoVideoUrl} onChange={e => setField('promoVideoUrl', e.target.value)}
                 placeholder="https://youtube.com/… or Supabase storage URL" />
               <p className="text-xs text-gray-400 mt-1">A short preview video shown to prospective students.</p>
             </div>
@@ -480,7 +479,7 @@ export function CourseForm({ onComplete, editCourse = null }) {
         {step === 5 && (
           <div className="space-y-6">
             <div>
-              <h3 className="mb-3">Pricing & Access</h3>
+              <h3 className="font-semibold text-neutral-700 mb-3">Pricing & Access</h3>
               <div className="flex gap-3 mb-4">
                 {[true, false].map(free => (
                   <button key={String(free)} type="button" onClick={() => setField('isFree', free)}
@@ -491,16 +490,16 @@ export function CourseForm({ onComplete, editCourse = null }) {
                 ))}
               </div>
               {!isFree && (
-                <div className="form-group">
-                  <label className="form-label">Price (USD)</label>
-                  <input className="form-input" type="number" min="0" step="0.01" value={fee}
+                <div className="space-y-2">
+                  <Label>Price (USD)</Label>
+                  <Input type="number" min="0" step="0.01" value={fee}
                     onChange={e => setField('fee', e.target.value)} placeholder="e.g. 49.99" />
                 </div>
               )}
             </div>
 
             <div>
-              <h3 className="mb-3">Engagement Settings</h3>
+              <h3 className="font-semibold text-neutral-700 mb-3">Engagement Settings</h3>
               <div className="space-y-3">
                 {[
                   ['qaEnabled', qaEnabled, 'Q&A enabled', 'Students can ask and answer questions'],
@@ -508,7 +507,7 @@ export function CourseForm({ onComplete, editCourse = null }) {
                   ['commentsEnabled', commentsEnabled, 'Comments per lecture', 'Students can comment on individual lectures'],
                 ].map(([key, val, label, desc]) => (
                   <label key={key} className="flex items-start gap-3 cursor-pointer p-3 rounded-lg hover:bg-neutral-50">
-                    <input type="checkbox" className="form-checkbox mt-0.5" checked={val}
+                    <input type="checkbox" className="rounded border-neutral-300 text-primary-500 focus:ring-primary-500 mt-0.5" checked={val}
                       onChange={e => setField(key, e.target.checked)} />
                     <div>
                       <div className="text-sm font-medium text-gray-700">{label}</div>
@@ -523,17 +522,18 @@ export function CourseForm({ onComplete, editCourse = null }) {
 
         {/* ── Navigation ── */}
         <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
-          <button type="button" onClick={() => setStep(step - 1)} disabled={step === 1}
-            className="btn-ghost disabled:opacity-30">← Back</button>
+          <Button type="button" variant="ghost" onClick={() => setStep(step - 1)} disabled={step === 1}>
+            ← Back
+          </Button>
 
           {step < STEPS.length ? (
-            <button type="button" onClick={() => setStep(step + 1)} disabled={!canProceed()}
-              className="btn-primary disabled:opacity-50">Continue →</button>
+            <Button type="button" variant="primary" onClick={() => setStep(step + 1)} disabled={!canProceed()}>
+              Continue →
+            </Button>
           ) : (
-            <button type="button" onClick={handlePublish} disabled={publishing}
-              className="btn-primary">
+            <Button type="button" variant="primary" onClick={handlePublish} disabled={publishing} loading={publishing}>
               {publishing ? 'Submitting…' : isAdmin ? '🚀 Publish Course' : '📤 Submit for Approval'}
-            </button>
+            </Button>
           )}
         </div>
       </div>
