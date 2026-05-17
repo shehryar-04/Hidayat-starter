@@ -218,10 +218,12 @@ export const useFatwaStore = create((set, get) => ({
       // Total count
       const totalCount = countRes.count || 0
 
-      // Institutions
+      // Institutions — filter out corrupted names with replacement character
       const institutionSet = new Set()
       for (const row of (institutionsRes.data || [])) {
-        if (row.dar_ul_ifta) institutionSet.add(row.dar_ul_ifta)
+        if (row.dar_ul_ifta && !row.dar_ul_ifta.includes('\uFFFD') && !row.dar_ul_ifta.includes('�')) {
+          institutionSet.add(row.dar_ul_ifta)
+        }
       }
       const institutionList = [...institutionSet]
 
