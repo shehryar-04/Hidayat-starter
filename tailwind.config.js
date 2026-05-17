@@ -28,6 +28,7 @@ export default {
       fontFamily: {
         sans:    ['"Inter"', 'system-ui', 'sans-serif'],
         display: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
+        urdu:    ['"Jameel Noori Nastaleeq"', 'serif'],
       },
       fontSize: {
         xs:    ['0.75rem', { lineHeight: '1rem', letterSpacing: '0.01em' }],

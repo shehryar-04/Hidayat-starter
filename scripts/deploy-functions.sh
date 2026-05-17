@@ -19,8 +19,10 @@ FUNCTIONS=(
   "evaluate-wazifa"
   "generate-certificate"
   "generate-report"
+  "increment-fatwa-view"
   "promote-student"
   "publish-fatwa"
+  "regenerate-sitemap"
   "resend-verification"
   "signup"
 )
@@ -35,8 +37,8 @@ SUCCEEDED=()
 
 for fn in "${FUNCTIONS[@]}"; do
   echo "→ Deploying: $fn"
-  # signup and resend-verification must skip gateway JWT verification (unauthenticated users call them)
-  if [ "$fn" = "signup" ] || [ "$fn" = "resend-verification" ]; then
+  # Functions that skip gateway JWT verification (called by unauthenticated users or webhooks)
+  if [ "$fn" = "signup" ] || [ "$fn" = "resend-verification" ] || [ "$fn" = "increment-fatwa-view" ] || [ "$fn" = "regenerate-sitemap" ]; then
     DEPLOY_CMD="npx supabase functions deploy $fn --no-verify-jwt"
   else
     DEPLOY_CMD="npx supabase functions deploy $fn"

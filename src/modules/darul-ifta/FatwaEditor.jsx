@@ -160,20 +160,22 @@ export function FatwaEditor({ fatwa, onComplete, onCancel }) {
     await loadResponses()
   }
 
-  // ── Publish ───────────────────────────────────────────────
+  // ── Publish (calls edge function to create entry in fatwas table) ──
   const handlePublish = async () => {
     setSaving(true); setError(null)
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      await supabase.from('fatwa_questions').update({ status: 'published' }).eq('id', fatwa.id)
-      await supabase.from('fatwa_audit_log').insert({
-        question_id: fatwa.id,
-        old_status: status,
-        new_status: 'published',
-        actor_id: user.id,
+      const { data, error: fnErr } = await supabase.functions.invoke('publish-fatwa', {
+        body: {
+          question_id: fatwa.id,
+          anonymize_questioner: anonymize,
+        },
       })
+
+      if (fnErr) throw fnErr
+      if (data?.error) throw new Error(data.error)
+
       setStatus('published')
-      setMsg('Fatwa published.')
+      setMsg(`Fatwa published to knowledge base. Number: ${data.fatwa_number || ''}`)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -235,7 +237,7 @@ export function FatwaEditor({ fatwa, onComplete, onCancel }) {
             <Button type="submit" variant="primary" disabled={saving || !questionText.trim()} loading={saving}>
               {isEdit ? 'Update Question' : 'Create Fatwa'}
             </Button>
-            {isEdit && status === 'under_review' && role === 'admin' && (
+            {isEdit && ['under_review', 'approved'].includes(status) && (role === 'admin' || role === 'mufti') && (
               <Button type="button" variant="secondary" onClick={handlePublish} disabled={saving}>
                 🌐 Publish Fatwa
               </Button>

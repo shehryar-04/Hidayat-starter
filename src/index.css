@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Jameel Noori Nastaleeq — Urdu font */
+@font-face {
+  font-family: 'Jameel Noori Nastaleeq';
+  src: url('/fonts/Jameel Noori Nastaleeq Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   html,
   body {
@@ -36,6 +45,26 @@
     );
     background-size: 200% 100%;
     animation: shimmer 1.5s ease-in-out infinite;
+  }
+}
+
+/* Fatwa Platform responsive typography */
+.fatwa-platform {
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+/* Apply Jameel Noori Nastaleeq to all RTL (Urdu/Arabic) content */
+.fatwa-platform [dir="rtl"],
+.fatwa-platform .font-urdu {
+  font-family: 'Jameel Noori Nastaleeq', serif;
+  font-size: 1.35em;
+  line-height: 2.4;
+}
+
+@media (min-width: 1024px) {
+  .fatwa-platform {
+    font-size: 18px;
   }
 }
 

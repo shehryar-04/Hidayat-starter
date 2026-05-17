@@ -1,13 +1,13 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Routes, Route, useLocation } from 'react-router-dom'
 import { useRole } from '../../app/RoleProvider'
 import { FatwaList } from './FatwaList'
 import { FatwaEditor } from './FatwaEditor'
-import { PublicFatwaList } from './PublicFatwaList'
 import { QuestionSubmitForm } from './QuestionSubmitForm'
 import { WhatsAppButton } from '../../shared/WhatsAppButton'
 import { Star, PenLine, BookOpen, BadgeCheck } from 'lucide-react'
-import { Button, Card, CardContent, Tabs } from '../../shared/ui'
+import { Card, CardContent, Tabs } from '../../shared/ui'
+import FatwaPlatformModule from '../fatwa-platform'
 
 // ─── Hero Section (shared by guest + scholar/student) ────────
 function DarulIftaHero({ showSubmitBtn = false, onSubmitClick }) {
@@ -105,27 +105,35 @@ function AdminMuftiView() {
   )
 }
 
-// ─── Scholar / Student: browse + submit question ──────────────
-function ScholarStudentView() {
-  const [showForm, setShowForm] = useState(false)
+// ─── Public View: Hero + Process + Fatwa Platform (categories, detail pages) ──
+function PublicView({ showSubmitBtn = false, onSubmitClick }) {
+  const { pathname } = useLocation()
 
-  if (showForm) {
+  // If we're on a sub-route (category, fatwa detail, search), show only the platform
+  const isSubRoute = pathname !== '/darul-ifta' && pathname !== '/darul-ifta/'
+
+  if (isSubRoute) {
     return (
       <div className="bg-background min-h-screen">
-        <QuestionSubmitForm onComplete={() => setShowForm(false)} />
+        <FatwaPlatformModule />
+        {/* WhatsApp CTA */}
+        <div className="fixed bottom-6 right-6 z-50">
+          <WhatsAppButton
+            message="Assalamu Alaikum, I have a question for Darul Ifta."
+            label="Ask on WhatsApp"
+          />
+        </div>
       </div>
     )
   }
 
+  // Root /darul-ifta — show hero + process steps + fatwa platform home
   return (
     <div className="bg-background min-h-screen">
-      <DarulIftaHero showSubmitBtn onSubmitClick={() => setShowForm(true)} />
+      <DarulIftaHero showSubmitBtn={showSubmitBtn} onSubmitClick={onSubmitClick} />
       <ProcessSteps />
-      <div id="library" className="max-w-screen-xl mx-auto px-8 pb-24">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="font-serif text-3xl font-bold text-primary">Fatwa Library</h2>
-        </div>
-        <PublicFatwaList hideHeader />
+      <div id="library">
+        <FatwaPlatformModule />
       </div>
       {/* WhatsApp CTA */}
       <div className="fixed bottom-6 right-6 z-50">
@@ -138,31 +146,25 @@ function ScholarStudentView() {
   )
 }
 
+// ─── Scholar / Student: browse + submit question ──────────────
+function ScholarStudentView() {
+  const [showForm, setShowForm] = useState(false)
+
+  if (showForm) {
+    return (
+      <div className="bg-background min-h-screen">
+        <QuestionSubmitForm onComplete={() => setShowForm(false)} />
+      </div>
+    )
+  }
+
+  return <PublicView showSubmitBtn onSubmitClick={() => setShowForm(true)} />
+}
+
 // ─── Guest: browse only, prompt to login to submit ───────────
 function GuestView() {
   const navigate = useNavigate()
-  return (
-    <div className="bg-background min-h-screen">
-      <DarulIftaHero showSubmitBtn onSubmitClick={() => navigate('/login')} />
-      <ProcessSteps />
-      <div id="library" className="max-w-screen-xl mx-auto px-8 pb-24">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="font-serif text-3xl font-bold text-primary">Fatwa Library</h2>
-          <p className="text-sm text-slate-500">
-            <a href="/login" className="text-primary underline hover:text-secondary">Sign in</a> to submit your own question.
-          </p>
-        </div>
-        <PublicFatwaList hideHeader />
-      </div>
-      {/* WhatsApp CTA */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <WhatsAppButton
-          message="Assalamu Alaikum, I have a question for Darul Ifta."
-          label="Ask on WhatsApp"
-        />
-      </div>
-    </div>
-  )
+  return <PublicView showSubmitBtn onSubmitClick={() => navigate('/login')} />
 }
 
 // ─── Root: branch by role ─────────────────────────────────────

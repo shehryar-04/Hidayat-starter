@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:prerender": "vite build && node scripts/generate-prerender-manifest.js && node scripts/prerender.js",
+    "prerender": "node scripts/prerender.js",
+    "generate:manifest": "node scripts/generate-prerender-manifest.js",
     "preview": "vite preview",
     "test": "vitest --run",
     "test:watch": "vitest"
@@ -20,9 +23,11 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
+    "fuse.js": "^7.3.0",
     "lucide-react": "^1.16.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-helmet-async": "^3.0.0",
     "react-quill": "^2.0.0",
     "react-router-dom": "^6.21.0",
     "tailwind-merge": "^3.6.0",
@@ -34,8 +39,11 @@
     "@testing-library/user-event": "^14.5.2",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.17",
+    "dotenv": "^16.3.1",
+    "fast-check": "^4.8.0",
     "jsdom": "^23.0.1",
     "postcss": "^8.4.35",
+    "puppeteer": "^22.0.0",
     "tailwindcss": "^3.4.1",
     "vite": "^5.0.8",
     "vitest": "^1.1.0"

@@ -18,6 +18,7 @@ import StudentAdminModule from '../modules/student-admin'
 import ScholarAdminModule from '../modules/scholar-admin'
 import ArticlesPage from '../modules/articles'
 import DownloadsPage from '../modules/downloads'
+import FatwaPlatformModule from '../modules/fatwa-platform'
 
 /**
  * Shell wrapper — single navbar for all pages (guest + authenticated).
@@ -58,6 +59,8 @@ export default function AppRouter() {
       <Route path="/research-center/*" element={<AppShell><ResearchCenterModule /></AppShell>} />
       <Route path="/articles/*" element={<AppShell><ArticlesPage /></AppShell>} />
       <Route path="/downloads/*" element={<AppShell><DownloadsPage /></AppShell>} />
+      <Route path="/fatwas/*" element={<AppShell><FatwaPlatformModule /></AppShell>} />
+      <Route path="/darul-iftaa/*" element={<AppShell><FatwaPlatformModule /></AppShell>} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
