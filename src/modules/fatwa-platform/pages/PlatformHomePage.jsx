@@ -1,12 +1,9 @@
-import { useEffect, useState, useCallback, useMemo } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useEffect, useMemo } from 'react'
+import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { BookOpen, Building2, TrendingUp, Clock } from 'lucide-react'
+import { BookOpen, Building2 } from 'lucide-react'
 import SEOHead from '../components/SEOHead'
-import SearchInput from '../components/SearchInput'
-import { FatwaCard } from '../components/FatwaCard'
 import PlatformStats from '../components/PlatformStats'
-import { useSearch } from '../hooks/useSearch'
 import { useFatwaStore } from '../stores/fatwaStore'
 import { useCategories } from '../hooks/useCategories'
 import { useBasePath } from '../hooks/useBasePath'
@@ -14,10 +11,6 @@ import { generateWebSiteSchema } from '../utils/structuredData'
 import { isValidCategoryName } from '../utils/categoryFilter'
 import { detectDirection } from '../utils/rtlDetection'
 
-/**
- * Framer Motion variants for section entrance animations.
- * Each section fades in and slides up with staggered timing.
- */
 const sectionVariants = {
   hidden: { opacity: 0, y: 30 },
   visible: {
@@ -27,51 +20,19 @@ const sectionVariants = {
   },
 }
 
-/**
- * PlatformHomePage — the main landing page for the Fatwa Knowledge Platform.
- *
- * Sections:
- * - Hero with prominent search input
- * - Featured Categories (top-level categories with counts)
- * - Latest Fatwas (6 most recent)
- * - Popular Fatwas (6 most viewed)
- * - Trusted Institutions (distinct dar_ul_ifta values)
- * - Platform Statistics
- */
 export default function PlatformHomePage() {
-  const navigate = useNavigate()
-  const [searchQuery, setSearchQuery] = useState('')
   const basePath = useBasePath()
 
   const fetchFatwas = useFatwaStore((state) => state.fetchFatwas)
-  const latestFatwas = useFatwaStore((state) => state.latestFatwas)
-  const popularFatwas = useFatwaStore((state) => state.popularFatwas)
   const totalCount = useFatwaStore((state) => state.totalCount)
   const institutionList = useFatwaStore((state) => state.institutionList)
   const loading = useFatwaStore((state) => state.loading)
 
   const { topLevelCategories } = useCategories()
-  const { suggestions, isSearching } = useSearch(searchQuery)
 
   useEffect(() => {
     fetchFatwas()
   }, [fetchFatwas])
-
-  const handleSearchSelect = useCallback(
-    (suggestion) => {
-      navigate(`${basePath}/${suggestion.slug}`)
-    },
-    [navigate, basePath]
-  )
-
-  const handleSearchSubmit = useCallback(
-    (e) => {
-      if (e.key === 'Enter' && searchQuery.trim()) {
-        navigate(`${basePath}/search?q=${encodeURIComponent(searchQuery.trim())}`)
-      }
-    },
-    [navigate, searchQuery, basePath]
-  )
 
   const websiteSchema = generateWebSiteSchema({
     name: 'Hidayat Fatwa Platform',
@@ -82,12 +43,12 @@ export default function PlatformHomePage() {
   const totalCategories = topLevelCategories.length
   const totalInstitutions = institutionList.length
 
-  // Top categories: filter out corrupted names, sort by count, take top 9
+  // Top categories: filter out corrupted names, sort by count, take top 12
   const featuredCategories = useMemo(() => {
     return topLevelCategories
       .filter(cat => isValidCategoryName(cat.name))
       .sort((a, b) => b.count - a.count)
-      .slice(0, 9)
+      .slice(0, 12)
   }, [topLevelCategories])
 
   if (loading && totalCount === 0) {
@@ -113,81 +74,105 @@ export default function PlatformHomePage() {
 
       {/* Hero Section */}
       <motion.section
-        className="bg-gradient-to-b from-green-700 to-green-800 text-white py-16 px-4"
+        className="bg-gradient-to-b from-green-700 to-green-800 text-white py-14 px-4"
         variants={sectionVariants}
         initial="hidden"
         animate="visible"
         aria-labelledby="hero-heading"
       >
-        <div className="max-w-3xl mx-auto text-center">
-          <h1
-            id="hero-heading"
-            className="text-3xl md:text-4xl font-bold mb-4"
-          >
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 id="hero-heading" className="text-3xl md:text-4xl font-bold mb-3">
             Islamic Fatwa Knowledge Platform
           </h1>
-          <p className="text-green-100 text-base md:text-lg mb-8">
+          <p className="text-green-100 text-base md:text-lg">
             Explore authentic Islamic rulings from trusted scholars and institutions
           </p>
-          <div className="max-w-xl mx-auto" onKeyDown={handleSearchSubmit}>
-            <SearchInput
-              value={searchQuery}
-              onChange={setSearchQuery}
-              suggestions={suggestions}
-              onSelect={handleSearchSelect}
-              placeholder="Search fatwas by topic, question, or fatwa number..."
-              isSearching={isSearching}
-            />
-          </div>
           <p className="text-green-200 text-sm mt-4">
-            <Link to={`${basePath}/search`} className="underline hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:rounded-sm">
-              Advanced Search
-            </Link>
+            {totalCount.toLocaleString()} fatwas across {totalCategories} categories
           </p>
         </div>
       </motion.section>
 
-      {/* Featured Categories Section */}
+      {/* Featured Categories with Subcategories */}
       <motion.section
-        className="max-w-6xl mx-auto px-4 py-12"
+        className="max-w-6xl mx-auto px-4 py-10"
         variants={sectionVariants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: '-50px' }}
         aria-labelledby="categories-heading"
       >
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-8">
           <h2 id="categories-heading" className="text-2xl font-bold text-gray-800 flex items-center gap-2">
             <BookOpen className="text-green-600" size={24} aria-hidden="true" />
-            Featured Categories
+            Browse by Category
           </h2>
           <Link
             to={`${basePath}/categories`}
-            className="text-sm font-medium text-green-700 hover:text-green-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:rounded-sm"
+            className="text-sm font-medium text-green-700 hover:text-green-800 transition-colors"
           >
             View All Categories →
           </Link>
         </div>
+
         {featuredCategories.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {featuredCategories.map((category) => {
               const isRtl = detectDirection(category.name) === 'rtl'
+              const subcategories = Object.values(category.children || {})
+                .filter(sub => isValidCategoryName(sub.name))
+                .sort((a, b) => b.count - a.count)
+                .slice(0, 5)
+
               return (
-                <Link
+                <div
                   key={category.name}
-                  to={`${basePath}/category/${category.slug}`}
-                  className="group block bg-white rounded-xl border border-gray-200 shadow-sm p-5 hover:shadow-lg hover:border-green-300 hover:scale-[1.02] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
+                  className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow"
                 >
-                  <h3
-                    className={`text-sm font-semibold text-gray-800 mb-1 group-hover:text-green-700 transition-colors ${isRtl ? 'font-urdu text-right' : ''}`}
-                    dir={isRtl ? 'rtl' : undefined}
+                  {/* Category Header */}
+                  <Link
+                    to={`${basePath}/category/${category.slug}`}
+                    className="block px-5 py-4 border-b border-gray-100 hover:bg-green-50 transition-colors"
                   >
-                    {category.name}
-                  </h3>
-                  <p className="text-xs text-gray-500">
-                    {category.count.toLocaleString()} {category.count === 1 ? 'fatwa' : 'fatwas'}
-                  </p>
-                </Link>
+                    <h3
+                      className={`text-base font-bold text-gray-800 hover:text-green-700 transition-colors ${isRtl ? 'font-urdu text-right' : ''}`}
+                      dir={isRtl ? 'rtl' : undefined}
+                    >
+                      {category.name}
+                    </h3>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {category.count.toLocaleString()} fatwas
+                    </p>
+                  </Link>
+
+                  {/* Subcategories List */}
+                  {subcategories.length > 0 && (
+                    <div className="px-5 py-3 space-y-1">
+                      {subcategories.map((sub) => {
+                        const isSubRtl = detectDirection(sub.name) === 'rtl'
+                        return (
+                          <Link
+                            key={sub.name}
+                            to={`${basePath}/category/${category.slug}/${sub.slug}`}
+                            className={`flex items-center justify-between py-1.5 text-sm text-gray-600 hover:text-green-700 transition-colors ${isSubRtl ? 'font-urdu flex-row-reverse' : ''}`}
+                            dir={isSubRtl ? 'rtl' : undefined}
+                          >
+                            <span className="truncate">{sub.name}</span>
+                            <span className="text-xs text-gray-400 flex-shrink-0 ml-2">{sub.count}</span>
+                          </Link>
+                        )
+                      })}
+                      {Object.keys(category.children).length > 5 && (
+                        <Link
+                          to={`${basePath}/category/${category.slug}`}
+                          className="block text-xs text-green-600 hover:text-green-700 pt-1 font-medium"
+                        >
+                          + {Object.keys(category.children).length - 5} more →
+                        </Link>
+                      )}
+                    </div>
+                  )}
+                </div>
               )
             })}
           </div>
@@ -198,61 +183,9 @@ export default function PlatformHomePage() {
         )}
       </motion.section>
 
-      {/* Latest Fatwas Section */}
-      <motion.section
-        className="max-w-6xl mx-auto px-4 py-12"
-        variants={sectionVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-50px' }}
-        aria-labelledby="latest-heading"
-      >
-        <h2 id="latest-heading" className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-          <Clock className="text-green-600" size={24} aria-hidden="true" />
-          Latest Fatwas
-        </h2>
-        {latestFatwas.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {latestFatwas.map((fatwa) => (
-              <FatwaCard key={fatwa.id} fatwa={fatwa} />
-            ))}
-          </div>
-        ) : (
-          !loading && (
-            <p className="text-gray-600 text-sm">No fatwas published yet.</p>
-          )
-        )}
-      </motion.section>
-
-      {/* Popular Fatwas Section */}
-      <motion.section
-        className="max-w-6xl mx-auto px-4 py-12 bg-white rounded-lg shadow-sm mx-4"
-        variants={sectionVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-50px' }}
-        aria-labelledby="popular-heading"
-      >
-        <h2 id="popular-heading" className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-          <TrendingUp className="text-green-600" size={24} aria-hidden="true" />
-          Popular Fatwas
-        </h2>
-        {popularFatwas.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {popularFatwas.map((fatwa) => (
-              <FatwaCard key={fatwa.id} fatwa={fatwa} />
-            ))}
-          </div>
-        ) : (
-          !loading && (
-            <p className="text-gray-600 text-sm">No popular fatwas yet.</p>
-          )
-        )}
-      </motion.section>
-
       {/* Trusted Institutions Section */}
       <motion.section
-        className="max-w-6xl mx-auto px-4 py-12"
+        className="max-w-6xl mx-auto px-4 py-10"
         variants={sectionVariants}
         initial="hidden"
         whileInView="visible"
@@ -265,14 +198,18 @@ export default function PlatformHomePage() {
         </h2>
         {institutionList.length > 0 ? (
           <div className="flex flex-wrap gap-3">
-            {institutionList.map((institution) => (
-              <span
-                key={institution}
-                className="inline-block bg-white rounded-full shadow-sm px-4 py-2 text-sm font-medium text-gray-700 border border-gray-200"
-              >
-                {institution}
-              </span>
-            ))}
+            {institutionList.map((institution) => {
+              const isRtl = detectDirection(institution) === 'rtl'
+              return (
+                <span
+                  key={institution}
+                  className={`inline-block bg-white rounded-full shadow-sm px-4 py-2 text-sm font-medium text-gray-700 border border-gray-200 ${isRtl ? 'font-urdu' : ''}`}
+                  dir={isRtl ? 'rtl' : undefined}
+                >
+                  {institution}
+                </span>
+              )
+            })}
           </div>
         ) : (
           !loading && (
@@ -283,7 +220,7 @@ export default function PlatformHomePage() {
 
       {/* Platform Statistics Section */}
       <motion.section
-        className="max-w-6xl mx-auto px-4 py-12"
+        className="max-w-6xl mx-auto px-4 py-10"
         variants={sectionVariants}
         initial="hidden"
         whileInView="visible"

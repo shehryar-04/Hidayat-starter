@@ -1,48 +1,40 @@
 /**
- * Generates a URL-friendly slug from a fatwa title.
+ * Generates a URL-friendly slug from a fatwa title/question.
+ * Preserves Unicode characters (Urdu/Arabic) for readable URLs.
  *
- * - Converts to lowercase
- * - Removes non-alphanumeric characters (except spaces and hyphens)
+ * - Trims whitespace
+ * - Replaces slashes with hyphens (to avoid URL path conflicts)
  * - Replaces spaces with hyphens
  * - Collapses multiple consecutive hyphens
  * - Trims leading/trailing hyphens
- * - Truncates to max 80 characters
- * - Appends fatwa_number if slug already exists in the provided set
+ * - Appends ID suffix if slug already exists in the provided set
  *
- * @param {string} title - The fatwa title to slugify
- * @param {string|number} fatwaNumber - The unique fatwa reference number
+ * @param {string} title - The fatwa title/question to slugify
+ * @param {string|number} id - The unique fatwa ID (used for deduplication)
  * @param {Set<string>} existingSlugs - Set of already-used slugs
  * @returns {string} A unique, URL-safe slug
  */
-export function generateSlug(title, fatwaNumber, existingSlugs = new Set()) {
-  // Handle edge cases: empty or non-string input
+export function generateSlug(title, id, existingSlugs = new Set()) {
   const input = typeof title === 'string' ? title : ''
 
-  // Sanitize fatwaNumber: convert to string, lowercase, keep only alphanumeric/hyphens
-  const sanitizedNumber = String(fatwaNumber)
-    .toLowerCase()
-    .replace(/[^a-z0-9-]/g, '')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '') || '0'
-
   let slug = input
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')   // Remove non-alphanumeric (keep spaces and hyphens)
+    .trim()
+    .replace(/C-جامعہ-علوم-اسلامیہ-علامہ-محمد-یوسف-بنوری-ٹاؤن/g, '')
+    .replace(/جامعہ علوم اسلامیہ علامہ محمد یوسف بنوری ٹاؤن/g, '')
+    .replace(/[/\\]+/g, '-')         // Replace slashes with hyphens
+    .replace(/[?#&=]+/g, '')         // Remove URL-unsafe query characters
     .replace(/\s+/g, '-')            // Replace spaces with hyphens
     .replace(/-+/g, '-')             // Collapse multiple hyphens
     .replace(/^-|-$/g, '')           // Trim leading/trailing hyphens
-    .slice(0, 80)                    // Max 80 characters
-    .replace(/^-|-$/g, '')           // Trim again after slice (slice may expose trailing hyphen)
 
-  // If slug is empty after processing (e.g., all-special-character input),
-  // use the fatwa number as the slug
+  // If slug is empty (e.g., no usable text), use the ID
   if (!slug) {
-    slug = `fatwa-${sanitizedNumber}`
+    slug = `fatwa-${String(id)}`
   }
 
-  // Ensure uniqueness by appending fatwa number if slug already exists
+  // Ensure uniqueness by appending ID if slug already exists
   if (existingSlugs.has(slug)) {
-    slug = `${slug}-${sanitizedNumber}`
+    slug = `${slug}-${String(id)}`
   }
 
   return slug

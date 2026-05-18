@@ -27,12 +27,18 @@ function slugify(text) {
  * expected by the platform components.
  */
 function normalizeFatwa(row, existingSlugs) {
-  const titleText = row.title || row.question || ''
-  const slug = generateSlug(titleText, row.id, existingSlugs)
+  const rawTitle = row.title || row.question || ''
+  // Strip institution suffix from title
+  const cleanTitle = rawTitle
+    .replace(/C-جامعہ-علوم-اسلامیہ-علامہ-محمد-یوسف-بنوری-ٹاؤن/g, '')
+    .replace(/جامعہ علوم اسلامیہ علامہ محمد یوسف بنوری ٹاؤن/g, '')
+    .trim()
+
+  const slug = generateSlug(rawTitle, row.id, existingSlugs)
   existingSlugs.add(slug)
   return {
     id: String(row.id),
-    title: row.title || row.question,
+    title: cleanTitle || rawTitle,
     slug,
     question_text: row.question,
     response_text: row.answer,
