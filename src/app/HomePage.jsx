@@ -17,6 +17,7 @@ import {
   Scale,
   Lightbulb,
   ChevronRight,
+  ChevronLeft,
   MapPin,
   Mail,
   Verified,
@@ -155,8 +156,7 @@ function Hero() {
           </h1>
 
           <p className="text-base sm:text-lg text-neutral-600 max-w-xl mx-auto lg:mx-0">
-            A modern sanctuary for traditional Islamic sciences. Bridging authentic
-            heritage with contemporary intellectual rigor for seekers of truth worldwide.
+            A dynamic platform dedicated to professional excellence, intellectual development, Islamic guidance, and capacity building through modern education, training, research, and consultancy services.
           </p>
 
           <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 pt-2 sm:pt-4 justify-center lg:justify-start">
@@ -216,9 +216,9 @@ function Hero() {
 // ─── Vision Section ──────────────────────────────────────────
 function Vision() {
   const cards = [
-    { icon: GraduationCap, title: 'Academic Rigor', desc: 'Systematic study of Darse Nizami using authentic texts and classical methodologies of interpretation.', color: 'primary' },
-    { icon: Lightbulb, title: 'Intellectual Clarity', desc: 'Fostering critical thinking through the lens of divine revelation to navigate modern ethical dilemmas.', color: 'primary' },
-    { icon: Heart, title: 'Spiritual Tarbiyah', desc: 'Focusing on Tazkiyah (purification) of the heart and the embodiment of prophetic character.', color: 'primary' },
+    { icon: GraduationCap, title: 'Educational Excellence', desc: 'Maintaining the highest standards in teaching, training, learning, and research to ensure quality education and professional development.' },
+    { icon: Lightbulb, title: 'Lifelong Learning', desc: 'Learning is a continuous journey — we encourage personal, professional, and spiritual growth at every stage of life.' },
+    { icon: Heart, title: 'Service to Humanity', desc: 'Committed to serving society through beneficial knowledge, ethical guidance, welfare initiatives, and community development.' },
   ]
 
   const containerVariants = {
@@ -247,8 +247,8 @@ function Vision() {
       <div className="max-w-7xl mx-auto px-4 sm:px-8">
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-10 sm:mb-16 gap-4 sm:gap-6">
           <div className="max-w-2xl">
-            <h2 className="font-display font-bold text-2xl sm:text-3xl text-neutral-900 mb-3 sm:mb-4">A Vision Rooted in Tradition</h2>
-            <p className="text-sm sm:text-lg text-neutral-500">HIDAYAT is committed to producing scholars who are deeply grounded in the Qur'an and Sunnah while equipped to address the complexities of the 21st century.</p>
+            <h2 className="font-display font-bold text-2xl sm:text-3xl text-neutral-900 mb-3 sm:mb-4">Our Core Values</h2>
+            <p className="text-sm sm:text-lg text-neutral-500">At Hidayat, our work is guided by a strong set of values that define our mission, culture, and commitment to excellence.</p>
           </div>
           <div className="h-px flex-grow bg-neutral-200 mx-8 hidden md:block" />
         </div>
@@ -443,6 +443,133 @@ function FatwaSection() {
   )
 }
 
+// ─── Trainers Carousel ───────────────────────────────────────
+const TRAINER_CATEGORIES = [
+  {
+    title: 'Islamic Studies',
+    icon: GraduationCap,
+    trainers: [
+      { name: 'Dr. Molana Khalil Ahmad Thanvi', role: 'Islamic Scholar & Author', desc: 'PhD from University of Karachi. Author of 20+ books. Muhaddith and Head of Research at Jamia Darul Uloom Islamia Lahore. Expert in Islamic Banking, Shariah advisory, and financial engineering.' },
+      { name: 'Dr. Muhammad Saad Siddiqui', role: 'Professor & Chairman, Islamic Studies', desc: 'Post-Doctorate from Malaysia, PhD from University of the Punjab. 25+ years in education. Professor and Chairman of Islamic Studies at University of the Punjab.' },
+      { name: 'Mufti Muhammad Akram', role: 'Mufti & Islamic Auditor', desc: 'Serving at Jamia Darul Uloom Islamia Lahore. Specialist in Takhassus fil Fiqh, Islamic auditing, financial evaluation, and management systems.' },
+      { name: 'Hafiz Muhammad Ibrahim Salik', role: 'Researcher', desc: 'Associated with Idara Ashraf-ul-Tehqiq Lahore. Pursuing M.Phil from UMT. Expert in Hadith studies, Islamic organizational management, and personal development.' },
+    ],
+  },
+  {
+    title: 'Islamic Banking, Takaful & Finance',
+    icon: Scale,
+    trainers: [
+      { name: 'Mufti Muhammad Nadeem Ahmad', role: 'Islamic Banking Specialist', desc: 'Background from Darul Uloom Karachi and Jamia Darul Uloom Islamia Lahore. Expert in risk mitigation, Islamic financial product development, and Shariah-compliant systems.' },
+      { name: 'Dr. Mufti Munib Siddiqui', role: 'Head of Research & Trainings', desc: 'Dars-e-Nizami, MBA, PhD in Management. Multiple certifications in Islamic Finance. Active in promoting Islamic Finance through research, education, conferences, and consultancy at national and international levels.' },
+    ],
+  },
+  {
+    title: 'Food Safety & Halal Assurance',
+    icon: Verified,
+    trainers: [
+      { name: 'Dr. Muhammad Ashraf Ali Farooqui', role: 'Halal Food Researcher', desc: 'PhD scholar in genetic modification and Halal food systems. Researcher and thesis supervisor at Jamia Darul Uloom Islamia Lahore. Expert in Halal certification, food processing, and slaughtering systems.' },
+      { name: 'Dr. M. Asif Iftikhar Siddiqui', role: 'Dairy & Food Scientist', desc: 'PhD in Dairy Technology from UVAS. 25+ years of industry experience. Expert in food quality systems, ISO standards, HACCP, FSSC auditing, and Halal food certification.' },
+    ],
+  },
+  {
+    title: 'Insurance & Risk Management',
+    icon: CheckCircle,
+    trainers: [
+      { name: 'Mr. Tassawar Abbas Jaffery', role: 'VP Operations, Century Insurance', desc: 'MBA in Insurance & Risk Management from Hailey College. 15+ years in multinational insurance organizations. Author of multiple research articles and industry reports.' },
+      { name: 'Mr. Zulfiqar Ali Khan', role: 'EVP, EFU General Insurance', desc: 'ACII London and ARe certifications from USA. Vice Chairman of Lahore Insurance Institute. Extensive expertise in insurance, finance, reinsurance, and risk management.' },
+      { name: 'Ms. Farkhanda Jabeen', role: 'VP, EFU General Insurance', desc: 'Fellow member of Chartered Insurance Institute London. Expert in underwriting, brokerage, risk management, and reinsurance. Founding member of Hidayat.' },
+    ],
+  },
+  {
+    title: 'Entrepreneurship, Business & Research',
+    icon: Lightbulb,
+    trainers: [
+      { name: 'Dr. Sheikh Usman Yousaf', role: 'Assistant Professor, Hailey College', desc: 'PhD in Management from Malaysia, MBA in Banking & Finance. Expert in entrepreneurship, business development, leadership, and motivational training.' },
+      { name: 'Mr. Tahir Iftikhar', role: 'Director, Hidayat', desc: 'Renowned entrepreneur with diversified experience in business management, logistics, merchandising, and organizational leadership. CEO of Atlantic Logistics.' },
+      { name: 'Ms. Hafsa Siddiqui', role: 'Research & Management', desc: 'M.Phil in Management Sciences from University of the Punjab. Expert in academic writing, organizational behavior, business management, and research methodology.' },
+      { name: 'Muhammad Moeez Siddiqui', role: 'Finance & Banking', desc: 'Founding member of Hidayat. Business graduate with experience at Deloitte and State Bank of Pakistan. Expert in accounting, finance, banking operations, and auditing.' },
+    ],
+  },
+]
+
+function TrainersCarousel() {
+  const [activeIndex, setActiveIndex] = useState(0)
+  const total = TRAINER_CATEGORIES.length
+  const current = TRAINER_CATEGORIES[activeIndex]
+  const Icon = current.icon
+
+  const goNext = () => setActiveIndex((prev) => (prev + 1) % total)
+  const goPrev = () => setActiveIndex((prev) => (prev - 1 + total) % total)
+
+  return (
+    <section className="py-16 sm:py-24 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8">
+        {/* Header */}
+        <div className="text-center mb-10">
+          <span className="text-xs text-primary-500 tracking-[0.3em] uppercase font-bold">Our Team</span>
+          <h2 className="font-display font-bold text-2xl sm:text-3xl text-neutral-900 mt-2">Profile of Trainers</h2>
+          <p className="text-sm sm:text-base text-neutral-500 mt-3 max-w-2xl mx-auto">
+            Our distinguished panel of scholars, researchers, trainers, and industry experts bring together academic excellence, practical experience, and deep Islamic understanding.
+          </p>
+        </div>
+
+        {/* Category Navigation */}
+        <div className="flex items-center justify-between mb-8">
+          <button
+            onClick={goPrev}
+            className="w-10 h-10 rounded-full border border-neutral-200 flex items-center justify-center hover:bg-primary-50 hover:border-primary-300 transition-colors"
+            aria-label="Previous category"
+          >
+            <ChevronLeft className="w-5 h-5 text-neutral-600" />
+          </button>
+
+          <div className="flex-1 text-center px-4">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <Icon className="w-5 h-5 text-primary-600" />
+              <h3 className="font-display font-semibold text-lg sm:text-xl text-primary-700">{current.title}</h3>
+            </div>
+            <p className="text-xs text-neutral-400">{activeIndex + 1} / {total}</p>
+          </div>
+
+          <button
+            onClick={goNext}
+            className="w-10 h-10 rounded-full border border-neutral-200 flex items-center justify-center hover:bg-primary-50 hover:border-primary-300 transition-colors"
+            aria-label="Next category"
+          >
+            <ChevronRight className="w-5 h-5 text-neutral-600" />
+          </button>
+        </div>
+
+        {/* Dots */}
+        <div className="flex justify-center gap-2 mb-8">
+          {TRAINER_CATEGORIES.map((cat, i) => (
+            <button
+              key={cat.title}
+              onClick={() => setActiveIndex(i)}
+              className={`w-2.5 h-2.5 rounded-full transition-all ${i === activeIndex ? 'bg-primary-500 w-6' : 'bg-neutral-300 hover:bg-neutral-400'}`}
+              aria-label={`Go to ${cat.title}`}
+            />
+          ))}
+        </div>
+
+        {/* Trainer Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {current.trainers.map((trainer) => (
+            <div key={trainer.name} className="bg-neutral-50 rounded-xl border border-neutral-200 p-6 hover:shadow-md hover:-translate-y-1 transition-all duration-200">
+              <div className="w-14 h-14 bg-primary-100 rounded-full flex items-center justify-center mb-4">
+                <Icon className="w-7 h-7 text-primary-600" />
+              </div>
+              <h4 className="font-display font-semibold text-neutral-900 text-sm mb-1">{trainer.name}</h4>
+              <p className="text-xs text-primary-600 font-medium mb-3">{trainer.role}</p>
+              <p className="text-xs text-neutral-500 leading-relaxed">{trainer.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
 // ─── Newsletter CTA ──────────────────────────────────────────
 function Newsletter() {
   return (
@@ -482,7 +609,7 @@ function Footer() {
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-6 px-4 sm:px-8 py-10 sm:py-16 max-w-7xl mx-auto">
         <div className="col-span-2 sm:col-span-2 md:col-span-1">
           <Logo size="md" className="mb-4" />
-          <p className="font-sans text-sm leading-relaxed text-neutral-500">Dedicated to the preservation and dissemination of classical Islamic sciences.</p>
+          <p className="font-sans text-sm leading-relaxed text-neutral-500">Dedicated to professional excellence, intellectual development, Islamic guidance, and capacity building through modern education and training.</p>
         </div>
         <div>
           <h4 className="font-display font-semibold text-neutral-900 text-base mb-4 sm:mb-6">Programs</h4>
@@ -623,6 +750,71 @@ export default function HomePage() {
       )}
 
       <Vision />
+
+      {/* About Hidayat */}
+      <section className="py-16 sm:py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            <div className="space-y-5">
+              <span className="text-xs text-primary-500 tracking-[0.3em] uppercase font-bold">About Us</span>
+              <h2 className="font-display font-bold text-2xl sm:text-3xl text-neutral-900">About HIDAYAT</h2>
+              <p className="text-sm sm:text-base text-neutral-600 leading-relaxed">
+                Hidayat is a dynamic platform dedicated to professional excellence, intellectual development, Islamic guidance, and capacity building through modern education, training, research, and consultancy services. Established with the vision of nurturing competent individuals and progressive institutions, Hidayat serves both the public and private sectors across Pakistan.
+              </p>
+              <p className="text-sm sm:text-base text-neutral-600 leading-relaxed">
+                At Hidayat, we believe that true success is achieved through the balanced integration of professional competence, ethical values, and continuous learning. Our programs are carefully designed to empower individuals, organizations, students, professionals, and entrepreneurs with the practical skills, strategic mindset, and Islamic guidance required to thrive in today's rapidly evolving world.
+              </p>
+            </div>
+            <div className="space-y-4">
+              <h3 className="font-display font-semibold text-lg text-neutral-800 mb-4">Our Key Services</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {[
+                  'Banking & Finance Training',
+                  'Corporate Training',
+                  'Research & Gap Analysis',
+                  'Shariah Consultancy',
+                  'Virtual Learning Programs',
+                  'Online Dar-ul-Ifta',
+                  'Leadership Programs',
+                  'Islamic Financial Advisory',
+                ].map(service => (
+                  <div key={service} className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-primary-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm text-neutral-600">{service}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Director's Message */}
+      <section className="py-16 sm:py-24 bg-neutral-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-8 text-center">
+          <span className="text-xs text-primary-500 tracking-[0.3em] uppercase font-bold">Director's Message</span>
+          <h2 className="font-display font-bold text-2xl sm:text-3xl text-neutral-900 mt-3 mb-8">Welcome to Hidayat</h2>
+          <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-8 sm:p-12 text-left space-y-4">
+            <p className="text-sm sm:text-base text-neutral-600 leading-relaxed">
+              Since its inception, Hidayat has remained committed to providing quality education, professional development, and intellectual growth opportunities that prepare individuals to excel academically, personally, professionally, and spiritually. Our mission is not only to educate, but to inspire individuals to become responsible professionals, ethical leaders, and valuable contributors to society.
+            </p>
+            <p className="text-sm sm:text-base text-neutral-600 leading-relaxed">
+              We emphasize bridging the gap between academic concepts and professional practice through active participation, industry collaboration, interactive learning methodologies, and skill-based training programs. Our objective is to equip participants with the confidence, competence, and vision required to face the challenges of an increasingly competitive global environment.
+            </p>
+            <p className="text-sm sm:text-base text-neutral-600 leading-relaxed">
+              We pray that Allah Subhanahu Wa Ta'ala grants us wisdom, sincerity, and strength to continue fulfilling this noble mission with dedication and excellence.
+            </p>
+            <div className="pt-6 border-t border-neutral-200 mt-6">
+              <p className="font-display font-semibold text-neutral-900">Dr. Mufti Munib Siddiqui</p>
+              <p className="text-sm text-neutral-500">Director, Hidayat</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Profile of Trainers — Sliding Carousel */}
+      <TrainersCarousel />
+
       <FlashcardSlider />
       <UpcomingCourseVideo />
       <Courses />
