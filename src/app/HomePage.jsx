@@ -443,6 +443,64 @@ function FatwaSection() {
   )
 }
 
+// ─── Gallery Auto-Slider ─────────────────────────────────────
+const GALLERY_IMAGES = [
+  '/gallery/20230520_194337.webp',
+  '/gallery/IMG_6202.webp',
+  '/gallery/IMG-20181213-WA0023.webp',
+  '/gallery/IMG-20230529-WA0052.webp',
+  '/gallery/Workshop-Nov.-2017-Highlights-011.webp',
+]
+
+function GallerySlider() {
+  const [current, setCurrent] = useState(0)
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % GALLERY_IMAGES.length)
+    }, 4000)
+    return () => clearInterval(timer)
+  }, [])
+
+  return (
+    <section className="py-16 sm:py-24 bg-neutral-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8">
+        <div className="text-center mb-10">
+          <span className="text-xs text-primary-500 tracking-[0.3em] uppercase font-bold">Gallery</span>
+          <h2 className="font-display font-bold text-2xl sm:text-3xl text-neutral-900 mt-2">Moments at Hidayat</h2>
+        </div>
+
+        {/* Slider */}
+        <div className="relative rounded-2xl overflow-hidden shadow-lg border border-neutral-200 aspect-[16/7] bg-neutral-900">
+          {GALLERY_IMAGES.map((src, i) => (
+            <img
+              key={src}
+              src={src}
+              alt={`Hidayat gallery ${i + 1}`}
+              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${i === current ? 'opacity-100' : 'opacity-0'}`}
+            />
+          ))}
+
+          {/* Overlay gradient */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
+
+          {/* Dots */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+            {GALLERY_IMAGES.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrent(i)}
+                className={`w-2.5 h-2.5 rounded-full transition-all ${i === current ? 'bg-white w-6' : 'bg-white/50 hover:bg-white/80'}`}
+                aria-label={`Go to image ${i + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 // ─── Trainers Carousel ───────────────────────────────────────
 const TRAINER_CATEGORIES = [
   {
@@ -811,6 +869,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Gallery Auto-Slider */}
+      <GallerySlider />
 
       {/* Profile of Trainers — Sliding Carousel */}
       <TrainersCarousel />
