@@ -712,11 +712,14 @@ function Footer() {
 }
 
 // ─── Page Assembly ───────────────────────────────────────────
+const DOOR_IMAGES = ['/assets/closed.webp', '/assets/semi-open.webp', '/assets/open.webp']
+
 export default function HomePage() {
   const { role } = useRole()
   const [scrollProgress, setScrollProgress] = useState(0)
   const [animationDone, setAnimationDone] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [imagesLoaded, setImagesLoaded] = useState(false)
   const scrollSectionRef = useRef(null)
 
   // Detect mobile — skip animation on touch devices or small screens
@@ -735,8 +738,37 @@ export default function HomePage() {
   useEffect(() => {
     if (sessionStorage.getItem('doorAnimationSeen') || role) {
       setAnimationDone(true)
+      setImagesLoaded(true)
     }
   }, [role])
+
+  // Preload door images before showing the animation
+  useEffect(() => {
+    if (isMobile || animationDone) {
+      setImagesLoaded(true)
+      return
+    }
+
+    let loaded = 0
+    const total = DOOR_IMAGES.length
+
+    DOOR_IMAGES.forEach((src) => {
+      const img = new Image()
+      img.onload = () => {
+        loaded++
+        if (loaded >= total) setImagesLoaded(true)
+      }
+      img.onerror = () => {
+        loaded++
+        if (loaded >= total) setImagesLoaded(true)
+      }
+      img.src = src
+    })
+
+    // Fallback: show after 5 seconds even if images fail
+    const timeout = setTimeout(() => setImagesLoaded(true), 5000)
+    return () => clearTimeout(timeout)
+  }, [isMobile, animationDone])
 
   useEffect(() => {
     if (isMobile || animationDone) return
@@ -780,8 +812,16 @@ export default function HomePage() {
 
   return (
     <div className="font-sans scroll-smooth bg-neutral-50 text-neutral-800 selection:bg-primary-100 selection:text-primary-900">
+      {/* Loading screen while door images preload */}
+      {!imagesLoaded && (
+        <div className="fixed inset-0 z-[100] bg-[#080808] flex flex-col items-center justify-center gap-6">
+          <img src="/assets/LOGO_HIDAYAT.png" alt="Hidayat" className="w-24 h-24 object-contain opacity-80" />
+          <div className="w-10 h-10 border-[3px] border-white/30 border-t-white rounded-full animate-spin" />
+        </div>
+      )}
+
       {/* Door animation phase — desktop only */}
-      {showAnimation && (
+      {showAnimation && imagesLoaded && (
         <>
           <div ref={scrollSectionRef} style={{ height: '300vh' }}>
             <div className="sticky top-0">
