@@ -448,7 +448,7 @@ const GALLERY_IMAGES = [
   '/gallery/20230520_194337.webp',
   '/gallery/IMG_6202.webp',
   '/gallery/IMG-20181213-WA0023.webp',
-  '/gallery/IMG-20230529-WA0052.webp',
+  '/gallery/Workshop-Nov.-2017-Highlights-007.webp',
   '/gallery/Workshop-Nov.-2017-Highlights-011.webp',
 ]
 
