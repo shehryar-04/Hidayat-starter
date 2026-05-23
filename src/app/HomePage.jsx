@@ -5,6 +5,7 @@ import { useRole } from './RoleProvider'
 import PublicTopNav from './PublicTopNav'
 import Logo from './Logo'
 import FlashcardSlider from './FlashcardSlider'
+import { supabase } from '../lib/supabase'
 import { Button, Input, cn } from '../shared/ui'
 import {
   BookOpen,
@@ -392,11 +393,35 @@ function Courses() {
 // ─── Darul Ifta / Fatwas Section ─────────────────────────────
 function FatwaSection() {
   const navigate = useNavigate()
-  const fatwas = [
-    { cat: 'Zakat & Wealth', date: 'Oct 24, 2024', title: 'Ruling on Zakat for Long-term Retirement Investments', desc: 'The question pertains to the calculation of Zakat on modern retirement accounts...' },
-    { cat: 'Modern Ethics', date: 'Oct 20, 2024', title: "Artificial Intelligence and Copyright: A Shari'ah Perspective", desc: 'Navigating the complexities of intellectual property in the age of generative AI...' },
-    { cat: 'Family Law', date: 'Oct 15, 2024', title: 'The Status of Electronic Signatures in Nikah Contracts', desc: 'An analysis of modern digital authentication methods and their validity...' },
-  ]
+  const [fatwas, setFatwas] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const loadFatwas = async () => {
+      try {
+        const { data } = await supabase
+          .from('fatwas')
+          .select('id, title, question, category_1, created_at')
+          .order('created_at', { ascending: false })
+          .limit(4)
+
+        if (data) setFatwas(data)
+      } catch (err) {
+        console.error('Failed to load fatwas for homepage:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadFatwas()
+  }, [])
+
+  const toSlug = (text) => {
+    if (!text) return ''
+    return text.trim().replace(/[/\\]+/g, '-').replace(/[?#&=]+/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
+  }
+
+  const fmt = (d) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+
   return (
     <section className="py-16 sm:py-24 bg-neutral-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-8">
@@ -404,7 +429,7 @@ function FatwaSection() {
           <div className="lg:col-span-4">
             <div className="lg:sticky lg:top-28 space-y-4 sm:space-y-6 text-center lg:text-left">
               <span className="text-xs text-primary-500 tracking-widest uppercase font-bold">Darul Ifta Guidance</span>
-              <h2 className="font-display font-bold text-2xl sm:text-3xl text-neutral-900">Recent Legal Rulings & Queries</h2>
+              <h2 className="font-display font-bold text-2xl sm:text-3xl text-neutral-900">Recent Fatwas</h2>
               <p className="text-sm sm:text-base text-neutral-500 leading-relaxed max-w-md mx-auto lg:mx-0">
                 Our Darul Ifta provides scholarly answers to your personal and communal questions.
               </p>
@@ -413,29 +438,53 @@ function FatwaSection() {
                 size="md"
                 onClick={() => navigate('/darul-ifta')}
               >
-                Submit a Question
+                Browse All Fatwas
               </Button>
             </div>
           </div>
           <div className="lg:col-span-8 space-y-4 sm:space-y-6">
-            {fatwas.map(({ cat, date, title, desc }) => (
-              <div
-                key={title}
-                onClick={() => navigate('/darul-ifta')}
-                className="bg-white p-5 sm:p-8 rounded-xl border border-neutral-200 shadow-sm hover:shadow-md transition-shadow duration-200 group cursor-pointer"
-              >
-                <div className="flex items-center justify-between mb-3 sm:mb-4 flex-wrap gap-2">
-                  <span className="text-[10px] sm:text-xs text-primary-700 bg-primary-50 px-3 py-1 rounded font-bold">{cat}</span>
-                  <span className="text-[10px] sm:text-xs text-neutral-400">{date}</span>
-                </div>
-                <h4 className="font-display font-semibold text-lg sm:text-xl text-neutral-900 mb-2 sm:mb-3 group-hover:text-primary-500 transition-colors">{title}</h4>
-                <p className="text-sm sm:text-base text-neutral-500 line-clamp-2">{desc}</p>
-                <div className="mt-3 sm:mt-4 flex items-center text-primary-600 font-medium text-xs sm:text-sm">
-                  <Verified className="w-4 h-4 mr-2" />
-                  <span>Mufti's Conclusion Available</span>
-                </div>
+            {loading ? (
+              <div className="flex justify-center py-12">
+                <div className="w-8 h-8 border-[3px] border-primary-500 border-t-transparent rounded-full animate-spin" />
               </div>
-            ))}
+            ) : fatwas.length === 0 ? (
+              <p className="text-neutral-400 text-center py-12">No fatwas available yet.</p>
+            ) : (
+              fatwas.map((fatwa) => {
+                const slug = toSlug(fatwa.title || fatwa.question)
+                return (
+                  <div
+                    key={fatwa.id}
+                    onClick={() => navigate(`/darul-ifta/${slug}`)}
+                    className="bg-white p-5 sm:p-8 rounded-xl border border-neutral-200 shadow-sm hover:shadow-md transition-shadow duration-200 group cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between mb-3 sm:mb-4 flex-wrap gap-2">
+                      {fatwa.category_1 && (
+                        <span className="text-[10px] sm:text-xs text-primary-700 bg-primary-50 px-3 py-1 rounded font-bold font-urdu">
+                          {fatwa.category_1}
+                        </span>
+                      )}
+                      <span className="text-[10px] sm:text-xs text-neutral-400">{fmt(fatwa.created_at)}</span>
+                    </div>
+                    <h4
+                      className="font-semibold text-lg sm:text-xl text-neutral-900 mb-2 sm:mb-3 group-hover:text-primary-500 transition-colors font-urdu leading-relaxed"
+                      dir="rtl"
+                    >
+                      {fatwa.title || fatwa.question}
+                    </h4>
+                    {fatwa.question && fatwa.title && (
+                      <p className="text-sm sm:text-base text-neutral-500 line-clamp-2 font-urdu" dir="rtl">
+                        {fatwa.question}
+                      </p>
+                    )}
+                    <div className="mt-3 sm:mt-4 flex items-center text-primary-600 font-medium text-xs sm:text-sm">
+                      <Verified className="w-4 h-4 mr-2" />
+                      <span>View Full Fatwa</span>
+                    </div>
+                  </div>
+                )
+              })
+            )}
           </div>
         </div>
       </div>
