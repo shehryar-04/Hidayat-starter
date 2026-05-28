@@ -417,7 +417,15 @@ function FatwaSection() {
 
   const toSlug = (text) => {
     if (!text) return ''
-    return text.trim().replace(/[/\\]+/g, '-').replace(/[?#&=]+/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
+    return text
+      .trim()
+      .replace(/C-جامعہ-علوم-اسلامیہ-علامہ-محمد-یوسف-بنوری-ٹاؤن/g, '')
+      .replace(/جامعہ علوم اسلامیہ علامہ محمد یوسف بنوری ٹاؤن/g, '')
+      .replace(/[/\\]+/g, '-')
+      .replace(/[?#&=]+/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
   }
 
   const fmt = (d) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })

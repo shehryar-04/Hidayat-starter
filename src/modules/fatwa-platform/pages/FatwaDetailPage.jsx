@@ -108,20 +108,20 @@ export default function FatwaDetailPage() {
     const found = getFatwaBySlug(slug)
     if (found) {
       setFatwa(found)
+      setNotFound(false)
       return
     }
 
-    // If not in local state and data has loaded, try fetching by slug
-    if (lastFetched) {
-      fetchFatwaBySlug(slug).then(result => {
-        if (result) {
-          setFatwa(result)
-        } else {
-          setNotFound(true)
-        }
-      })
-    }
-  }, [slug, lastFetched, getFatwaBySlug, fetchFatwaBySlug])
+    // Always try fetching by slug from DB (don't wait for lastFetched for direct URL access)
+    fetchFatwaBySlug(slug).then(result => {
+      if (result) {
+        setFatwa(result)
+        setNotFound(false)
+      } else {
+        setNotFound(true)
+      }
+    })
+  }, [slug, getFatwaBySlug, fetchFatwaBySlug])
 
   // Increment view count once on mount when fatwa is found
   useEffect(() => {

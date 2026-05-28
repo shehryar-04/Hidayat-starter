@@ -302,7 +302,7 @@ export const useFatwaStore = create((set, get) => ({
 
   /**
    * Fetch a single fatwa by slug-matching.
-   * Slugs are generated from the question/title text.
+   * Converts slug back to search text and queries the DB by title/question.
    */
   fetchFatwaBySlug: async (slug) => {
     // First check if we already have it in memory
@@ -315,19 +315,33 @@ export const useFatwaStore = create((set, get) => ({
       if (found) return found
     }
 
-    // Fetch from DB — search broadly and match slug client-side
+    // Convert slug back to search text (replace hyphens with spaces)
+    const searchText = slug.replace(/-/g, ' ').trim()
+
     set({ loading: true })
 
     try {
-      const { data, error } = await supabase
+      // Search by title using ilike (case-insensitive pattern match)
+      let { data, error } = await supabase
         .from('fatwas')
         .select('id, title, question, answer, fatwa_ref, dar_ul_ifta, category_1, category_2, category_3, created_at')
-        .order('created_at', { ascending: false })
-        .limit(100)
+        .or(`title.ilike.%${searchText.slice(0, 50)}%,question.ilike.%${searchText.slice(0, 50)}%`)
+        .limit(20)
 
-      if (error) {
-        set({ loading: false })
-        return null
+      if (error || !data || data.length === 0) {
+        // Fallback: try with first few words only
+        const shortSearch = searchText.split(' ').slice(0, 5).join(' ')
+        const fallback = await supabase
+          .from('fatwas')
+          .select('id, title, question, answer, fatwa_ref, dar_ul_ifta, category_1, category_2, category_3, created_at')
+          .or(`title.ilike.%${shortSearch}%,question.ilike.%${shortSearch}%`)
+          .limit(20)
+
+        if (fallback.error || !fallback.data || fallback.data.length === 0) {
+          set({ loading: false })
+          return null
+        }
+        data = fallback.data
       }
 
       const existingSlugs = new Set()
@@ -335,12 +349,21 @@ export const useFatwaStore = create((set, get) => ({
       const found = fatwas.find(f => f.slug === slug)
 
       if (found) {
-        // Add to local cache
         set(state => ({
           fatwas: [...state.fatwas.filter(f => f.id !== found.id), found],
           loading: false,
         }))
         return found
+      }
+
+      // If exact slug match fails, return the first result as best match
+      if (fatwas.length > 0) {
+        const bestMatch = fatwas[0]
+        set(state => ({
+          fatwas: [...state.fatwas.filter(f => f.id !== bestMatch.id), bestMatch],
+          loading: false,
+        }))
+        return bestMatch
       }
 
       set({ loading: false })
