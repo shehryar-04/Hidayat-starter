@@ -318,23 +318,27 @@ export const useFatwaStore = create((set, get) => ({
     // Convert slug back to search text (replace hyphens with spaces)
     const searchText = slug.replace(/-/g, ' ').trim()
 
+    // Escape Postgres LIKE wildcards to prevent injection
+    const escapeLike = (str) => str.replace(/%/g, '\\%').replace(/_/g, '\\_')
+
     set({ loading: true })
 
     try {
+      const escaped = escapeLike(searchText.slice(0, 50))
       // Search by title using ilike (case-insensitive pattern match)
       let { data, error } = await supabase
         .from('fatwas')
         .select('id, title, question, answer, fatwa_ref, dar_ul_ifta, category_1, category_2, category_3, created_at')
-        .or(`title.ilike.%${searchText.slice(0, 50)}%,question.ilike.%${searchText.slice(0, 50)}%`)
+        .or(`title.ilike.%${escaped}%,question.ilike.%${escaped}%`)
         .limit(20)
 
       if (error || !data || data.length === 0) {
         // Fallback: try with first few words only
-        const shortSearch = searchText.split(' ').slice(0, 5).join(' ')
+        const shortEscaped = escapeLike(searchText.split(' ').slice(0, 5).join(' '))
         const fallback = await supabase
           .from('fatwas')
           .select('id, title, question, answer, fatwa_ref, dar_ul_ifta, category_1, category_2, category_3, created_at')
-          .or(`title.ilike.%${shortSearch}%,question.ilike.%${shortSearch}%`)
+          .or(`title.ilike.%${shortEscaped}%,question.ilike.%${shortEscaped}%`)
           .limit(20)
 
         if (fallback.error || !fallback.data || fallback.data.length === 0) {
