@@ -1,22 +1,7 @@
 import { useMemo } from 'react'
 import { useFatwaStore } from '../stores/fatwaStore'
 import { isValidCategoryName } from '../utils/categoryFilter'
-
-/**
- * Slugify helper that supports Unicode (Urdu/Arabic) text.
- * Produces URL-friendly strings while preserving non-Latin characters.
- * Replaces slashes and spaces with hyphens to avoid URL path conflicts.
- */
-function slugify(text) {
-  if (!text || typeof text !== 'string') return ''
-
-  return text
-    .trim()
-    .replace(/[/\\]+/g, '-')    // Replace slashes with hyphens
-    .replace(/\s+/g, '-')       // Replace spaces with hyphens
-    .replace(/-+/g, '-')        // Collapse multiple hyphens
-    .replace(/^-|-$/g, '')      // Trim leading/trailing hyphens
-}
+import { slugify } from '../utils/slugGenerator'
 
 /**
  * Build a nested 3-level category tree from flat fatwa data.

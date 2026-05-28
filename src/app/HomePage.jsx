@@ -6,6 +6,7 @@ import PublicTopNav from './PublicTopNav'
 import Logo from './Logo'
 import FlashcardSlider from './FlashcardSlider'
 import { supabase } from '../lib/supabase'
+import { slugify } from '../modules/fatwa-platform/utils/slugGenerator'
 import { Button, Input, cn } from '../shared/ui'
 import {
   BookOpen,
@@ -415,19 +416,6 @@ function FatwaSection() {
     loadFatwas()
   }, [])
 
-  const toSlug = (text) => {
-    if (!text) return ''
-    return text
-      .trim()
-      .replace(/C-جامعہ-علوم-اسلامیہ-علامہ-محمد-یوسف-بنوری-ٹاؤن/g, '')
-      .replace(/جامعہ علوم اسلامیہ علامہ محمد یوسف بنوری ٹاؤن/g, '')
-      .replace(/[/\\]+/g, '-')
-      .replace(/[?#&=]+/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '')
-  }
-
   const fmt = (d) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 
   return (
@@ -459,7 +447,7 @@ function FatwaSection() {
               <p className="text-neutral-400 text-center py-12">No fatwas available yet.</p>
             ) : (
               fatwas.map((fatwa) => {
-                const slug = toSlug(fatwa.title || fatwa.question)
+                const slug = slugify(fatwa.title || fatwa.question)
                 return (
                   <div
                     key={fatwa.id}
@@ -536,6 +524,9 @@ function GallerySlider() {
               key={src}
               src={src}
               alt={`Hidayat gallery ${i + 1}`}
+              loading="lazy"
+              width={1200}
+              height={525}
               className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${i === current ? 'opacity-100' : 'opacity-0'}`}
             />
           ))}

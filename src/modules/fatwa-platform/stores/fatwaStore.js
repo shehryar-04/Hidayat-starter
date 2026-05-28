@@ -1,26 +1,10 @@
 import { create } from 'zustand'
 import { supabase } from '../../../lib/supabase'
 import { incrementFatwaView } from '../utils/incrementView'
-import { generateSlug } from '../utils/slugGenerator'
+import { generateSlug, slugify } from '../utils/slugGenerator'
 
 // Cache duration: 5 minutes in milliseconds
 const CACHE_DURATION = 5 * 60 * 1000
-
-/**
- * Slugify helper that supports Unicode (Urdu/Arabic) text.
- * Produces URL-friendly strings while preserving non-Latin characters.
- * Replaces slashes and spaces with hyphens to avoid URL path conflicts.
- */
-function slugify(text) {
-  if (!text || typeof text !== 'string') return ''
-
-  return text
-    .trim()
-    .replace(/[/\\]+/g, '-')    // Replace slashes with hyphens
-    .replace(/\s+/g, '-')       // Replace spaces with hyphens
-    .replace(/-+/g, '-')        // Collapse multiple hyphens
-    .replace(/^-|-$/g, '')      // Trim leading/trailing hyphens
-}
 
 /**
  * Normalize a fatwa row from the `fatwas` table into the shape
@@ -173,12 +157,12 @@ export const useFatwaStore = create((set, get) => ({
           .from('fatwas')
           .select('id', { count: 'exact', head: true }),
 
-        // Distinct institutions
+        // Distinct institutions (limited — deduplication happens client-side)
         supabase
           .from('fatwas')
           .select('dar_ul_ifta')
           .not('dar_ul_ifta', 'is', null)
-          .limit(1000),
+          .limit(100),
       ])
 
       // Process latest fatwas
@@ -191,11 +175,12 @@ export const useFatwaStore = create((set, get) => ({
         // Fallback: paginate through all category columns (lightweight — only 3 small text fields per row)
         console.log('[FatwaStore] RPC not available, using fallback category fetch')
         const PAGE_SIZE = 1000
+        const MAX_ROWS = 15000 // Cap fallback to prevent excessive requests
         let allCatData = []
         let from = 0
         let hasMore = true
 
-        while (hasMore) {
+        while (hasMore && from < MAX_ROWS) {
           const { data: catData } = await supabase
             .from('fatwas')
             .select('category_1, category_2, category_3')

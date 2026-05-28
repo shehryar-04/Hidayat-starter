@@ -87,43 +87,47 @@ export default function FatwaDetailPage() {
 
   const fetchFatwas = useFatwaStore((state) => state.fetchFatwas)
   const fatwas = useFatwaStore((state) => state.fatwas)
-  const getFatwaBySlug = useFatwaStore((state) => state.getFatwaBySlug)
-  const fetchFatwaBySlug = useFatwaStore((state) => state.fetchFatwaBySlug)
   const getFatwasByCategory = useFatwaStore((state) => state.getFatwasByCategory)
   const incrementView = useFatwaStore((state) => state.incrementView)
   const loading = useFatwaStore((state) => state.loading)
-  const lastFetched = useFatwaStore((state) => state.lastFetched)
 
   const { tree } = useCategories()
+  const fetchAttempted = useRef(false)
 
-  // Fetch home data (for categories tree) and try to find fatwa
+  // Fetch home data (for categories tree)
   useEffect(() => {
     fetchFatwas()
   }, [fetchFatwas])
 
-  // Try to find fatwa from local state or fetch on-demand
+  // Try to find fatwa from local state or fetch on-demand (runs once per slug)
   useEffect(() => {
     if (!slug) return
 
-    const found = getFatwaBySlug(slug)
+    // Reset state for new slug
+    fetchAttempted.current = false
+    setFatwa(null)
+    setNotFound(false)
+
+    // Check local state first
+    const state = useFatwaStore.getState()
+    const found = state.getFatwaBySlug(slug)
     if (found) {
       setFatwa(found)
-      setNotFound(false)
       return
     }
 
-    // Always try fetching by slug from DB (don't wait for lastFetched for direct URL access)
-    fetchFatwaBySlug(slug).then(result => {
+    // Fetch from DB once
+    fetchAttempted.current = true
+    state.fetchFatwaBySlug(slug).then(result => {
       if (result) {
         setFatwa(result)
-        setNotFound(false)
       } else {
         setNotFound(true)
       }
     })
-  }, [slug, getFatwaBySlug, fetchFatwaBySlug])
+  }, [slug])
 
-  // Increment view count once on mount when fatwa is found
+  // Increment view count once when fatwa is found
   useEffect(() => {
     if (fatwa && fatwa.id) {
       incrementView(fatwa.id)
