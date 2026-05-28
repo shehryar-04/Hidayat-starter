@@ -494,11 +494,13 @@ function FatwaSection() {
 
 // ─── Gallery Auto-Slider ─────────────────────────────────────
 const GALLERY_IMAGES = [
-  '/gallery/20230520_194337.webp',
-  '/gallery/IMG_6202.webp',
+  '/gallery/20230520_194340.webp',
   '/gallery/IMG-20181213-WA0023.webp',
-  '/gallery/Workshop-Nov.-2017-Highlights-007.webp',
-  '/gallery/Workshop-Nov.-2017-Highlights-011.webp',
+  '/gallery/IMG-20181223-WA0019.webp',
+  '/gallery/IMG-20181223-WA0022.webp',
+  '/gallery/PicsArt_10-08-09.25.32.webp',
+  '/gallery/Workshop-Nov.-2017-Highlights-006.webp',
+  '/gallery/Workshop-Nov.-2017-Highlights-008.webp',
 ]
 
 function GallerySlider() {

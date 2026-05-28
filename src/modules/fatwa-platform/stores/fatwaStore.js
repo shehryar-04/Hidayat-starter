@@ -46,7 +46,7 @@ function normalizeFatwa(row, existingSlugs) {
     category_1: row.category_1 || null,
     category_2: row.category_2 || null,
     category_3: row.category_3 || null,
-    dar_ul_ifta: row.dar_ul_ifta || 'Hidayat Darul Ifta',
+    dar_ul_ifta: (row.dar_ul_ifta && row.dar_ul_ifta.trim() !== 'جامعہ علوم اسلامیہ علامہ محمد یوسف بنوری ٹاؤن') ? row.dar_ul_ifta : null,
     view_count: row.view_count || 0,
     published_at: row.created_at,
     created_at: row.created_at,
@@ -224,10 +224,11 @@ export const useFatwaStore = create((set, get) => ({
       // Total count
       const totalCount = countRes.count || 0
 
-      // Institutions — filter out corrupted names with replacement character
+      // Institutions — filter out corrupted names and specific excluded institutions
+      const EXCLUDED_INSTITUTIONS = ['جامعہ علوم اسلامیہ علامہ محمد یوسف بنوری ٹاؤن']
       const institutionSet = new Set()
       for (const row of (institutionsRes.data || [])) {
-        if (row.dar_ul_ifta && !row.dar_ul_ifta.includes('\uFFFD') && !row.dar_ul_ifta.includes('�')) {
+        if (row.dar_ul_ifta && !row.dar_ul_ifta.includes('\uFFFD') && !row.dar_ul_ifta.includes('�') && !EXCLUDED_INSTITUTIONS.includes(row.dar_ul_ifta.trim())) {
           institutionSet.add(row.dar_ul_ifta)
         }
       }
