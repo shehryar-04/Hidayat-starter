@@ -189,13 +189,6 @@ export default function SearchInput({
 
         {isSearching && (
           <div className="absolute right-3 top-1/2 -translate-y-1/2">
-            <svg
-              className="animate-spin h-5 w-5 text-green-600"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
               <circle
                 className="opacity-25"
                 cx="12"
