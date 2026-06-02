@@ -11,7 +11,11 @@
     "generate:manifest": "node scripts/generate-prerender-manifest.js",
     "preview": "vite preview",
     "test": "vitest --run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "search:backfill-slugs": "node scripts/search/backfill-slugs.js",
+    "search:generate-embeddings": "node scripts/search/generate-embeddings.js",
+    "search:reindex": "node scripts/search/generate-embeddings.js --mode=initial",
+    "search:populate-suggestions": "node scripts/search/populate-suggestions.js"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",

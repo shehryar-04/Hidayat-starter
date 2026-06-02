@@ -5,12 +5,22 @@ import { FatwaList } from './FatwaList'
 import { FatwaEditor } from './FatwaEditor'
 import { QuestionSubmitForm } from './QuestionSubmitForm'
 import { WhatsAppButton } from '../../shared/WhatsAppButton'
-import { Star, PenLine, BookOpen, BadgeCheck } from 'lucide-react'
+import { Star, PenLine, BookOpen, BadgeCheck, Search } from 'lucide-react'
 import { Card, CardContent, Tabs } from '../../shared/ui'
 import FatwaPlatformModule from '../fatwa-platform'
 
 // ─── Hero Section (shared by guest + scholar/student) ────────
 function DarulIftaHero({ showSubmitBtn = false, onSubmitClick }) {
+  const navigate = useNavigate()
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      navigate(`/darul-ifta/search?q=${encodeURIComponent(searchQuery.trim())}`)
+    }
+  }
+
   return (
     <header className="relative py-24 overflow-hidden bg-primary text-white">
       <div className="absolute inset-0 pattern-overlay opacity-20" />
@@ -23,6 +33,28 @@ function DarulIftaHero({ showSubmitBtn = false, onSubmitClick }) {
           <p className="text-lg text-white/80 max-w-2xl mb-8">
             Guided by classical scholarship and contemporary precision. Our Muftis provide scholarly vetting for every inquiry, ensuring spiritual clarity for the modern era.
           </p>
+
+          {/* ─── Search Bar ─────────────────────────────────── */}
+          <form onSubmit={handleSearchSubmit} className="max-w-xl mx-auto md:mx-0 mb-8">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search 70,000+ fatwas..."
+                className="w-full h-14 pl-12 pr-28 rounded-xl border-0 bg-white text-gray-900 placeholder-gray-400 text-base shadow-lg focus:outline-none focus:ring-2 focus:ring-secondary"
+                aria-label="Search fatwas"
+              />
+              <button
+                type="submit"
+                className="absolute right-2 top-1/2 -translate-y-1/2 px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium text-sm transition-colors min-h-[44px]"
+              >
+                Search
+              </button>
+            </div>
+          </form>
+
           <div className="flex flex-wrap justify-center md:justify-start gap-4">
             {showSubmitBtn && onSubmitClick && (
               <button onClick={onSubmitClick}

@@ -3,7 +3,8 @@ import { Routes, Route } from 'react-router-dom'
 
 // Code-split page components with React.lazy
 const PlatformHomePage = lazy(() => import('./pages/PlatformHomePage'))
-const SearchPage = lazy(() => import('./pages/SearchPage'))
+const SearchPage = lazy(() => import('./pages/EnterpriseSearchPage'))
+const LegacySearchPage = lazy(() => import('./pages/SearchPage'))
 const AllCategoriesPage = lazy(() => import('./pages/AllCategoriesPage'))
 const CategoryPage = lazy(() => import('./pages/CategoryPage'))
 const FatwaDetailPage = lazy(() => import('./pages/FatwaDetailPage'))
@@ -36,6 +37,7 @@ export default function FatwaPlatformModule() {
         <Routes>
           <Route index element={<PlatformHomePage />} />
           <Route path="search" element={<SearchPage />} />
+          <Route path="search/legacy" element={<LegacySearchPage />} />
           <Route path="categories" element={<AllCategoriesPage />} />
           <Route path="category/:cat1" element={<CategoryPage />} />
           <Route path="category/:cat1/:cat2" element={<CategoryPage />} />
