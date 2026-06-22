@@ -9,11 +9,23 @@ const AllCategoriesPage = lazy(() => import('./pages/AllCategoriesPage'))
 const CategoryPage = lazy(() => import('./pages/CategoryPage'))
 const FatwaDetailPage = lazy(() => import('./pages/FatwaDetailPage'))
 
-// Loading fallback shown while lazy chunks load
+// Loading fallback shown while lazy chunks load — skeleton instead of blank
 function PageLoader() {
   return (
-    <div className="min-h-[60vh] flex items-center justify-center">
-      <div className="animate-pulse text-primary font-medium">Loading…</div>
+    <div className="min-h-[60vh] px-4 py-8 max-w-6xl mx-auto">
+      {/* Header skeleton */}
+      <div className="h-8 w-64 bg-gray-200 rounded animate-pulse mb-4" />
+      <div className="h-4 w-96 bg-gray-100 rounded animate-pulse mb-8" />
+      {/* Content skeleton */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="bg-white rounded-xl border border-gray-200 p-5">
+            <div className="h-4 bg-gray-200 rounded animate-pulse mb-3 w-3/4" />
+            <div className="h-3 bg-gray-100 rounded animate-pulse mb-2 w-full" />
+            <div className="h-3 bg-gray-100 rounded animate-pulse w-1/2" />
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
@@ -42,6 +54,7 @@ export default function FatwaPlatformModule() {
           <Route path="category/:cat1" element={<CategoryPage />} />
           <Route path="category/:cat1/:cat2" element={<CategoryPage />} />
           <Route path="category/:cat1/:cat2/:cat3" element={<CategoryPage />} />
+          <Route path="id/:id" element={<FatwaDetailPage />} />
           <Route path=":slug" element={<FatwaDetailPage />} />
         </Routes>
       </Suspense>

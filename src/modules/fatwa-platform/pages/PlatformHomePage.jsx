@@ -1,7 +1,7 @@
-import { useEffect, useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useMemo, useState, useCallback } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { BookOpen, Building2 } from 'lucide-react'
+import { BookOpen, Building2, Search } from 'lucide-react'
 import SEOHead from '../components/SEOHead'
 import PlatformStats from '../components/PlatformStats'
 import { useFatwaStore } from '../stores/fatwaStore'
@@ -22,6 +22,8 @@ const sectionVariants = {
 
 export default function PlatformHomePage() {
   const basePath = useBasePath()
+  const navigate = useNavigate()
+  const [searchQuery, setSearchQuery] = useState('')
 
   const fetchFatwas = useFatwaStore((state) => state.fetchFatwas)
   const totalCount = useFatwaStore((state) => state.totalCount)
@@ -33,6 +35,13 @@ export default function PlatformHomePage() {
   useEffect(() => {
     fetchFatwas()
   }, [fetchFatwas])
+
+  const handleSearchSubmit = useCallback((e) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      navigate(`${basePath}/search?q=${encodeURIComponent(searchQuery.trim())}`)
+    }
+  }, [searchQuery, navigate, basePath])
 
   const websiteSchema = generateWebSiteSchema({
     name: 'Hidayat Fatwa Platform',
@@ -53,10 +62,51 @@ export default function PlatformHomePage() {
 
   if (loading && totalCount === 0) {
     return (
-      <main className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-green-600 border-t-transparent rounded-full animate-spin" />
-          <p className="text-gray-600 text-sm font-medium">Loading Fatwa Platform...</p>
+      <main className="min-h-screen bg-gray-50">
+        {/* Show search bar immediately even while loading */}
+        <section className="bg-gradient-to-b from-green-700 to-green-800 text-white py-14 px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-3xl md:text-4xl font-bold mb-3">
+              Islamic Fatwa Knowledge Platform
+            </h1>
+            <p className="text-green-100 text-base md:text-lg mb-6">
+              Explore authentic Islamic rulings from trusted scholars and institutions
+            </p>
+            <form onSubmit={handleSearchSubmit} className="max-w-2xl mx-auto relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" aria-hidden="true" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search 70,000+ fatwas..."
+                className="w-full h-14 rounded-xl border-0 bg-white shadow-lg pl-12 pr-4 text-gray-900 placeholder-gray-400 text-base focus:outline-none focus:ring-2 focus:ring-green-400"
+                aria-label="Search fatwas"
+              />
+            </form>
+          </div>
+        </section>
+
+        {/* Skeleton loading state */}
+        <div className="max-w-6xl mx-auto px-4 py-10">
+          <div className="flex items-center justify-between mb-8">
+            <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
+            <div className="h-5 w-32 bg-gray-200 rounded animate-pulse" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                <div className="px-5 py-4 border-b border-gray-100">
+                  <div className="h-5 w-3/4 bg-gray-200 rounded animate-pulse mb-2" />
+                  <div className="h-3 w-1/3 bg-gray-100 rounded animate-pulse" />
+                </div>
+                <div className="px-5 py-3 space-y-2">
+                  <div className="h-4 w-full bg-gray-100 rounded animate-pulse" />
+                  <div className="h-4 w-5/6 bg-gray-100 rounded animate-pulse" />
+                  <div className="h-4 w-2/3 bg-gray-100 rounded animate-pulse" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </main>
     )
@@ -72,7 +122,7 @@ export default function PlatformHomePage() {
         structuredData={[websiteSchema]}
       />
 
-      {/* Hero Section */}
+      {/* Hero Section with Search */}
       <motion.section
         className="bg-gradient-to-b from-green-700 to-green-800 text-white py-14 px-4"
         variants={sectionVariants}
@@ -87,6 +137,20 @@ export default function PlatformHomePage() {
           <p className="text-green-100 text-base md:text-lg">
             Explore authentic Islamic rulings from trusted scholars and institutions
           </p>
+
+          {/* Prominent Search Bar */}
+          <form onSubmit={handleSearchSubmit} className="max-w-2xl mx-auto mt-6 relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" aria-hidden="true" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search 70,000+ fatwas..."
+              className="w-full h-14 rounded-xl border-0 bg-white shadow-lg pl-12 pr-4 text-gray-900 placeholder-gray-400 text-base focus:outline-none focus:ring-2 focus:ring-green-400"
+              aria-label="Search fatwas"
+            />
+          </form>
+
           <p className="text-green-200 text-sm mt-4">
             {totalCount.toLocaleString()} fatwas across {totalCategories} categories
           </p>

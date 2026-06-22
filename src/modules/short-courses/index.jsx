@@ -8,21 +8,66 @@ import { RevenueView } from './RevenueView'
 import { AdminCourseReview } from './AdminCourseReview'
 import { StudentCourseList } from './StudentCourseList'
 import { StudentCourseView } from './StudentCourseView'
+import { StudentDashboard } from './StudentDashboard'
+import { QuizBuilder } from './components/QuizBuilder'
+import { CourseAnnouncements } from './components/CourseAnnouncements'
+import { TeacherAnalytics } from './components/TeacherAnalytics'
+import { AdminCourseManager } from './components/AdminCourseManager'
 import { cn } from '../../shared/ui'
 
 // ─── Student view ─────────────────────────────────────────────
 function StudentShortCourses() {
   const [selectedCourse, setSelectedCourse] = useState(null)
+  const [tab, setTab] = useState('dashboard')
 
   if (selectedCourse) {
     return <StudentCourseView course={selectedCourse} onBack={() => setSelectedCourse(null)} />
   }
 
-  return <StudentCourseList onSelectCourse={setSelectedCourse} />
+  if (tab === 'dashboard') {
+    return (
+      <div>
+        <div className="bg-white border-b border-neutral-200 px-4 sm:px-8 pt-4 pb-0">
+          <div className="flex gap-4 overflow-x-auto">
+            <button onClick={() => setTab('dashboard')}
+              className={cn('px-4 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors',
+                'text-primary-500 font-semibold border-primary-500')}>
+              My Dashboard
+            </button>
+            <button onClick={() => setTab('browse')}
+              className="px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-neutral-500 hover:text-neutral-800 whitespace-nowrap transition-colors">
+              Browse Courses
+            </button>
+          </div>
+        </div>
+        <StudentDashboard onSelectCourse={setSelectedCourse} />
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <div className="bg-white border-b border-neutral-200 px-4 sm:px-8 pt-4 pb-0">
+        <div className="flex gap-4 overflow-x-auto">
+          <button onClick={() => setTab('dashboard')}
+            className="px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-neutral-500 hover:text-neutral-800 whitespace-nowrap transition-colors">
+            My Dashboard
+          </button>
+          <button onClick={() => setTab('browse')}
+            className={cn('px-4 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors',
+              'text-primary-500 font-semibold border-primary-500')}>
+            Browse Courses
+          </button>
+        </div>
+      </div>
+      <StudentCourseList onSelectCourse={setSelectedCourse} />
+    </div>
+  )
 }
 
 // ─── Admin view — includes approval queue ─────────────────────
 function AdminShortCourses() {
+  const { userId } = useRole()
   const [view, setView] = useState('courses')
   const [selectedCourse, setSelectedCourse] = useState(null)
   const [editingCourse, setEditingCourse] = useState(null)
@@ -35,7 +80,6 @@ function AdminShortCourses() {
   ]
 
   const handleEdit = async (course) => {
-    // Fetch full course data for editing
     const { data } = await supabase
       .from('short_courses')
       .select('*')
@@ -47,7 +91,12 @@ function AdminShortCourses() {
     }
   }
 
-  const isActive = (key) => view === key || (view === 'enrollment' && key === 'courses') || (view === 'edit' && key === 'courses')
+  const handleManageCourse = (course) => {
+    setSelectedCourse(course)
+    setView('manage')
+  }
+
+  const isActive = (key) => view === key || (view === 'enrollment' && key === 'courses') || (view === 'edit' && key === 'courses') || (view === 'manage' && key === 'courses')
 
   return (
     <div>
@@ -71,7 +120,7 @@ function AdminShortCourses() {
 
       {view === 'courses' && !selectedCourse && (
         <CourseList
-          onSelectCourse={c => { setSelectedCourse(c); setView('enrollment') }}
+          onSelectCourse={handleManageCourse}
           onEditCourse={handleEdit}
         />
       )}
@@ -82,6 +131,14 @@ function AdminShortCourses() {
       )}
       {view === 'enrollment' && selectedCourse && (
         <EnrollmentView course={selectedCourse} onBack={() => { setSelectedCourse(null); setView('courses') }} />
+      )}
+      {view === 'manage' && selectedCourse && (
+        <AdminCourseManager
+          course={selectedCourse}
+          userId={userId}
+          onBack={() => { setSelectedCourse(null); setView('courses') }}
+          onEditCourse={handleEdit}
+        />
       )}
       {view === 'revenue' && <RevenueView />}
     </div>

@@ -11,8 +11,8 @@ export function slugify(text) {
 
   return text
     .trim()
-    .replace(/C-جامعہ-علوم-اسلامیہ-علامہ-محمد-یوسف-بنوری-ٹاؤن/g, '')
-    .replace(/جامعہ علوم اسلامیہ علامہ محمد یوسف بنوری ٹاؤن/g, '')
+    .replace(/C-جامعہ-علوم-اسلامیہ-علامہ-محمد-یوسف-بنوری-ٹاؤن|/g, '')
+    .replace(/جامعہ علوم اسلامیہ علامہ محمد یوسف بنوری ٹاؤن|/g, '')
     .replace(/[/\\]+/g, '-')         // Replace slashes with hyphens
     .replace(/[?#&=]+/g, '')         // Remove URL-unsafe query characters
     .replace(/\s+/g, '-')            // Replace spaces with hyphens

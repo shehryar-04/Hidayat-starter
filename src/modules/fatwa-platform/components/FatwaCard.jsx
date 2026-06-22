@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useBasePath } from '../hooks/useBasePath'
 import { detectDirection } from '../utils/rtlDetection'
 
@@ -9,11 +9,14 @@ import { detectDirection } from '../utils/rtlDetection'
 export function FatwaCard({ fatwa }) {
   const { title, slug, category_1, dar_ul_ifta } = fatwa
   const basePath = useBasePath()
+  const location = useLocation()
   const isRtl = detectDirection(title) === 'rtl'
+  const isFromSearch = location.pathname.includes('/search')
 
   return (
     <Link
       to={`${basePath}/${slug}`}
+      state={isFromSearch ? { fromSearch: true } : undefined}
       className="block rounded-xl border border-gray-200 shadow-sm p-5 bg-white hover:scale-[1.02] hover:shadow-lg hover:border-green-300 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
     >
       <h3

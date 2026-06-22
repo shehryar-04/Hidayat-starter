@@ -1,7 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useRole } from '../../app/RoleProvider'
 import { Button, Input, Label, Spinner } from '../../shared/ui'
+import { getCourseQuizzes, getStudentAttempts } from './services/quizService'
+import { QuizTaker } from './components/QuizTaker'
+import { FileText, CheckCircle, XCircle, PlayCircle, Download } from 'lucide-react'
 
 function getYouTubeId(url) {
   if (!url) return null
@@ -14,12 +18,31 @@ function getYouTubeId(url) {
   return null
 }
 
-// ─── Protected Video Player ──────────────────────────────────
-function ProtectedVideoPlayer({ url, title, isEnrolled }) {
+// ─── Protected Video Player (YouTube IFrame API) ─────────────
+// Uses the official YouTube IFrame API to track:
+// - Current playback position
+// - Total duration
+// - Auto-marks lecture complete when ≥90% watched
+function ProtectedVideoPlayer({ url, title, isEnrolled, courseId, lectureId, studentId, onComplete }) {
   const [playing, setPlaying] = useState(false)
-  const [showControls, setShowControls] = useState(true)
-  const controlsTimer = useRef(null)
+  const [watchPercent, setWatchPercent] = useState(0)
+  const [autoCompleted, setAutoCompleted] = useState(false)
+  const playerRef = useRef(null)
+  const containerRef = useRef(null)
+  const intervalRef = useRef(null)
   const id = getYouTubeId(url)
+
+  // Load saved watch progress on mount
+  useEffect(() => {
+    if (lectureId && studentId) {
+      import('./services/progressService.js').then(({ getLectureWatchPercent }) => {
+        getLectureWatchPercent(lectureId, studentId).then(({ watchPercent: saved, isCompleted }) => {
+          if (saved > 0) setWatchPercent(saved)
+          if (isCompleted) setAutoCompleted(true)
+        })
+      })
+    }
+  }, [lectureId, studentId])
 
   if (!isEnrolled || !id) {
     return (
@@ -34,69 +57,151 @@ function ProtectedVideoPlayer({ url, title, isEnrolled }) {
     )
   }
 
-  const embedUrl = `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1&showinfo=0&iv_load_policy=3&disablekb=0&fs=1&playsinline=1&enablejsapi=1${playing ? '&autoplay=1' : ''}`
+  // Load YouTube IFrame API
+  useEffect(() => {
+    if (!playing || !id) return
 
-  const handleMouseMove = () => {
-    setShowControls(true)
-    if (controlsTimer.current) clearTimeout(controlsTimer.current)
-    controlsTimer.current = setTimeout(() => setShowControls(false), 3000)
+    // Load the API script if not already loaded
+    if (!window.YT) {
+      const tag = document.createElement('script')
+      tag.src = 'https://www.youtube.com/iframe_api'
+      document.head.appendChild(tag)
+    }
+
+    const initPlayer = () => {
+      if (!containerRef.current) return
+      playerRef.current = new window.YT.Player(containerRef.current, {
+        videoId: id,
+        playerVars: {
+          autoplay: 1,
+          rel: 0,
+          modestbranding: 1,
+          iv_load_policy: 3,
+          playsinline: 1,
+          enablejsapi: 1,
+        },
+        events: {
+          onReady: (e) => {
+            e.target.playVideo()
+            startTracking()
+          },
+          onStateChange: (e) => {
+            if (e.data === window.YT.PlayerState.ENDED) {
+              handleWatchComplete()
+            }
+          },
+        },
+      })
+    }
+
+    if (window.YT && window.YT.Player) {
+      initPlayer()
+    } else {
+      window.onYouTubeIframeAPIReady = initPlayer
+    }
+
+    return () => {
+      stopTracking()
+      if (playerRef.current && playerRef.current.destroy) {
+        try { playerRef.current.destroy() } catch {}
+      }
+      playerRef.current = null
+    }
+  }, [playing, id])
+
+  const startTracking = () => {
+    stopTracking()
+    intervalRef.current = setInterval(async () => {
+      if (!playerRef.current || !playerRef.current.getCurrentTime) return
+      try {
+        const current = playerRef.current.getCurrentTime()
+        const duration = playerRef.current.getDuration()
+        if (duration > 0) {
+          const pct = Math.round((current / duration) * 100)
+          setWatchPercent(pct)
+
+          // Save progress to DB every 15 seconds
+          if (courseId && lectureId && studentId && pct > 0) {
+            const { saveWatchProgress } = await import('./services/progressService.js')
+            await saveWatchProgress(courseId, lectureId, studentId, pct)
+          }
+
+          // Auto-complete at 90% watched
+          if (pct >= 90 && !autoCompleted && courseId && lectureId && studentId) {
+            setAutoCompleted(true)
+            handleWatchComplete()
+          }
+        }
+      } catch {}
+    }, 15000) // Save every 15 seconds
+  }
+
+  const stopTracking = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
+    }
+  }
+
+  const handleWatchComplete = async () => {
+    if (!courseId || !lectureId || !studentId) return
+    // Import dynamically to avoid issues
+    const { markLectureComplete } = await import('./services/progressService.js')
+    await markLectureComplete(courseId, lectureId, studentId)
+    onComplete?.()
   }
 
   return (
-    <div
-      className="aspect-video rounded-xl overflow-hidden shadow-lg relative group select-none"
-      onMouseMove={handleMouseMove}
-      onMouseLeave={() => setShowControls(false)}
-      onTouchStart={() => setShowControls(true)}
-    >
+    <div className="aspect-video rounded-xl overflow-hidden shadow-lg relative group select-none bg-black">
       {playing ? (
-        <iframe
-          className="w-full h-full absolute inset-0 z-0"
-          src={embedUrl}
-          title={title || 'Video'}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-          allowFullScreen
-          referrerPolicy="strict-origin-when-cross-origin"
-        />
-      ) : (
-        <div className="w-full h-full absolute inset-0 z-0 bg-black">
-          <img
-            src={`https://img.youtube.com/vi/${id}/maxresdefault.jpg`}
-            alt={title}
-            className="w-full h-full object-cover opacity-80"
-            onError={(e) => { e.target.src = `https://img.youtube.com/vi/${id}/hqdefault.jpg` }}
-          />
-        </div>
-      )}
-
-      <div className="absolute top-0 right-0 w-[180px] h-[50px] z-20 bg-transparent" />
-      <div className="absolute bottom-0 right-0 w-[160px] h-[40px] z-20 bg-transparent" />
-      <div className="absolute top-0 left-0 w-[120px] h-[40px] z-20 bg-transparent" />
-
-      {!playing && (
-        <div
-          className="absolute inset-0 z-10 flex items-center justify-center cursor-pointer bg-black/20 hover:bg-black/30 transition-colors"
-          onClick={() => setPlaying(true)}
-        >
-          <div className="w-20 h-20 rounded-full bg-white/90 shadow-2xl flex items-center justify-center hover:scale-110 transition-transform">
-            <svg className="w-8 h-8 text-primary ml-1" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z" />
-            </svg>
+        <>
+          <div ref={containerRef} className="w-full h-full" />
+          {/* Watch progress indicator */}
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/30 z-30">
+            <div
+              className="h-full bg-green-500 transition-all duration-1000"
+              style={{ width: `${watchPercent}%` }}
+            />
           </div>
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2">
-            <span className="bg-black/60 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm">
-              ▶ Click to Play
+          {/* Watermark */}
+          <div className="absolute top-3 left-3 z-20 pointer-events-none opacity-40">
+            <span className="text-white text-[10px] font-bold tracking-wider bg-black/30 px-2 py-0.5 rounded">
+              HIDAYAT
             </span>
           </div>
-        </div>
-      )}
-
-      {playing && (
-        <div className="absolute top-3 left-3 z-20 pointer-events-none opacity-40">
-          <span className="text-white text-[10px] font-bold tracking-wider bg-black/30 px-2 py-0.5 rounded">
-            HIDAYAT
-          </span>
-        </div>
+          {/* Auto-complete badge */}
+          {autoCompleted && (
+            <div className="absolute top-3 right-3 z-20 bg-green-500/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+              ✓ Completed
+            </div>
+          )}
+        </>
+      ) : (
+        <>
+          <div className="w-full h-full absolute inset-0 z-0">
+            <img
+              src={`https://img.youtube.com/vi/${id}/maxresdefault.jpg`}
+              alt={title}
+              className="w-full h-full object-cover opacity-80"
+              onError={(e) => { e.target.src = `https://img.youtube.com/vi/${id}/hqdefault.jpg` }}
+            />
+          </div>
+          <div
+            className="absolute inset-0 z-10 flex items-center justify-center cursor-pointer bg-black/20 hover:bg-black/30 transition-colors"
+            onClick={() => setPlaying(true)}
+          >
+            <div className="w-20 h-20 rounded-full bg-white/90 shadow-2xl flex items-center justify-center hover:scale-110 transition-transform">
+              <svg className="w-8 h-8 text-primary ml-1" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2">
+              <span className="bg-black/60 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm">
+                ▶ Click to Play
+              </span>
+            </div>
+          </div>
+        </>
       )}
     </div>
   )
@@ -665,6 +770,9 @@ export function StudentCourseView({ course, onBack }) {
             </div>
           )}
 
+          {/* Certificate banner — shown when course is completed */}
+          {enrolled && <CertificateBanner courseId={course.id} studentId={studentId} />}
+
           {/* Video player */}
           {activeLecture && canAccessLecture(activeLecture) && activeLecture.video_url ? (
             <div>
@@ -672,6 +780,10 @@ export function StudentCourseView({ course, onBack }) {
                 url={activeLecture.video_url}
                 title={activeLecture.title}
                 isEnrolled={enrolled || activeLecture.is_free_preview}
+                courseId={course.id}
+                lectureId={activeLecture.id}
+                studentId={studentId}
+                onComplete={() => {/* progress updated automatically */}}
               />
               <div className="mt-3">
                 <h2 className="font-semibold text-gray-800 text-lg">{activeLecture.title}</h2>
@@ -756,6 +868,9 @@ export function StudentCourseView({ course, onBack }) {
               </ul>
             </div>
           )}
+
+          {/* ── Course Quizzes (enrolled students only) ── */}
+          {enrolled && <StudentQuizSection courseId={course.id} studentId={studentId} />}
         </div>
 
 
@@ -865,6 +980,169 @@ export function StudentCourseView({ course, onBack }) {
             )}
           </div>
         </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Certificate Banner ──────────────────────────────────────
+// Shows when student has a certificate (course completed).
+function CertificateBanner({ courseId, studentId }) {
+  const [cert, setCert] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (courseId && studentId) loadCert()
+  }, [courseId, studentId])
+
+  const loadCert = async () => {
+    const { data } = await supabase
+      .from('certificates')
+      .select('id, certificate_number, verification_code, issued_at')
+      .eq('student_id', studentId)
+      .eq('course_id', courseId)
+      .eq('is_active', true)
+      .limit(1)
+      .maybeSingle()
+
+    setCert(data)
+    setLoading(false)
+  }
+
+  if (loading || !cert) return null
+
+  const verifyUrl = `${window.location.origin}/certificate/verify/${cert.verification_code}`
+
+  return (
+    <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-6 flex flex-col sm:flex-row items-center gap-4">
+      <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+        <span className="text-2xl">🎓</span>
+      </div>
+      <div className="flex-1 text-center sm:text-left">
+        <h3 className="text-lg font-bold text-green-800 mb-0.5">Course Completed! 🎉</h3>
+        <p className="text-sm text-green-700">
+          Certificate: <span className="font-mono font-bold">{cert.certificate_number}</span>
+        </p>
+        <p className="text-xs text-green-600 mt-1">
+          Issued: {new Date(cert.issued_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+        </p>
+        {/* Primary action: view & download the certificate */}
+        <Link
+          to={`/certificate/${cert.id}`}
+          className="inline-flex items-center gap-2 mt-3 bg-green-600 hover:bg-green-700 text-white text-sm font-bold px-4 py-2.5 rounded-xl shadow-sm transition-colors"
+        >
+          <Download className="w-4 h-4" />
+          View &amp; Download Certificate
+        </Link>
+      </div>
+      <div className="flex flex-col items-center gap-2 flex-shrink-0">
+        {/* QR Code linking to public verification */}
+        <div className="w-20 h-20 bg-white rounded-lg border border-green-200 flex items-center justify-center p-1">
+          <img
+            src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(verifyUrl)}`}
+            alt="Certificate QR Code"
+            className="w-full h-full"
+          />
+        </div>
+        <a
+          href={verifyUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-green-600 hover:text-green-800 font-medium underline"
+        >
+          Verify Certificate
+        </a>
+      </div>
+    </div>
+  )
+}
+
+// ─── Student Quiz Section ────────────────────────────────────
+// Shows published quizzes for the course with attempt history.
+function StudentQuizSection({ courseId, studentId }) {
+  const [quizzes, setQuizzes] = useState([])
+  const [attempts, setAttempts] = useState({})
+  const [loading, setLoading] = useState(true)
+  const [activeQuiz, setActiveQuiz] = useState(null)
+
+  useEffect(() => { loadQuizzes() }, [courseId])
+
+  const loadQuizzes = async () => {
+    setLoading(true)
+    try {
+      const data = await getCourseQuizzes(courseId)
+      const published = data.filter(q => q.is_published)
+      setQuizzes(published)
+
+      // Load attempts for each quiz
+      if (studentId && published.length > 0) {
+        const attemptsMap = {}
+        for (const quiz of published) {
+          const a = await getStudentAttempts(quiz.id, studentId)
+          attemptsMap[quiz.id] = a
+        }
+        setAttempts(attemptsMap)
+      }
+    } catch (err) { console.error(err) }
+    finally { setLoading(false) }
+  }
+
+  if (loading) return null
+  if (quizzes.length === 0) return null
+
+  // If student is taking a quiz, show the QuizTaker
+  if (activeQuiz) {
+    return (
+      <QuizTaker
+        quizId={activeQuiz}
+        studentId={studentId}
+        onComplete={() => { setActiveQuiz(null); loadQuizzes() }}
+      />
+    )
+  }
+
+  return (
+    <div className="bg-white rounded-xl border border-neutral-200 p-6">
+      <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+        <FileText className="w-5 h-5 text-primary-500" />
+        Course Quizzes
+      </h3>
+      <div className="space-y-3">
+        {quizzes.map(quiz => {
+          const quizAttempts = attempts[quiz.id] || []
+          const bestAttempt = quizAttempts.length > 0
+            ? quizAttempts.reduce((best, a) => (a.percentage || 0) > (best.percentage || 0) ? a : best, quizAttempts[0])
+            : null
+
+          return (
+            <div key={quiz.id} className="flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:border-primary-200 transition-colors">
+              <div>
+                <p className="text-sm font-medium text-gray-800">{quiz.title}</p>
+                <p className="text-xs text-gray-400">Passing: {quiz.passing_score}%</p>
+                {bestAttempt && (
+                  <div className="flex items-center gap-1.5 mt-1">
+                    {bestAttempt.passed
+                      ? <CheckCircle className="w-3.5 h-3.5 text-green-500" />
+                      : <XCircle className="w-3.5 h-3.5 text-red-400" />
+                    }
+                    <span className={`text-xs font-medium ${bestAttempt.passed ? 'text-green-600' : 'text-red-500'}`}>
+                      Best: {bestAttempt.percentage}%
+                    </span>
+                    <span className="text-xs text-gray-400">({quizAttempts.length} attempt{quizAttempts.length !== 1 ? 's' : ''})</span>
+                  </div>
+                )}
+              </div>
+              <Button
+                variant={bestAttempt?.passed ? 'outline' : 'primary'}
+                size="sm"
+                onClick={() => setActiveQuiz(quiz.id)}
+              >
+                <PlayCircle className="w-3.5 h-3.5 mr-1.5" />
+                {bestAttempt ? (bestAttempt.passed ? 'Retake' : 'Try Again') : 'Start Quiz'}
+              </Button>
+            </div>
+          )
+        })}
       </div>
     </div>
   )

@@ -1,7 +1,29 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useBasePath } from '../hooks/useBasePath'
 import { detectDirection } from '../utils/rtlDetection'
-import { slugify } from '../utils/slugGenerator'
+
+/**
+ * Sanitize a server-generated snippet so only <mark> tags survive.
+ * Everything else is escaped to plain text. Defense-in-depth against
+ * any HTML that might slip through ts_headline.
+ *
+ * @param {string} raw
+ * @returns {string} HTML-safe string containing only <mark> markup
+ */
+function sanitizeSnippet(raw) {
+  if (!raw || typeof raw !== 'string') return ''
+  // 1. Escape ALL HTML special characters
+  const escaped = raw
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+  // 2. Re-enable ONLY the <mark> tags that the server inserted
+  return escaped
+    .replace(/&lt;mark&gt;/g, '<mark>')
+    .replace(/&lt;\/mark&gt;/g, '</mark>')
+}
 
 /**
  * EnterpriseSearchResults — Displays search results with highlighted snippets,
@@ -18,6 +40,7 @@ export default function EnterpriseSearchResults({
   limit = 20,
 }) {
   const basePath = useBasePath()
+  const location = useLocation()
 
   if (error) {
     return (
@@ -81,7 +104,8 @@ export default function EnterpriseSearchResults({
           return (
             <Link
               key={result.id}
-              to={`${basePath}/${result.slug || slugify(result.title) || result.id}`}
+              to={result.slug ? `${basePath}/${result.slug}` : `${basePath}/id/${result.id}`}
+              state={{ fromSearch: true, searchQuery: query }}
               onClick={() => onResultClick?.(result.id, position)}
               className="block bg-white rounded-xl border border-gray-200 shadow-sm p-5 hover:shadow-md hover:border-green-300 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
             >
@@ -98,7 +122,7 @@ export default function EnterpriseSearchResults({
                 <p
                   className="text-sm text-gray-600 mb-2 line-clamp-2 leading-relaxed"
                   dir={detectDirection(result.snippet_question) === 'rtl' ? 'rtl' : undefined}
-                  dangerouslySetInnerHTML={{ __html: result.snippet_question }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeSnippet(result.snippet_question) }}
                 />
               )}
 
@@ -107,7 +131,7 @@ export default function EnterpriseSearchResults({
                 <p
                   className="text-sm text-gray-500 mb-3 line-clamp-2 leading-relaxed"
                   dir={detectDirection(result.snippet_answer) === 'rtl' ? 'rtl' : undefined}
-                  dangerouslySetInnerHTML={{ __html: result.snippet_answer }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeSnippet(result.snippet_answer) }}
                 />
               )}
 
@@ -128,9 +152,9 @@ export default function EnterpriseSearchResults({
                     {result.dar_ul_ifta}
                   </span>
                 )}
-                {result.rank != null && result.rank > 0 && (
+                {result.combined_score != null && result.combined_score > 0 && (
                   <span className="text-[10px] text-gray-400 ml-auto">
-                    Relevance: {(result.rank * 100).toFixed(0)}%
+                    {result.combined_score >= 0.66 ? 'Strong match' : result.combined_score >= 0.33 ? 'Good match' : 'Related'}
                   </span>
                 )}
               </div>

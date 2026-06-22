@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
 import LoginPage from './LoginPage'
 import ProtectedRoute from './ProtectedRoute'
 import FeatureFlagGuard from './FeatureFlagGuard'
@@ -13,6 +14,10 @@ import ShortCoursesModule from '../modules/short-courses'
 import DarulIftaModule from '../modules/darul-ifta'
 import ResearchCenterModule from '../modules/research-center'
 import WazifaModule from '../modules/wazifa'
+
+// Lazy-loaded public pages
+const CertificateVerifyPage = lazy(() => import('../modules/short-courses/CertificateVerifyPage'))
+const CertificatePage = lazy(() => import('../modules/short-courses/CertificatePage'))
 import StudentReportsModule from '../modules/reports'
 import StudentAdminModule from '../modules/student-admin'
 import ScholarAdminModule from '../modules/scholar-admin'
@@ -61,6 +66,22 @@ export default function AppRouter() {
       <Route path="/downloads/*" element={<AppShell><DownloadsPage /></AppShell>} />
       <Route path="/fatwas/*" element={<AppShell><FatwaPlatformModule /></AppShell>} />
       <Route path="/darul-iftaa/*" element={<AppShell><FatwaPlatformModule /></AppShell>} />
+
+      {/* Certificate Verification — public, no login required */}
+      <Route path="/certificate/verify/:code" element={
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading...</p></div>}>
+          <CertificateVerifyPage />
+        </Suspense>
+      } />
+
+      {/* Certificate View & Download — protected (owner/admin) */}
+      <Route path="/certificate/:id" element={
+        <ProtectedRoute>
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading...</p></div>}>
+            <CertificatePage />
+          </Suspense>
+        </ProtectedRoute>
+      } />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

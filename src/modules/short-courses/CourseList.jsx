@@ -108,7 +108,7 @@ export function CourseList({ onSelectCourse, onEditCourse }) {
                   {/* Actions */}
                   <div className="mt-3 flex gap-2">
                     <Button variant="primary" size="sm" className="flex-1" onClick={() => onSelectCourse(course)}>
-                      Enrollments
+                      Manage
                     </Button>
                     {onEditCourse && (
                       <Button variant="outline" size="sm" onClick={() => onEditCourse(course)}>

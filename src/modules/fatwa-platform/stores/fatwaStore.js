@@ -18,7 +18,7 @@ function normalizeFatwa(row, existingSlugs) {
     .replace(/جامعہ علوم اسلامیہ علامہ محمد یوسف بنوری ٹاؤن/g, '')
     .trim()
 
-  const slug = generateSlug(rawTitle, row.id, existingSlugs)
+  const slug = row.slug || generateSlug(rawTitle, row.id, existingSlugs)
   existingSlugs.add(slug)
   return {
     id: String(row.id),
@@ -30,7 +30,7 @@ function normalizeFatwa(row, existingSlugs) {
     category_1: row.category_1 || null,
     category_2: row.category_2 || null,
     category_3: row.category_3 || null,
-    dar_ul_ifta: (row.dar_ul_ifta && row.dar_ul_ifta.trim() !== 'جامعہ علوم اسلامیہ علامہ محمد یوسف بنوری ٹاؤن') ? row.dar_ul_ifta : null,
+    dar_ul_ifta: (row.dar_ul_ifta && row.dar_ul_ifta.trim() !== 'جامعہ علوم اسلامیہ علامہ محمد یوسف بنوری ٹاؤن|') ? row.dar_ul_ifta : null,
     view_count: row.view_count || 0,
     published_at: row.created_at,
     created_at: row.created_at,
@@ -286,10 +286,79 @@ export const useFatwaStore = create((set, get) => ({
   },
 
   /**
+   * Fetch a single fatwa by its exact numeric ID.
+   * This is the reliable lookup path — no title collisions, uses the
+   * primary-key index (fast), and never returns the wrong fatwa.
+   */
+  fetchFatwaById: async (id) => {
+    if (!id) return null
+
+    // Check in-memory caches first
+    const existing = get().fatwas.find(f => String(f.id) === String(id))
+    if (existing) return existing
+    for (const cached of Object.values(get().categoryFatwas)) {
+      const found = cached.find(f => String(f.id) === String(id))
+      if (found) return found
+    }
+
+    set({ loading: true })
+    try {
+      const { data, error } = await supabase
+        .from('fatwas')
+        .select('id, title, question, answer, fatwa_ref, dar_ul_ifta, category_1, category_2, category_3, created_at, slug, view_count')
+        .eq('id', id)
+        .single()
+
+      if (error || !data) {
+        set({ loading: false })
+        return null
+      }
+
+      const found = normalizeFatwa(data, new Set())
+      set(state => ({
+        fatwas: [...state.fatwas.filter(f => f.id !== found.id), found],
+        loading: false,
+      }))
+      return found
+    } catch (err) {
+      set({ loading: false })
+      return null
+    }
+  },
+
+  /**
    * Fetch a single fatwa by slug-matching.
-   * Converts slug back to search text and queries the DB by title/question.
+   * Prefers an exact slug column lookup (fast, reliable). Falls back to
+   * title/question ilike only if the slug column is not yet populated.
    */
   fetchFatwaBySlug: async (slug) => {
+    // 0. Exact slug column match (fast, uses idx_fatwas_slug)
+    {
+      const { data: slugMatch } = await supabase
+        .from('fatwas')
+        .select('id, title, question, answer, fatwa_ref, dar_ul_ifta, category_1, category_2, category_3, created_at, slug, view_count')
+        .eq('slug', slug)
+        .limit(1)
+        .maybeSingle()
+
+      if (slugMatch) {
+        const found = normalizeFatwa(slugMatch, new Set())
+        set(state => ({
+          fatwas: [...state.fatwas.filter(f => f.id !== found.id), found],
+          loading: false,
+        }))
+        return found
+      }
+    }
+
+    return get()._fetchFatwaBySlugFallback(slug)
+  },
+
+  /**
+   * Legacy fallback: slug → search-text → ilike lookup.
+   * Used only when the slug column is not populated for a row.
+   */
+  _fetchFatwaBySlugFallback: async (slug) => {
     // First check if we already have it in memory
     const existing = get().fatwas.find(f => f.slug === slug)
     if (existing) return existing

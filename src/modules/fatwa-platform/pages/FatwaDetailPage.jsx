@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useMemo } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Clock, ChevronDown, ChevronUp } from 'lucide-react'
+import { Clock, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react'
 import SEOHead from '../components/SEOHead'
 import BreadcrumbNav from '../components/BreadcrumbNav'
 import ReadingProgress from '../components/ReadingProgress'
@@ -79,7 +79,9 @@ function extractHeadings(text) {
  * - Semantic HTML with proper heading hierarchy
  */
 export default function FatwaDetailPage() {
-  const { slug } = useParams()
+  const { slug, id } = useParams()
+  const navigate = useNavigate()
+  const location = useLocation()
   const contentRef = useRef(null)
   const [expanded, setExpanded] = useState(false)
   const [notFound, setNotFound] = useState(false)
@@ -99,24 +101,36 @@ export default function FatwaDetailPage() {
     fetchFatwas()
   }, [fetchFatwas])
 
-  // Try to find fatwa from local state or fetch on-demand (runs once per slug)
+  // Try to find fatwa from local state or fetch on-demand (runs once per slug/id)
   useEffect(() => {
-    if (!slug) return
+    if (!slug && !id) return
 
-    // Reset state for new slug
+    // Reset state for new param
     fetchAttempted.current = false
     setFatwa(null)
     setNotFound(false)
 
-    // Check local state first
     const state = useFatwaStore.getState()
+
+    // Exact ID lookup path (reliable — no title collisions)
+    if (id) {
+      const local = state.fatwas.find(f => String(f.id) === String(id))
+      if (local) { setFatwa(local); return }
+      fetchAttempted.current = true
+      state.fetchFatwaById(id).then(result => {
+        if (result) setFatwa(result)
+        else setNotFound(true)
+      })
+      return
+    }
+
+    // Slug lookup path
     const found = state.getFatwaBySlug(slug)
     if (found) {
       setFatwa(found)
       return
     }
 
-    // Fetch from DB once
     fetchAttempted.current = true
     state.fetchFatwaBySlug(slug).then(result => {
       if (result) {
@@ -125,7 +139,7 @@ export default function FatwaDetailPage() {
         setNotFound(true)
       }
     })
-  }, [slug])
+  }, [slug, id])
 
   // Increment view count once when fatwa is found
   useEffect(() => {
@@ -272,10 +286,35 @@ export default function FatwaDetailPage() {
   // Loading state
   if (loading || !fatwa) {
     return (
-      <main className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-[3px] border-green-600 border-t-transparent rounded-full animate-spin" />
-          <p className="text-gray-600 text-sm">Loading fatwa…</p>
+      <main className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          {/* Back button skeleton */}
+          <div className="h-5 w-32 bg-gray-200 rounded animate-pulse mb-4" />
+          {/* Breadcrumb skeleton */}
+          <div className="h-4 w-64 bg-gray-100 rounded animate-pulse mb-6" />
+          {/* Title skeleton */}
+          <div className="h-8 w-3/4 bg-gray-200 rounded animate-pulse mb-3" />
+          <div className="flex gap-2 mb-6">
+            <div className="h-6 w-20 bg-green-100 rounded-full animate-pulse" />
+            <div className="h-6 w-24 bg-blue-100 rounded-full animate-pulse" />
+            <div className="h-6 w-16 bg-gray-100 rounded-full animate-pulse" />
+          </div>
+          {/* Question skeleton */}
+          <div className="h-5 w-24 bg-gray-200 rounded animate-pulse mb-3" />
+          <div className="bg-white border border-gray-200 rounded-lg p-5">
+            <div className="h-4 w-full bg-gray-100 rounded animate-pulse mb-2" />
+            <div className="h-4 w-5/6 bg-gray-100 rounded animate-pulse mb-2" />
+            <div className="h-4 w-2/3 bg-gray-100 rounded animate-pulse" />
+          </div>
+          {/* Answer skeleton */}
+          <div className="h-5 w-20 bg-gray-200 rounded animate-pulse mt-8 mb-3" />
+          <div className="space-y-2">
+            <div className="h-4 w-full bg-gray-100 rounded animate-pulse" />
+            <div className="h-4 w-full bg-gray-100 rounded animate-pulse" />
+            <div className="h-4 w-4/5 bg-gray-100 rounded animate-pulse" />
+            <div className="h-4 w-full bg-gray-100 rounded animate-pulse" />
+            <div className="h-4 w-3/4 bg-gray-100 rounded animate-pulse" />
+          </div>
         </div>
       </main>
     )
@@ -299,6 +338,23 @@ export default function FatwaDetailPage() {
         />
 
         <div className="max-w-7xl mx-auto px-4 py-6">
+          {/* Back to Results / Search link */}
+          <div className="mb-2">
+            <button
+              onClick={() => {
+                if (location.state?.fromSearch) {
+                  navigate(-1)
+                } else {
+                  navigate('/fatwas/search')
+                }
+              }}
+              className="inline-flex items-center gap-1.5 text-sm text-green-700 hover:text-green-800 font-medium transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:rounded-sm"
+            >
+              <ArrowLeft size={16} aria-hidden="true" />
+              {location.state?.fromSearch ? 'Back to Results' : 'Back to Search'}
+            </button>
+          </div>
+
           {/* Breadcrumb */}
           <BreadcrumbNav items={breadcrumbItems} />
 
