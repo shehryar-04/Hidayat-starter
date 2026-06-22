@@ -107,18 +107,21 @@ async function generatePurePdf(data, fileName) {
   // ═══ Header ═══
   let y = 30
 
+  // Load and add the Hidayat logo
+  try {
+    const logoImg = await loadImage('/assets/LOGO_HIDAYAT.png')
+    pdf.addImage(logoImg, 'PNG', cx - 7, y - 8, 14, 14)
+    y += 10
+  } catch {
+    // Logo load failed — continue without it
+    y += 2
+  }
+
   // "HIDAYAT ACADEMY"
   pdf.setFont('helvetica', 'bold')
   pdf.setFontSize(18)
   pdf.setTextColor(...EMERALD)
   pdf.text('HIDAYAT ACADEMY', cx, y, { align: 'center' })
-  y += 6
-
-  // "ISLAMIC SEMINARY · DARUL ULOOM"
-  pdf.setFont('helvetica', 'normal')
-  pdf.setFontSize(8)
-  pdf.setTextColor(...GOLD)
-  pdf.text('ISLAMIC SEMINARY  \u00B7  DARUL ULOOM', cx, y, { align: 'center' })
   y += 14
 
   // ═══ Title ═══
@@ -226,11 +229,11 @@ async function generatePurePdf(data, fileName) {
   // ═══ Bottom: Verification + Certificate Number ═══
   const bottomY = H - 18
 
-  // QR code (loaded as image)
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=0&data=${encodeURIComponent(data.verifyUrl)}`
+  // QR code (loaded as image) — large and prominent
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=0&data=${encodeURIComponent(data.verifyUrl)}`
   try {
     const qrImg = await loadImage(qrUrl)
-    pdf.addImage(qrImg, 'PNG', 18, bottomY - 12, 14, 14)
+    pdf.addImage(qrImg, 'PNG', 16, bottomY - 16, 22, 22)
   } catch {
     // QR load failed — skip silently
   }
@@ -238,15 +241,15 @@ async function generatePurePdf(data, fileName) {
   pdf.setFont('helvetica', 'normal')
   pdf.setFontSize(6)
   pdf.setTextColor(...GRAY)
-  pdf.text('VERIFY AT', 34, bottomY - 8)
+  pdf.text('VERIFY AT', 40, bottomY - 10)
   pdf.setFont('helvetica', 'bold')
   pdf.setFontSize(7)
   pdf.setTextColor(...EMERALD)
-  pdf.text('hidayat.pk/certificate', 34, bottomY - 4)
+  pdf.text('hidayat.pk/certificate', 40, bottomY - 5)
   pdf.setFont('courier', 'normal')
   pdf.setFontSize(7)
   pdf.setTextColor(...GRAY)
-  pdf.text(data.verificationCode || '', 34, bottomY)
+  pdf.text(data.verificationCode || '', 40, bottomY)
 
   // Certificate number (bottom right)
   pdf.setFont('helvetica', 'normal')
