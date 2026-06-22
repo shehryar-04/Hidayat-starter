@@ -179,7 +179,7 @@ const CertificateTemplate = forwardRef(function CertificateTemplate(
         <Divider color={GOLD} />
 
         {/* Presented to */}
-        <div style={{ fontSize: 14, color: '#6b6b5e', letterSpacing: 1, marginTop: 4 }}>
+        <div style={{ fontSize: 14, color: '#6b6b5e', wordSpacing: '4px', whiteSpace: 'pre-wrap', marginTop: 4 }}>
           This certificate is proudly presented to
         </div>
 
@@ -192,6 +192,8 @@ const CertificateTemplate = forwardRef(function CertificateTemplate(
             color: EMERALD,
             margin: '10px 0 6px',
             lineHeight: 1.1,
+            wordSpacing: '6px',
+            whiteSpace: 'pre-wrap',
           }}
         >
           {studentName}
@@ -208,7 +210,7 @@ const CertificateTemplate = forwardRef(function CertificateTemplate(
         />
 
         {/* Course statement */}
-        <div style={{ fontSize: 15, color: '#5a5a4f', maxWidth: 720, lineHeight: 1.6 }}>
+        <div style={{ fontSize: 15, color: '#5a5a4f', maxWidth: 720, lineHeight: 1.6, wordSpacing: '4px', whiteSpace: 'pre-wrap' }}>
           for successfully completing all requirements of the course
         </div>
         <div
@@ -219,6 +221,8 @@ const CertificateTemplate = forwardRef(function CertificateTemplate(
             marginTop: 10,
             maxWidth: 760,
             lineHeight: 1.3,
+            wordSpacing: '4px',
+            whiteSpace: 'pre-wrap',
           }}
         >
           {courseTitle}
@@ -328,7 +332,7 @@ function Divider({ color }) {
 function FooterBlock({ label, value, color, gold, align = 'left' }) {
   return (
     <div style={{ minWidth: 180, textAlign: align }}>
-      <div style={{ fontSize: 16, fontWeight: 700, color, fontStyle: 'italic' }}>
+      <div style={{ fontSize: 16, fontWeight: 700, color, fontStyle: 'italic', wordSpacing: '3px', whiteSpace: 'pre-wrap' }}>
         {value || '—'}
       </div>
       <div

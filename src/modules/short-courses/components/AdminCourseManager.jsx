@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
-import { ArrowLeft, Users, FileText, Megaphone, BarChart3, PlusCircle, BookOpen } from 'lucide-react'
+import { ArrowLeft, Users, FileText, Megaphone, BarChart3, PlusCircle, BookOpen, MessageSquare } from 'lucide-react'
 import { Button, cn } from '../../../shared/ui'
 import { EnrollmentView } from '../EnrollmentView'
 import { QuizBuilder } from './QuizBuilder'
 import { QuizTaker } from './QuizTaker'
 import { CourseAnnouncements } from './CourseAnnouncements'
 import { LectureResources } from './LectureResources'
+import { CourseResources } from './CourseResources'
+import { CourseDiscussion } from './CourseDiscussion'
 import { TeacherAnalytics } from './TeacherAnalytics'
 import { getCourseQuizzes } from '../services/quizService'
 import { supabase } from '../../../lib/supabase'
@@ -48,6 +50,7 @@ export function AdminCourseManager({ course, userId, onBack, onEditCourse }) {
     { key: 'enrollments', label: 'Enrollments', icon: Users },
     { key: 'quizzes', label: 'Quizzes', icon: FileText },
     { key: 'announcements', label: 'Announcements', icon: Megaphone },
+    { key: 'discussion', label: 'Discussion', icon: MessageSquare },
     { key: 'resources', label: 'Resources', icon: BookOpen },
     { key: 'analytics', label: 'Analytics', icon: BarChart3 },
   ]
@@ -152,10 +155,37 @@ export function AdminCourseManager({ course, userId, onBack, onEditCourse }) {
           <CourseAnnouncements courseId={course.id} isTeacher={true} userId={userId} />
         )}
 
-        {tab === 'resources' && (
+        {tab === 'discussion' && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-gray-800">Lecture Resources</h2>
-            <p className="text-sm text-gray-500">Select a lecture to manage its resources (PDFs, links, files).</p>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-800">Course Discussion</h2>
+              <p className="text-sm text-gray-500">
+                Join the conversation or moderate posts. You can remove any post as a moderator.
+              </p>
+            </div>
+            <CourseDiscussion courseId={course.id} userId={userId} isModerator={true} />
+          </div>
+        )}
+
+        {tab === 'resources' && (
+          <div className="space-y-8">
+            {/* Course-wide resources */}
+            <div className="space-y-4">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-800">Course Resources</h2>
+                <p className="text-sm text-gray-500">
+                  Files or links shared with the whole course. Students see these in the course&apos;s <strong>Resources</strong> tab.
+                </p>
+              </div>
+              <CourseResources courseId={course.id} isTeacher={true} userId={userId} />
+            </div>
+
+            {/* Per-lecture resources */}
+            <div className="space-y-4 pt-4 border-t border-gray-100">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-800">Lecture Resources</h2>
+                <p className="text-sm text-gray-500">Attach resources (PDFs, links, files) to a specific lecture.</p>
+              </div>
 
             {lectures.length === 0 ? (
               <p className="text-sm text-gray-400">No lectures in this course yet. Add lectures in the course editor first.</p>
@@ -193,6 +223,7 @@ export function AdminCourseManager({ course, userId, onBack, onEditCourse }) {
                 </div>
               </div>
             )}
+            </div>
           </div>
         )}
 

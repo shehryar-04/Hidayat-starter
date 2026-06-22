@@ -5,7 +5,10 @@ import { useRole } from '../../app/RoleProvider'
 import { Button, Input, Label, Spinner } from '../../shared/ui'
 import { getCourseQuizzes, getStudentAttempts } from './services/quizService'
 import { QuizTaker } from './components/QuizTaker'
-import { FileText, CheckCircle, XCircle, PlayCircle, Download } from 'lucide-react'
+import { CourseAnnouncements } from './components/CourseAnnouncements'
+import { CourseResources } from './components/CourseResources'
+import { CourseDiscussion } from './components/CourseDiscussion'
+import { FileText, CheckCircle, XCircle, PlayCircle, Download, Megaphone, FolderOpen, MessageSquare } from 'lucide-react'
 
 function getYouTubeId(url) {
   if (!url) return null
@@ -869,6 +872,11 @@ export function StudentCourseView({ course, onBack }) {
             </div>
           )}
 
+          {/* ── Announcements & Resources (enrolled students) ── */}
+          {enrolled && (
+            <CourseInfoTabs courseId={course.id} userId={userId} />
+          )}
+
           {/* ── Course Quizzes (enrolled students only) ── */}
           {enrolled && <StudentQuizSection courseId={course.id} studentId={studentId} />}
         </div>
@@ -980,6 +988,53 @@ export function StudentCourseView({ course, onBack }) {
             )}
           </div>
         </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Course Info Tabs (Announcements + Resources) ────────────
+// Shown to enrolled students inside the course view.
+function CourseInfoTabs({ courseId, userId }) {
+  const [tab, setTab] = useState('announcements')
+
+  const tabs = [
+    { key: 'announcements', label: 'Announcements', icon: Megaphone },
+    { key: 'discussion', label: 'Discussion', icon: MessageSquare },
+    { key: 'resources', label: 'Resources', icon: FolderOpen },
+  ]
+
+  return (
+    <div className="bg-white rounded-xl border border-neutral-200 overflow-hidden">
+      {/* Tab bar */}
+      <div className="flex border-b border-gray-100">
+        {tabs.map(({ key, label, icon: Icon }) => (
+          <button
+            key={key}
+            onClick={() => setTab(key)}
+            className={`flex items-center gap-1.5 px-5 py-3 text-sm font-medium transition-colors border-b-2 -mb-px ${
+              tab === key
+                ? 'text-primary-600 border-primary-500'
+                : 'text-gray-500 hover:text-gray-700 border-transparent'
+            }`}
+          >
+            <Icon className="w-4 h-4" />
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab content */}
+      <div className="p-5">
+        {tab === 'announcements' && (
+          <CourseAnnouncements courseId={courseId} isTeacher={false} userId={userId} />
+        )}
+        {tab === 'discussion' && (
+          <CourseDiscussion courseId={courseId} userId={userId} isModerator={false} />
+        )}
+        {tab === 'resources' && (
+          <CourseResources courseId={courseId} isTeacher={false} userId={userId} />
+        )}
       </div>
     </div>
   )
