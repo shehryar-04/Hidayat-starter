@@ -52,14 +52,26 @@ export default function CertificatePage() {
   }, [cert])
 
   const handleDownload = useCallback(async () => {
-    if (!certRef.current || downloading) return
+    if (!cert || downloading) return
     setDownloading(true)
     try {
-      const safeName = (cert?.student_name || 'certificate')
+      const safeName = (cert.student_name || 'certificate')
         .replace(/[^\w\s-]/g, '')
         .trim()
         .replace(/\s+/g, '_')
-      await downloadCertificatePdf(certRef.current, `Hidayat_Certificate_${safeName}`)
+
+      const verifyUrl = `${window.location.origin}/certificate/verify/${cert.verification_code}`
+
+      // Use the pure jsPDF approach (no html2canvas) for proper word spacing
+      await downloadCertificatePdf(null, `Hidayat_Certificate_${safeName}`, {
+        studentName: cert.student_name,
+        courseTitle: cert.course_title,
+        instructorName: cert.instructor_name,
+        certificateNumber: cert.certificate_number,
+        verificationCode: cert.verification_code,
+        issuedAt: cert.issued_at,
+        verifyUrl,
+      })
     } catch (err) {
       console.error('PDF export failed:', err)
       alert('Sorry, the certificate could not be downloaded. Please try again.')
