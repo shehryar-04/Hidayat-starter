@@ -70,8 +70,30 @@ export async function getStudentCertificates(studentId) {
 
 /**
  * Verify a certificate by its verification code (public).
+ * Uses the secure HMAC-based verification RPC when available,
+ * falls back to the legacy RPC otherwise.
  */
 export async function verifyCertificate(verificationCode) {
+  // Try the hardened HMAC-based verification first
+  const { data: secureData, error: secureErr } = await supabase.rpc('verify_certificate_secure', {
+    p_code: verificationCode,
+  })
+
+  if (!secureErr && secureData && secureData.length > 0) {
+    const cert = secureData[0]
+    return {
+      valid: cert.valid,
+      certificate_number: cert.certificate_number,
+      student_name: cert.student_name,
+      course_title: cert.course_title,
+      instructor_name: cert.instructor_name,
+      issued_at: cert.issued_at,
+      is_active: cert.is_active,
+      signature_valid: cert.signature_valid,
+    }
+  }
+
+  // Fallback to legacy verification
   const { data } = await supabase.rpc('verify_certificate', {
     p_code: verificationCode,
   })

@@ -96,6 +96,13 @@ export default function CertificateVerifyPage() {
             })} />
             <Detail label="Status" value={result.is_active ? '✓ Active' : '✗ Revoked'}
               valueClass={result.is_active ? 'text-green-600 font-bold' : 'text-red-600 font-bold'} />
+            {result.signature_valid !== null && result.signature_valid !== undefined && (
+              <Detail
+                label="Digital Signature"
+                value={result.signature_valid ? '✓ Cryptographically Verified' : '⚠ Signature Mismatch'}
+                valueClass={result.signature_valid ? 'text-green-600 font-bold' : 'text-orange-600 font-bold'}
+              />
+            )}
           </div>
         </div>
 

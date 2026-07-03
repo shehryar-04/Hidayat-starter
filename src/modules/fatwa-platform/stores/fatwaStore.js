@@ -372,13 +372,23 @@ export const useFatwaStore = create((set, get) => ({
     // Convert slug back to search text (replace hyphens with spaces)
     const searchText = slug.replace(/-/g, ' ').trim()
 
-    // Escape Postgres LIKE wildcards to prevent injection
-    const escapeLike = (str) => str.replace(/%/g, '\\%').replace(/_/g, '\\_')
+    // Sanitize before interpolating into a PostgREST `.or()` filter string.
+    // 1) Strip characters with structural meaning in or() filters — commas
+    //    separate conditions, parentheses group them, and quotes/backslashes
+    //    can break out of the value — preventing filter injection (V-2).
+    // 2) Escape SQL LIKE wildcards so they match literally.
+    const sanitizeForOrFilter = (str) =>
+      str
+        .replace(/[,()"\\*]/g, ' ')
+        .replace(/%/g, '\\%')
+        .replace(/_/g, '\\_')
+        .replace(/\s+/g, ' ')
+        .trim()
 
     set({ loading: true })
 
     try {
-      const escaped = escapeLike(searchText.slice(0, 50))
+      const escaped = sanitizeForOrFilter(searchText.slice(0, 50))
       // Search by title using ilike (case-insensitive pattern match)
       let { data, error } = await supabase
         .from('fatwas')
@@ -388,7 +398,7 @@ export const useFatwaStore = create((set, get) => ({
 
       if (error || !data || data.length === 0) {
         // Fallback: try with first few words only
-        const shortEscaped = escapeLike(searchText.split(' ').slice(0, 5).join(' '))
+        const shortEscaped = sanitizeForOrFilter(searchText.split(' ').slice(0, 5).join(' '))
         const fallback = await supabase
           .from('fatwas')
           .select('id, title, question, answer, fatwa_ref, dar_ul_ifta, category_1, category_2, category_3, created_at')

@@ -8,6 +8,11 @@ const LegacySearchPage = lazy(() => import('./pages/SearchPage'))
 const AllCategoriesPage = lazy(() => import('./pages/AllCategoriesPage'))
 const CategoryPage = lazy(() => import('./pages/CategoryPage'))
 const FatwaDetailPage = lazy(() => import('./pages/FatwaDetailPage'))
+const BookmarksPage = lazy(() => import('./pages/BookmarksPage'))
+const SavedSearches = lazy(() => import('./pages/SavedSearches'))
+const ModerationQueue = lazy(() => import('./pages/ModerationQueue'))
+const SearchAnalytics = lazy(() => import('./pages/SearchAnalytics'))
+const BulkImport = lazy(() => import('./pages/BulkImport'))
 
 // Loading fallback shown while lazy chunks load — skeleton instead of blank
 function PageLoader() {
@@ -37,6 +42,11 @@ function PageLoader() {
  * Route structure:
  *   /fatwas              → PlatformHomePage
  *   /fatwas/search       → SearchPage
+ *   /fatwas/bookmarks    → BookmarksPage (requires auth)
+ *   /fatwas/alerts       → SavedSearches (requires auth)
+ *   /fatwas/moderation   → ModerationQueue (admin/mufti)
+ *   /fatwas/analytics    → SearchAnalytics (admin)
+ *   /fatwas/import       → BulkImport (admin)
  *   /fatwas/category/:cat1            → CategoryPage (level 1)
  *   /fatwas/category/:cat1/:cat2      → CategoryPage (level 2)
  *   /fatwas/category/:cat1/:cat2/:cat3 → CategoryPage (level 3)
@@ -50,6 +60,11 @@ export default function FatwaPlatformModule() {
           <Route index element={<PlatformHomePage />} />
           <Route path="search" element={<SearchPage />} />
           <Route path="search/legacy" element={<LegacySearchPage />} />
+          <Route path="bookmarks" element={<BookmarksPage />} />
+          <Route path="alerts" element={<SavedSearches />} />
+          <Route path="moderation" element={<ModerationQueue />} />
+          <Route path="analytics" element={<SearchAnalytics />} />
+          <Route path="import" element={<BulkImport />} />
           <Route path="categories" element={<AllCategoriesPage />} />
           <Route path="category/:cat1" element={<CategoryPage />} />
           <Route path="category/:cat1/:cat2" element={<CategoryPage />} />
