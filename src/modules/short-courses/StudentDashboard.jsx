@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { BookOpen, Award, Clock, PlayCircle, GraduationCap, Download } from 'lucide-react'
+import { BookOpen, Award, Clock, PlayCircle, GraduationCap, Download, Play } from 'lucide-react'
 import { useRole } from '../../app/RoleProvider'
 import { supabase } from '../../lib/supabase'
 import { getStudentDashboardData, getRecentActivity } from './services/progressService'
 import { CourseProgressBar } from './components/CourseProgressBar'
-import { Button, Spinner, EmptyState, Badge } from '../../shared/ui'
+import { Button, Spinner, EmptyState, Badge, DashboardSkeleton } from '../../shared/ui'
 
 /**
  * StudentDashboard — Dedicated LMS dashboard for students.
@@ -23,6 +23,7 @@ export function StudentDashboard({ onSelectCourse }) {
   const [dashData, setDashData] = useState({ active: [], completed: [] })
   const [activity, setActivity] = useState([])
   const [certificates, setCertificates] = useState([])
+  const [continueData, setContinueData] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -57,6 +58,31 @@ export function StudentDashboard({ onSelectCourse }) {
       setDashData(dash)
       setActivity(activityData)
       setCertificates(certData.data || [])
+
+      // Load "continue where you left off" — most recent partially-watched lecture
+      const { data: lastWatched } = await supabase
+        .from('course_progress')
+        .select(`
+          lecture_id, watch_percent, course_id, completed_at,
+          course_lectures:lecture_id (id, title, section_id, video_url),
+          short_courses:course_id (id, title, thumbnail_url)
+        `)
+        .eq('student_id', student.id)
+        .is('completed_at', null)
+        .gt('watch_percent', 0)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (lastWatched && lastWatched.course_lectures && lastWatched.short_courses) {
+        setContinueData({
+          lectureTitle: lastWatched.course_lectures.title,
+          courseTitle: lastWatched.short_courses.title,
+          courseId: lastWatched.course_id,
+          watchPercent: lastWatched.watch_percent,
+          course: lastWatched.short_courses,
+        })
+      }
     } catch (err) {
       console.error('Dashboard load error:', err)
     } finally {
@@ -65,11 +91,7 @@ export function StudentDashboard({ onSelectCourse }) {
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-24">
-        <Spinner size="lg" />
-      </div>
-    )
+    return <DashboardSkeleton />
   }
 
   const totalCourses = dashData.active.length + dashData.completed.length
@@ -89,6 +111,35 @@ export function StudentDashboard({ onSelectCourse }) {
         <StatCard icon={GraduationCap} label="Certificates" value={certificates.length} color="blue" />
         <StatCard icon={Clock} label="Total Courses" value={totalCourses} color="purple" />
       </div>
+
+      {/* Continue Where You Left Off — single most-recent lecture */}
+      {continueData && (
+        <section className="mb-8">
+          <div
+            onClick={() => onSelectCourse(continueData.course)}
+            className="bg-gradient-to-r from-primary-50 to-blue-50 rounded-xl border border-primary-200 p-5 cursor-pointer hover:shadow-md transition-all group"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-xl bg-primary flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
+                <Play className="w-6 h-6 text-white ml-0.5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold text-primary-600 uppercase tracking-wide mb-0.5">Continue where you left off</p>
+                <p className="text-base font-semibold text-gray-800 truncate">{continueData.lectureTitle}</p>
+                <p className="text-xs text-gray-500">{continueData.courseTitle}</p>
+              </div>
+              <div className="text-right flex-shrink-0">
+                <div className="text-lg font-bold text-primary-600">{continueData.watchPercent}%</div>
+                <p className="text-[10px] text-gray-400">watched</p>
+              </div>
+            </div>
+            {/* Mini progress bar */}
+            <div className="mt-3 h-1.5 bg-white rounded-full overflow-hidden">
+              <div className="h-full bg-primary-500 rounded-full transition-all" style={{ width: `${continueData.watchPercent}%` }} />
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Continue Learning */}
       {dashData.active.length > 0 && (

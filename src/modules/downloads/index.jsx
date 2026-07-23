@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useRole } from '../../app/RoleProvider'
 import { Search, Plus, Download, FileText, Trash2, ArrowLeft } from 'lucide-react'
-import { Button, Input, Textarea, Label, EmptyState, Spinner } from '../../shared/ui'
+import { Button, Input, Textarea, Label, EmptyState, Spinner, ListSkeleton } from '../../shared/ui'
 
 export default function DownloadsPage() {
   const { role } = useRole()
@@ -102,7 +102,7 @@ export default function DownloadsPage() {
       {/* Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
         {loading ? (
-          <div className="flex items-center justify-center py-24"><Spinner size="lg" /></div>
+          <ListSkeleton count={5} />
         ) : filtered.length === 0 ? (
           <EmptyState
             icon={Download}

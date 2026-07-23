@@ -4,7 +4,9 @@ import LoginPage from './LoginPage'
 import ProtectedRoute from './ProtectedRoute'
 import FeatureFlagGuard from './FeatureFlagGuard'
 import HomePage from './HomePage'
+import Dashboard from './Dashboard'
 import PublicTopNav from './PublicTopNav'
+import { useRole } from './RoleProvider'
 
 // Module imports
 import DarsENizamiModule from '../modules/dars-e-nizami'
@@ -24,6 +26,8 @@ import ScholarAdminModule from '../modules/scholar-admin'
 import ArticlesPage from '../modules/articles'
 import DownloadsPage from '../modules/downloads'
 import FatwaPlatformModule from '../modules/fatwa-platform'
+import AdminDashboard from '../modules/admin-dashboard'
+import AuditLogViewer from '../modules/admin-dashboard/AuditLogViewer'
 
 /**
  * Shell wrapper — single navbar for all pages (guest + authenticated).
@@ -40,19 +44,34 @@ function AppShell({ children }) {
   )
 }
 
+/**
+ * SmartHome — Shows the public landing page (HomePage) for guests,
+ * and the module hub (Dashboard) for authenticated users.
+ */
+function SmartHome() {
+  const { role } = useRole()
+
+  if (role) {
+    return <AppShell><Dashboard /></AppShell>
+  }
+  return <HomePage />
+}
+
 export default function AppRouter() {
   return (
     <Routes>
-      {/* Home page — always the public landing page */}
-      <Route path="/" element={<HomePage />} />
+      {/* Home page — public landing for guests, module hub for authenticated */}
+      <Route path="/" element={<SmartHome />} />
       <Route path="/login" element={<LoginPage />} />
 
       {/* Under construction modules — no auth required, no flag guard */}
-      <Route path="/dars-e-nizami/*" element={<AppShell><DarsENizamiModule /></AppShell>} />
-      <Route path="/hifz/*" element={<AppShell><HifzModule /></AppShell>} />
-      <Route path="/nazra/*" element={<AppShell><NazraModule /></AppShell>} />
+      <Route path="/dars-e-nizami/*" element={<AppShell><FeatureFlagGuard flagKey="dars_e_nizami"><DarsENizamiModule /></FeatureFlagGuard></AppShell>} />
+      <Route path="/hifz/*" element={<AppShell><FeatureFlagGuard flagKey="hifz"><HifzModule /></FeatureFlagGuard></AppShell>} />
+      <Route path="/nazra/*" element={<AppShell><FeatureFlagGuard flagKey="nazra"><NazraModule /></FeatureFlagGuard></AppShell>} />
 
       {/* Protected module routes */}
+      <Route path="/admin-dashboard" element={<ProtectedRoute><AppShell><AdminDashboard /></AppShell></ProtectedRoute>} />
+      <Route path="/admin-dashboard/audit-log" element={<ProtectedRoute><AppShell><AuditLogViewer /></AppShell></ProtectedRoute>} />
       <Route path="/short-courses/*" element={<ProtectedRoute><AppShell><FeatureFlagGuard flagKey="short_courses"><ShortCoursesModule /></FeatureFlagGuard></AppShell></ProtectedRoute>} />
       <Route path="/wazifa/*" element={<ProtectedRoute><AppShell><FeatureFlagGuard flagKey="wazifa"><WazifaModule /></FeatureFlagGuard></AppShell></ProtectedRoute>} />
       <Route path="/reports/*" element={<ProtectedRoute><AppShell><FeatureFlagGuard flagKey="student_reports"><StudentReportsModule /></FeatureFlagGuard></AppShell></ProtectedRoute>} />

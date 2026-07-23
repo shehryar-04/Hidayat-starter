@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useRole } from '../../app/RoleProvider'
 import { GraduationCap, Search, Signal, Landmark } from 'lucide-react'
-import { Button, Input, Badge, EmptyState, Spinner } from '../../shared/ui'
+import { Button, Input, Badge, EmptyState, Spinner, CourseGridSkeleton } from '../../shared/ui'
 
 export function StudentCourseList({ onSelectCourse }) {
   const { userId } = useRole()
@@ -59,7 +59,11 @@ export function StudentCourseList({ onSelectCourse }) {
     return true
   })
 
-  if (loading) return <div className="flex items-center justify-center py-24"><Spinner size="lg" /></div>
+  if (loading) return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-8 py-12">
+      <CourseGridSkeleton count={6} />
+    </div>
+  )
 
   return (
     <div className="bg-background min-h-screen">

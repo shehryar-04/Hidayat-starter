@@ -19,6 +19,7 @@ import { useFeatureFlags } from './FeatureFlagProvider'
 import { useProfile } from './useProfile'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, Skeleton, EmptyState, Button, cn } from '../shared/ui'
+import { OnboardingTour } from '../shared/OnboardingTour'
 
 const moduleCards = [
   { to: '/student-admin',   label: 'Student Administration', icon: Users,         desc: 'Manage student profiles, enrollment, status changes, and documents.', roles: ['admin'],                              flag: null },
@@ -92,7 +93,7 @@ function SkeletonCard() {
 }
 
 export default function Dashboard() {
-  const { role } = useRole()
+  const { role, userId } = useRole()
   const { flags, loading: flagsLoading } = useFeatureFlags()
   const { profile } = useProfile()
   const navigate = useNavigate()
@@ -231,6 +232,9 @@ export default function Dashboard() {
           })}
         </motion.div>
       )}
+
+      {/* Onboarding tour — shown once per user */}
+      <OnboardingTour role={role} userId={userId} />
     </div>
   )
 }

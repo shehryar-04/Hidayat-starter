@@ -11,6 +11,7 @@ import { cn } from '../shared/ui'
 
 const allNavItems = [
   { to: '/',                label: 'Home',            exact: true,  roles: ['admin','scholar','mufti','student'] },
+  { to: '/admin-dashboard', label: 'Dashboard',                     roles: ['admin'] },
   { to: '/student-admin',   label: 'Students',                      roles: ['admin'] },
   { to: '/scholar-admin',   label: 'Scholars',                      roles: ['admin'] },
   { to: '/dars-e-nizami',   label: 'Dars-e-Nizami',  flag: 'dars_e_nizami', roles: ['admin','scholar'] },

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { BookOpen, Building2, Search } from 'lucide-react'
+import { BookOpen, Building2, Search, Heart } from 'lucide-react'
 import SEOHead from '../components/SEOHead'
 import PlatformStats from '../components/PlatformStats'
 import { useFatwaStore } from '../stores/fatwaStore'
@@ -83,6 +83,15 @@ export default function PlatformHomePage() {
                 aria-label="Search fatwas"
               />
             </form>
+            {/* Quick links */}
+            <div className="flex items-center justify-center gap-4 mt-4">
+              <Link
+                to={`${basePath}/saved`}
+                className="inline-flex items-center gap-1.5 text-sm text-white/80 hover:text-white transition-colors"
+              >
+                <Heart size={14} /> Saved Fatwas
+              </Link>
+            </div>
           </div>
         </section>
 
@@ -256,49 +265,6 @@ export default function PlatformHomePage() {
         viewport={{ once: true, margin: '-50px' }}
         aria-labelledby="institutions-heading"
       >
-        <h2 id="institutions-heading" className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-          <Building2 className="text-green-600" size={24} aria-hidden="true" />
-          Trusted Institutions
-        </h2>
-        {institutionList.length > 0 ? (
-          <div className="flex flex-wrap gap-3">
-            {institutionList.map((institution) => {
-              const isRtl = detectDirection(institution) === 'rtl'
-              return (
-                <span
-                  key={institution}
-                  className={`inline-block bg-white rounded-full shadow-sm px-4 py-2 text-sm font-medium text-gray-700 border border-gray-200 ${isRtl ? 'font-urdu' : ''}`}
-                  dir={isRtl ? 'rtl' : undefined}
-                >
-                  {institution}
-                </span>
-              )
-            })}
-          </div>
-        ) : (
-          !loading && (
-            <p className="text-gray-600 text-sm">No institutions listed yet.</p>
-          )
-        )}
-      </motion.section>
-
-      {/* Platform Statistics Section */}
-      <motion.section
-        className="max-w-6xl mx-auto px-4 py-10"
-        variants={sectionVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-50px' }}
-        aria-labelledby="stats-heading"
-      >
-        <h2 id="stats-heading" className="text-2xl font-bold text-gray-800 mb-6 text-center">
-          Platform at a Glance
-        </h2>
-        <PlatformStats
-          totalFatwas={totalCount}
-          totalCategories={totalCategories}
-          totalInstitutions={totalInstitutions}
-        />
       </motion.section>
     </main>
   )

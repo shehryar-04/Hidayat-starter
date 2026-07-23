@@ -8,8 +8,10 @@ import ReadingProgress from '../components/ReadingProgress'
 import ShareButtons from '../components/ShareButtons'
 import { RelatedFatwas } from '../components/RelatedFatwas'
 import { FatwaCard } from '../components/FatwaCard'
+import SaveFatwaButton from '../components/SaveFatwaButton'
 import { useFatwaStore } from '../stores/fatwaStore'
 import { useCategories, getCategoryPath } from '../hooks/useCategories'
+import { useLocalSavedFatwas } from '../hooks/useLocalSavedFatwas'
 import { calculateReadingTime } from '../utils/readingTime'
 import { detectDirection } from '../utils/rtlDetection'
 import { getRelatedFatwas } from '../utils/relatedFatwas'
@@ -94,6 +96,7 @@ export default function FatwaDetailPage() {
   const loading = useFatwaStore((state) => state.loading)
 
   const { tree } = useCategories()
+  const localSaved = useLocalSavedFatwas()
   const fetchAttempted = useRef(false)
 
   // Fetch home data (for categories tree)
@@ -367,12 +370,20 @@ export default function FatwaDetailPage() {
             >
               {/* Header */}
               <header className="mb-6">
-                <h1
-                  id="fatwa-title"
-                  className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight mb-3"
-                >
-                  {fatwa.title}
-                </h1>
+                <div className="flex items-start gap-3">
+                  <h1
+                    id="fatwa-title"
+                    className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight mb-3 flex-1"
+                  >
+                    {fatwa.title}
+                  </h1>
+                  <SaveFatwaButton
+                    isSaved={localSaved.isSaved(fatwa.id)}
+                    onToggle={() => localSaved.toggleSave(fatwa)}
+                    size="lg"
+                    className="mt-1 flex-shrink-0"
+                  />
+                </div>
                 <div className="flex flex-wrap items-center gap-3 text-sm">
                   {fatwa.category_1 && (
                     <span className="inline-block text-xs font-medium px-2.5 py-1 rounded-full bg-green-50 text-green-700">

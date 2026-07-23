@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '../../lib/supabase'
-import { Input, Spinner } from '../../shared/ui'
+import { Input, Spinner, SearchResultsSkeleton } from '../../shared/ui'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 
 const fmt = (d) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
@@ -129,8 +129,8 @@ export function PublicFatwaList({ hideHeader = false }) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-16">
-        <Spinner size="lg" />
+      <div className="max-w-[1280px] mx-auto px-4 py-6 md:px-6 md:py-8">
+        <SearchResultsSkeleton count={5} />
       </div>
     )
   }

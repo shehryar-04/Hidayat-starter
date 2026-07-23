@@ -1,5 +1,7 @@
 import { lazy, Suspense } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Link, useLocation } from 'react-router-dom'
+import { Heart } from 'lucide-react'
+import { useLocalSavedFatwas } from './hooks/useLocalSavedFatwas'
 
 // Code-split page components with React.lazy
 const PlatformHomePage = lazy(() => import('./pages/PlatformHomePage'))
@@ -9,6 +11,7 @@ const AllCategoriesPage = lazy(() => import('./pages/AllCategoriesPage'))
 const CategoryPage = lazy(() => import('./pages/CategoryPage'))
 const FatwaDetailPage = lazy(() => import('./pages/FatwaDetailPage'))
 const BookmarksPage = lazy(() => import('./pages/BookmarksPage'))
+const SavedFatwasPage = lazy(() => import('./pages/SavedFatwasPage'))
 const SavedSearches = lazy(() => import('./pages/SavedSearches'))
 const ModerationQueue = lazy(() => import('./pages/ModerationQueue'))
 const SearchAnalytics = lazy(() => import('./pages/SearchAnalytics'))
@@ -61,6 +64,7 @@ export default function FatwaPlatformModule() {
           <Route path="search" element={<SearchPage />} />
           <Route path="search/legacy" element={<LegacySearchPage />} />
           <Route path="bookmarks" element={<BookmarksPage />} />
+          <Route path="saved" element={<SavedFatwasPage />} />
           <Route path="alerts" element={<SavedSearches />} />
           <Route path="moderation" element={<ModerationQueue />} />
           <Route path="analytics" element={<SearchAnalytics />} />
@@ -73,6 +77,37 @@ export default function FatwaPlatformModule() {
           <Route path=":slug" element={<FatwaDetailPage />} />
         </Routes>
       </Suspense>
+      <FloatingSavedButton />
     </div>
+  )
+}
+
+/**
+ * Floating "Saved" pill — shows in the bottom-left corner on all fatwa pages
+ * when the user has at least one saved fatwa. Tapping it navigates to /saved.
+ * Hidden when already on the saved page.
+ */
+function FloatingSavedButton() {
+  const { count } = useLocalSavedFatwas()
+  const location = useLocation()
+
+  // Hide on the saved page itself
+  if (count === 0 || location.pathname.endsWith('/saved')) return null
+
+  // Determine the correct base path from the current URL
+  const basePath = location.pathname.startsWith('/darul-iftaa') ? '/darul-iftaa'
+    : location.pathname.startsWith('/darul-ifta') ? '/darul-ifta'
+    : '/fatwas'
+
+  return (
+    <Link
+      to={`${basePath}/saved`}
+      className="fixed bottom-6 left-6 z-50 flex items-center gap-2 bg-white border border-red-200 text-red-600 px-4 py-2.5 rounded-full shadow-lg hover:shadow-xl hover:bg-red-50 transition-all group"
+      title="View saved fatwas"
+    >
+      <Heart size={18} fill="currentColor" className="group-hover:scale-110 transition-transform" />
+      <span className="text-sm font-semibold">{count}</span>
+      <span className="text-xs text-gray-500 hidden sm:inline">Saved</span>
+    </Link>
   )
 }

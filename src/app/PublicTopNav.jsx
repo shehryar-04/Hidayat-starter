@@ -94,7 +94,7 @@ export default function PublicTopNav() {
   }
 
   // Primary links shown directly in navbar
-  const primaryLinks = [
+  const basePrimaryLinks = [
     { label: 'Home',          href: '/',              protected: false },
     { label: 'Darse Nizami',  href: '/dars-e-nizami', protected: false },
     { label: 'Hifz & Nazrah', href: '/hifz',          protected: false },
@@ -102,12 +102,30 @@ export default function PublicTopNav() {
     { label: 'Darul Ifta',    href: '/darul-ifta',    protected: false },
   ]
 
+  // Admin-only links (shown in primary nav when admin is logged in)
+  const adminLinks = role === 'admin' ? [
+    { label: 'Dashboard',     href: '/admin-dashboard',           protected: true },
+    { label: 'Students',      href: '/student-admin',             protected: true },
+  ] : []
+
+  const primaryLinks = [...basePrimaryLinks, ...adminLinks]
+
   // Secondary links grouped under "More" dropdown
-  const moreLinks = [
+  const baseMoreLinks = [
     { label: 'Research Center', href: '/research-center', protected: false },
     { label: 'Articles',        href: '/articles',        protected: false },
     { label: 'Downloads',       href: '/downloads',       protected: false },
   ]
+
+  // Admin-only "More" links
+  const adminMoreLinks = role === 'admin' ? [
+    { label: 'Scholars',        href: '/scholar-admin',             protected: true },
+    { label: 'Audit Log',       href: '/admin-dashboard/audit-log', protected: true },
+    { label: 'Moderation',      href: '/fatwas/moderation',         protected: true },
+    { label: 'Search Analytics', href: '/fatwas/analytics',         protected: true },
+  ] : []
+
+  const moreLinks = [...baseMoreLinks, ...adminMoreLinks]
 
   // All links combined (for mobile drawer)
   const navLinks = [...primaryLinks, ...moreLinks]

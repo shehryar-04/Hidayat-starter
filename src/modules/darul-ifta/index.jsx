@@ -5,11 +5,11 @@ import { FatwaList } from './FatwaList'
 import { FatwaEditor } from './FatwaEditor'
 import { QuestionSubmitForm } from './QuestionSubmitForm'
 import { WhatsAppButton } from '../../shared/WhatsAppButton'
-import { Star, PenLine, BookOpen, BadgeCheck, Search } from 'lucide-react'
-import { Card, CardContent, Tabs } from '../../shared/ui'
+import { Star, PenLine, BookOpen, BadgeCheck, Search, BarChart3, Shield, FileText } from 'lucide-react'
+import { Card, CardContent, Tabs, cn } from '../../shared/ui'
 import FatwaPlatformModule from '../fatwa-platform'
 
-// ─── Hero Section (shared by guest + scholar/student) ────────
+// ─── Hero Section (shared by all views) ──────────────────────
 function DarulIftaHero({ showSubmitBtn = false, onSubmitClick }) {
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
@@ -34,7 +34,7 @@ function DarulIftaHero({ showSubmitBtn = false, onSubmitClick }) {
             Guided by classical scholarship and contemporary precision. Our Muftis provide scholarly vetting for every inquiry, ensuring spiritual clarity for the modern era.
           </p>
 
-          {/* ─── Search Bar ─────────────────────────────────── */}
+          {/* Search Bar */}
           <form onSubmit={handleSearchSubmit} className="max-w-xl mx-auto md:mx-0 mb-8">
             <div className="relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -109,65 +109,111 @@ function ProcessSteps() {
   )
 }
 
-// ─── Admin / Mufti: full management ──────────────────────────
+// ─── Admin / Mufti: UNIFIED view (browse + manage + analytics) ──
 function AdminMuftiView() {
-  const [view, setView] = useState('list')
+  const [tab, setTab] = useState('browse')
   const [selected, setSelected] = useState(null)
-
-  const tabItems = [
-    { label: 'All Fatwas', content: <FatwaList onEdit={q => { setSelected(q); setView('edit') }} canManage /> },
-    { label: '+ New Fatwa', content: <FatwaEditor onComplete={() => setView('list')} onCancel={() => setView('list')} /> },
-  ]
-
-  return (
-    <div className="bg-neutral-50 min-h-screen">
-      <div className="bg-white border-b border-neutral-200 px-8 pt-6 pb-0">
-        <h1 className="font-display text-xl font-bold text-primary-600 mb-4">Darul Ifta — Fatwa Management</h1>
-      </div>
-      <div className="p-6">
-        {view === 'edit' && selected ? (
-          <FatwaEditor fatwa={selected}
-            onComplete={() => { setSelected(null); setView('list') }}
-            onCancel={() => { setSelected(null); setView('list') }} />
-        ) : (
-          <Tabs items={tabItems} />
-        )}
-      </div>
-    </div>
-  )
-}
-
-// ─── Public View: Hero + Process + Fatwa Platform (categories, detail pages) ──
-function PublicView({ showSubmitBtn = false, onSubmitClick }) {
+  const [showForm, setShowForm] = useState(false)
   const { pathname } = useLocation()
+  const navigate = useNavigate()
 
-  // If we're on a sub-route (category, fatwa detail, search), show only the platform
+  // If on a sub-route (category, fatwa detail, search), show the platform directly
   const isSubRoute = pathname !== '/darul-ifta' && pathname !== '/darul-ifta/'
 
   if (isSubRoute) {
     return (
       <div className="bg-background min-h-screen">
+        {/* Admin toolbar on sub-pages */}
+        <AdminToolbar currentTab={tab} onTabChange={setTab} navigate={navigate} />
         <FatwaPlatformModule />
-        {/* WhatsApp CTA */}
-        <div className="fixed bottom-6 right-6 z-50">
-          <WhatsAppButton
-            message="Assalamu Alaikum, I have a question for Darul Ifta."
-            label="Ask on WhatsApp"
-          />
-        </div>
       </div>
     )
   }
 
-  // Root /darul-ifta — show hero + process steps + fatwa platform home
+  const tabs = [
+    { key: 'browse', label: 'Browse & Search', icon: Search },
+    { key: 'manage', label: 'Manage Fatwas', icon: FileText },
+    { key: 'analytics', label: 'Analytics', icon: BarChart3 },
+    { key: 'moderation', label: 'Moderation', icon: Shield },
+  ]
+
   return (
     <div className="bg-background min-h-screen">
-      <DarulIftaHero showSubmitBtn={showSubmitBtn} onSubmitClick={onSubmitClick} />
-      <ProcessSteps />
-      <div id="library">
-        <FatwaPlatformModule />
+      {/* Hero — same as public */}
+      <DarulIftaHero showSubmitBtn onSubmitClick={() => setShowForm(true)} />
+
+      {/* Admin tab bar */}
+      <div className="sticky top-[57px] sm:top-[65px] z-40 bg-white border-b border-neutral-200 shadow-sm">
+        <div className="max-w-screen-xl mx-auto px-4 sm:px-8">
+          <div className="flex gap-1 overflow-x-auto py-1">
+            {tabs.map(({ key, label, icon: Icon }) => (
+              <button
+                key={key}
+                onClick={() => setTab(key)}
+                className={cn(
+                  'flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors',
+                  tab === key
+                    ? 'text-primary-500 font-semibold border-primary-500'
+                    : 'text-neutral-500 hover:text-neutral-800 border-transparent'
+                )}
+              >
+                <Icon className="w-4 h-4" />
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
-      {/* WhatsApp CTA */}
+
+      {/* Tab content */}
+      {tab === 'browse' && (
+        <>
+          <ProcessSteps />
+          <div id="library">
+            <FatwaPlatformModule />
+          </div>
+        </>
+      )}
+
+      {tab === 'manage' && (
+        <div className="max-w-screen-xl mx-auto px-4 sm:px-8 py-6">
+          {selected ? (
+            <FatwaEditor
+              fatwa={selected}
+              onComplete={() => { setSelected(null) }}
+              onCancel={() => { setSelected(null) }}
+            />
+          ) : (
+            <Tabs items={[
+              { label: 'All Fatwas', content: <FatwaList onEdit={q => setSelected(q)} canManage /> },
+              { label: '+ New Fatwa', content: <FatwaEditor onComplete={() => {}} onCancel={() => {}} /> },
+            ]} />
+          )}
+        </div>
+      )}
+
+      {tab === 'analytics' && (
+        <div className="max-w-screen-xl mx-auto px-4 sm:px-8 py-6">
+          <AnalyticsEmbed />
+        </div>
+      )}
+
+      {tab === 'moderation' && (
+        <div className="max-w-screen-xl mx-auto px-4 sm:px-8 py-6">
+          <ModerationEmbed />
+        </div>
+      )}
+
+      {/* Question form overlay */}
+      {showForm && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6">
+            <QuestionSubmitForm onComplete={() => setShowForm(false)} />
+          </div>
+        </div>
+      )}
+
+      {/* WhatsApp */}
       <div className="fixed bottom-6 right-6 z-50">
         <WhatsAppButton
           message="Assalamu Alaikum, I have a question for Darul Ifta."
@@ -178,7 +224,103 @@ function PublicView({ showSubmitBtn = false, onSubmitClick }) {
   )
 }
 
-// ─── Scholar / Student: browse + submit question ──────────────
+/**
+ * Compact admin toolbar shown on sub-pages (category, detail, search).
+ * Provides quick-links back to analytics/moderation without losing context.
+ */
+function AdminToolbar({ currentTab, onTabChange, navigate }) {
+  return (
+    <div className="bg-primary-50 border-b border-primary-100 px-4 py-2">
+      <div className="max-w-screen-xl mx-auto flex items-center gap-3 text-xs">
+        <span className="text-primary-600 font-medium">Admin:</span>
+        <button onClick={() => navigate('/darul-ifta')} className="text-primary-500 hover:text-primary-700 underline-offset-2 hover:underline">
+          Dashboard
+        </button>
+        <button onClick={() => navigate('/fatwas/analytics')} className="text-primary-500 hover:text-primary-700 underline-offset-2 hover:underline">
+          Analytics
+        </button>
+        <button onClick={() => navigate('/fatwas/moderation')} className="text-primary-500 hover:text-primary-700 underline-offset-2 hover:underline">
+          Moderation
+        </button>
+        <button onClick={() => navigate('/fatwas/import')} className="text-primary-500 hover:text-primary-700 underline-offset-2 hover:underline">
+          Bulk Import
+        </button>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Embed the SearchAnalytics page inline (lazy import to avoid circular deps).
+ */
+function AnalyticsEmbed() {
+  const [Component, setComponent] = useState(null)
+
+  if (!Component) {
+    import('../fatwa-platform/pages/SearchAnalytics').then(mod => {
+      setComponent(() => mod.default)
+    })
+    return <div className="py-12 text-center text-gray-400 text-sm">Loading analytics...</div>
+  }
+
+  return <Component />
+}
+
+/**
+ * Embed the ModerationQueue page inline.
+ */
+function ModerationEmbed() {
+  const [Component, setComponent] = useState(null)
+
+  if (!Component) {
+    import('../fatwa-platform/pages/ModerationQueue').then(mod => {
+      setComponent(() => mod.default)
+    })
+    return <div className="py-12 text-center text-gray-400 text-sm">Loading moderation queue...</div>
+  }
+
+  return <Component />
+}
+
+// ─── Public View: Hero + Process + Fatwa Platform ────────────
+function PublicView({ showSubmitBtn = false, onSubmitClick }) {
+  const { pathname } = useLocation()
+
+  // If on a sub-route, show only the platform
+  const isSubRoute = pathname !== '/darul-ifta' && pathname !== '/darul-ifta/'
+
+  if (isSubRoute) {
+    return (
+      <div className="bg-background min-h-screen">
+        <FatwaPlatformModule />
+        <div className="fixed bottom-6 right-6 z-50">
+          <WhatsAppButton
+            message="Assalamu Alaikum, I have a question for Darul Ifta."
+            label="Ask on WhatsApp"
+          />
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="bg-background min-h-screen">
+      <DarulIftaHero showSubmitBtn={showSubmitBtn} onSubmitClick={onSubmitClick} />
+      <ProcessSteps />
+      <div id="library">
+        <FatwaPlatformModule />
+      </div>
+      <div className="fixed bottom-6 right-6 z-50">
+        <WhatsAppButton
+          message="Assalamu Alaikum, I have a question for Darul Ifta."
+          label="Ask on WhatsApp"
+        />
+      </div>
+    </div>
+  )
+}
+
+// ─── Scholar / Student: browse + submit question ─────────────
 function ScholarStudentView() {
   const [showForm, setShowForm] = useState(false)
 

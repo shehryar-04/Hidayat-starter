@@ -5,9 +5,11 @@ import { useRole } from '../../app/RoleProvider'
 import { Button, Input, Label, Spinner } from '../../shared/ui'
 import { getCourseQuizzes, getStudentAttempts } from './services/quizService'
 import { QuizTaker } from './components/QuizTaker'
+import { QuizAttemptHistory } from './components/QuizAttemptHistory'
 import { CourseAnnouncements } from './components/CourseAnnouncements'
 import { CourseResources } from './components/CourseResources'
 import { CourseDiscussion } from './components/CourseDiscussion'
+import { LectureResources } from './components/LectureResources'
 import { FileText, CheckCircle, XCircle, PlayCircle, Download, Megaphone, FolderOpen, MessageSquare } from 'lucide-react'
 
 function getYouTubeId(url) {
@@ -796,6 +798,8 @@ export function StudentCourseView({ course, onBack }) {
                 {activeLecture.content_text && (
                   <p className="text-sm text-gray-600 mt-3 leading-relaxed">{activeLecture.content_text}</p>
                 )}
+                {/* Lecture-specific resources (downloads, links) */}
+                {enrolled && <LectureResources lectureId={activeLecture.id} isTeacher={false} />}
               </div>
             </div>
           ) : activeLecture && !canAccessLecture(activeLecture) ? (
@@ -1170,31 +1174,44 @@ function StudentQuizSection({ courseId, studentId }) {
             : null
 
           return (
-            <div key={quiz.id} className="flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:border-primary-200 transition-colors">
-              <div>
-                <p className="text-sm font-medium text-gray-800">{quiz.title}</p>
-                <p className="text-xs text-gray-400">Passing: {quiz.passing_score}%</p>
-                {bestAttempt && (
-                  <div className="flex items-center gap-1.5 mt-1">
-                    {bestAttempt.passed
-                      ? <CheckCircle className="w-3.5 h-3.5 text-green-500" />
-                      : <XCircle className="w-3.5 h-3.5 text-red-400" />
-                    }
-                    <span className={`text-xs font-medium ${bestAttempt.passed ? 'text-green-600' : 'text-red-500'}`}>
-                      Best: {bestAttempt.percentage}%
-                    </span>
-                    <span className="text-xs text-gray-400">({quizAttempts.length} attempt{quizAttempts.length !== 1 ? 's' : ''})</span>
-                  </div>
-                )}
+            <div key={quiz.id} className="border border-gray-100 rounded-lg hover:border-primary-200 transition-colors">
+              <div className="flex items-center justify-between p-3">
+                <div>
+                  <p className="text-sm font-medium text-gray-800">{quiz.title}</p>
+                  <p className="text-xs text-gray-400">Passing: {quiz.passing_score}%</p>
+                  {bestAttempt && (
+                    <div className="flex items-center gap-1.5 mt-1">
+                      {bestAttempt.passed
+                        ? <CheckCircle className="w-3.5 h-3.5 text-green-500" />
+                        : <XCircle className="w-3.5 h-3.5 text-red-400" />
+                      }
+                      <span className={`text-xs font-medium ${bestAttempt.passed ? 'text-green-600' : 'text-red-500'}`}>
+                        Best: {bestAttempt.percentage}%
+                      </span>
+                      <span className="text-xs text-gray-400">({quizAttempts.length} attempt{quizAttempts.length !== 1 ? 's' : ''})</span>
+                    </div>
+                  )}
+                </div>
+                <Button
+                  variant={bestAttempt?.passed ? 'outline' : 'primary'}
+                  size="sm"
+                  onClick={() => setActiveQuiz(quiz.id)}
+                >
+                  <PlayCircle className="w-3.5 h-3.5 mr-1.5" />
+                  {bestAttempt ? (bestAttempt.passed ? 'Retake' : 'Try Again') : 'Start Quiz'}
+                </Button>
               </div>
-              <Button
-                variant={bestAttempt?.passed ? 'outline' : 'primary'}
-                size="sm"
-                onClick={() => setActiveQuiz(quiz.id)}
-              >
-                <PlayCircle className="w-3.5 h-3.5 mr-1.5" />
-                {bestAttempt ? (bestAttempt.passed ? 'Retake' : 'Try Again') : 'Start Quiz'}
-              </Button>
+              {/* Detailed attempt history with answer breakdown */}
+              {quizAttempts.length > 0 && (
+                <div className="px-3 pb-3">
+                  <QuizAttemptHistory
+                    quizId={quiz.id}
+                    studentId={studentId}
+                    quizTitle={quiz.title}
+                    passingScore={quiz.passing_score}
+                  />
+                </div>
+              )}
             </div>
           )
         })}

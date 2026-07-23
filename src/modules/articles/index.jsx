@@ -4,7 +4,7 @@ import { useRole } from '../../app/RoleProvider'
 import ReactQuill from 'react-quill'
 import 'react-quill/dist/quill.snow.css'
 import { Search, Plus, ArrowLeft, Image, CloudUpload, FileText, Download, User } from 'lucide-react'
-import { Button, Input, Textarea, Label, EmptyState, Spinner, buttonVariants } from '../../shared/ui'
+import { Button, Input, Textarea, Label, EmptyState, Spinner, buttonVariants, CourseGridSkeleton } from '../../shared/ui'
 
 export default function ArticlesPage() {
   const { role } = useRole()
@@ -102,7 +102,7 @@ export default function ArticlesPage() {
       {/* Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
         {loading ? (
-          <div className="flex items-center justify-center py-24"><Spinner size="lg" /></div>
+          <CourseGridSkeleton count={6} />
         ) : filtered.length === 0 ? (
           <EmptyState
             icon={FileText}
