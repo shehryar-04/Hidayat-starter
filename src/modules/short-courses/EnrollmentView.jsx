@@ -22,6 +22,7 @@ export function EnrollmentView({ course, onBack }) {
   const [enrollments, setEnrollments] = useState([])
   const [students, setStudents] = useState([])
   const [invoices, setInvoices] = useState({}) // keyed by enrollment_id
+  const [certificates, setCertificates] = useState({}) // keyed by student_id
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [msg, setMsg] = useState(null)
@@ -41,7 +42,7 @@ export function EnrollmentView({ course, onBack }) {
   const loadAll = async () => {
     setLoading(true)
     try {
-      const [{ data: eData }, { data: sData }, { data: invData }] = await Promise.all([
+      const [{ data: eData }, { data: sData }, { data: invData }, { data: certData }] = await Promise.all([
         supabase.from('short_course_enrollments')
           .select(`id, enrolled_at, payment_ref, status, completed_at,
                    students:student_id(id, enrollment_number, profiles:profile_id(full_name))`)
@@ -55,6 +56,10 @@ export function EnrollmentView({ course, onBack }) {
           .select('*')
           .eq('course_id', course.id)
           .order('submitted_at', { ascending: false }),
+        supabase.from('certificates')
+          .select('id, student_id, certificate_number, verification_code, student_name, issued_at, is_active')
+          .eq('course_id', course.id)
+          .order('issued_at', { ascending: false }),
       ])
       setEnrollments(eData || [])
       setStudents(sData || [])
@@ -67,6 +72,15 @@ export function EnrollmentView({ course, onBack }) {
         }
       }
       setInvoices(invMap)
+
+      // Index certificates by student_id
+      const certMap = {}
+      for (const cert of (certData || [])) {
+        if (!certMap[cert.student_id]) {
+          certMap[cert.student_id] = cert
+        }
+      }
+      setCertificates(certMap)
     } catch (err) { setError(err.message) }
     finally { setLoading(false) }
   }
@@ -246,8 +260,9 @@ export function EnrollmentView({ course, onBack }) {
                 <TableHead>Enrolled</TableHead>
                 <TableHead>Payment</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Certificate</TableHead>
                 <TableHead>Completed</TableHead>
-                <TableHead></TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -277,6 +292,30 @@ export function EnrollmentView({ course, onBack }) {
                       <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${STATUS_STYLES[e.status] || 'bg-gray-100 text-gray-600'}`}>
                         {e.status}
                       </span>
+                    </TableCell>
+                    <TableCell className="text-gray-500 text-xs">
+                      {(() => {
+                        const cert = certificates[e.students?.id]
+                        if (!cert) return <span className="text-gray-300">—</span>
+                        return (
+                          <div className="space-y-0.5">
+                            <a
+                              href={`/certificate/${cert.id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs font-medium text-primary-600 hover:text-primary-700 underline underline-offset-2"
+                            >
+                              {cert.certificate_number}
+                            </a>
+                            <p className="text-[10px] text-gray-400">
+                              {cert.student_name} · {new Date(cert.issued_at).toLocaleDateString()}
+                            </p>
+                            <span className={`text-[10px] font-medium ${cert.is_active ? 'text-green-600' : 'text-red-500'}`}>
+                              {cert.is_active ? '✓ Active' : '✗ Revoked'}
+                            </span>
+                          </div>
+                        )
+                      })()}
                     </TableCell>
                     <TableCell className="text-gray-500 text-xs">{e.completed_at ? new Date(e.completed_at).toLocaleDateString() : '—'}</TableCell>
                     <TableCell>
