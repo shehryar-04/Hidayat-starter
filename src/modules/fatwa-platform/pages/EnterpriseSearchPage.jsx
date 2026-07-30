@@ -74,7 +74,6 @@ export default function EnterpriseSearchPage() {
       // Precomputed suggestion — use term as search query
       const term = suggestion.term || suggestion.title || ''
       handleQueryChange(term)
-      if (onSubmit) handleSubmit(term)
     }
   }, [navigate, basePath, handleQueryChange])
 

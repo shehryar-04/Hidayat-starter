@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Fehm-e-Ramadan Course Thumbnail</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Poppins,sans-serif;
+}
+
+body{
+
+width:1920px;
+height:1080px;
+overflow:hidden;
+
+background:
+radial-gradient(circle at top right,#15776d 0%,#0b4f48 45%,#04211d 100%);
+
+}
+
+/* Background */
+
+.pattern{
+
+position:absolute;
+inset:0;
+opacity:.05;
+
+background-image:
+linear-gradient(rgba(255,255,255,.25) 1px,transparent 1px),
+linear-gradient(90deg,rgba(255,255,255,.25) 1px,transparent 1px);
+
+background-size:80px 80px;
+
+}
+
+.glow{
+
+position:absolute;
+
+width:850px;
+height:850px;
+
+top:-220px;
+right:-120px;
+
+background:#D6B15B;
+
+filter:blur(240px);
+
+opacity:.28;
+
+}
+
+/* Logo */
+
+.logo{
+
+position:absolute;
+
+top:55px;
+left:70px;
+
+width:230px;
+height:70px;
+
+border-radius:15px;
+
+border:2px dashed rgba(255,255,255,.3);
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+font-size:22px;
+font-weight:700;
+color:white;
+
+}
+
+/* Left */
+
+.left{
+
+position:absolute;
+
+left:90px;
+top:160px;
+
+width:900px;
+
+}
+
+.course{
+
+display:inline-block;
+
+padding:16px 34px;
+
+border-radius:50px;
+
+background:#D6B15B;
+
+font-size:28px;
+
+font-weight:800;
+
+color:#111;
+
+margin-bottom:35px;
+
+}
+
+.title{
+
+font-size:108px;
+
+line-height:1;
+
+font-weight:900;
+
+color:white;
+
+text-shadow:0 15px 30px rgba(0,0,0,.25);
+
+}
+
+.subtitle{
+
+margin-top:28px;
+
+font-size:38px;
+
+font-weight:500;
+
+line-height:1.45;
+
+color:#eeeeee;
+
+}
+
+/* Feature Grid */
+
+.grid{
+
+margin-top:45px;
+
+display:grid;
+
+grid-template-columns:repeat(2,280px);
+
+gap:18px;
+
+}
+
+.card{
+
+background:rgba(255,255,255,.12);
+
+backdrop-filter:blur(8px);
+
+padding:18px 25px;
+
+border-radius:18px;
+
+border:1px solid rgba(255,255,255,.15);
+
+color:white;
+
+font-size:26px;
+
+font-weight:600;
+
+}
+
+/* Right */
+
+.right{
+
+position:absolute;
+
+right:80px;
+top:120px;
+
+width:720px;
+height:820px;
+
+display:flex;
+
+justify-content:center;
+align-items:center;
+
+}
+
+.circle{
+
+position:absolute;
+
+width:560px;
+height:560px;
+
+border-radius:50%;
+
+border:8px solid rgba(214,177,91,.4);
+
+}
+
+.circle2{
+
+position:absolute;
+
+width:450px;
+height:450px;
+
+border-radius:50%;
+
+border:3px solid rgba(255,255,255,.18);
+
+}
+
+.moon{
+
+font-size:240px;
+
+filter:drop-shadow(0 0 45px rgba(255,255,255,.3));
+
+}
+
+.star{
+
+position:absolute;
+
+font-size:60px;
+
+color:#FFD966;
+
+}
+
+.s1{
+
+left:80px;
+top:160px;
+
+}
+
+.s2{
+
+right:70px;
+top:120px;
+
+}
+
+.s3{
+
+bottom:180px;
+right:80px;
+
+}
+
+/* Badge */
+
+.badge{
+
+position:absolute;
+
+right:120px;
+bottom:80px;
+
+background:white;
+
+padding:24px 40px;
+
+border-radius:24px;
+
+box-shadow:0 20px 45px rgba(0,0,0,.3);
+
+text-align:center;
+
+}
+
+.badge .big{
+
+font-size:74px;
+
+font-weight:900;
+
+color:#0b4f48;
+
+line-height:1;
+
+}
+
+.badge .small{
+
+font-size:26px;
+
+font-weight:700;
+
+color:#444;
+
+letter-spacing:2px;
+
+}
+
+.footer{
+
+position:absolute;
+
+bottom:45px;
+left:90px;
+
+font-size:26px;
+
+color:#ffffffbb;
+
+font-weight:600;
+
+letter-spacing:1px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="pattern"></div>
+
+<div class="glow"></div>
+
+<div class="logo">
+
+HIDAYAT LOGO
+
+<!--
+Replace with:
+
+<img src="hidayat-logo.svg" style="height:60px">
+
+-->
+
+</div>
+
+<div class="left">
+
+<div class="course">
+
+COMPLETE COURSE
+
+</div>
+
+<div class="title">
+
+FEHM-E<br>
+RAMADAN
+
+</div>
+
+<div class="subtitle">
+
+Master Ramadan according to the<br>
+
+Qur'an & Sunnah
+
+</div>
+
+<div class="grid">
+
+<div class="card">🌙 Fasting</div>
+
+<div class="card">💰 Zakat</div>
+
+<div class="card">🕌 Taraweeh</div>
+
+<div class="card">🤲 Du'a & I'tikaf</div>
+
+</div>
+
+</div>
+
+<div class="right">
+
+<div class="circle"></div>
+
+<div class="circle2"></div>
+
+<div class="moon">
+
+🌙
+
+</div>
+
+<div class="star s1">✦</div>
+
+<div class="star s2">✦</div>
+
+<div class="star s3">✦</div>
+
+</div>
+
+<div class="badge">
+
+<div class="big">
+
+10
+
+</div>
+
+<div class="small">
+
+LECTURES
+
+</div>
+
+</div>
+
+<div class="footer">
+
+Structured • Authentic • Practical • Complete
+
+</div>
+
+</body>
+</html>

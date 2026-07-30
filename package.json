@@ -18,6 +18,7 @@
     "search:populate-suggestions": "node scripts/search/populate-suggestions.js"
   },
   "dependencies": {
+    "@fontsource/amiri": "5.3.0",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
     "@radix-ui/react-select": "^2.2.6",
@@ -26,6 +27,7 @@
     "@supabase/supabase-js": "^2.39.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dompurify": "3.4.12",
     "framer-motion": "^12.38.0",
     "fuse.js": "^7.3.0",
     "html2canvas": "^1.4.1",

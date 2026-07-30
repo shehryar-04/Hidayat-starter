@@ -185,7 +185,7 @@ function AdminMuftiView() {
             />
           ) : (
             <Tabs items={[
-              { label: 'All Fatwas', content: <FatwaList onEdit={q => setSelected(q)} canManage /> },
+              { label: 'Submitted Questions', content: <FatwaList onEdit={q => setSelected(q)} canManage /> },
               { label: '+ New Fatwa', content: <FatwaEditor onComplete={() => {}} onCancel={() => {}} /> },
             ]} />
           )}

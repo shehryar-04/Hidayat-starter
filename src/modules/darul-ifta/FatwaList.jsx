@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { Button, Input, Card, CardContent, Badge, Spinner, EmptyState } from '../../shared/ui'
 import { Scale } from 'lucide-react'
+import { QuestionDetails } from './QuestionDetails'
 
 const STATUS_VARIANT = {
   pending: 'warning',
@@ -25,21 +26,27 @@ export function FatwaList({ onEdit, canManage }) {
   const load = async () => {
     setLoading(true)
     try {
-      let q = supabase
-        .from('fatwa_questions')
-        .select(`
-          id, reference_number, question_text, context, status, created_at,
-          profiles:submitted_by(full_name),
-          assigned_profiles:assigned_mufti(full_name),
-          fatwa_responses(id, response_text, quotes, submitted_at)
-        `)
-        .order('created_at', { ascending: false })
+      const buildQuery = (activeOnly) => {
+        let query = supabase
+          .from('fatwa_questions')
+          .select(`
+            id, reference_number, question_text, context, status, created_at,
+            profiles:submitted_by(full_name),
+            assigned_profiles:assigned_mufti(full_name),
+            fatwa_responses(id, response_text, quotes, submitted_at)
+          `)
+        if (activeOnly) query = query.eq('is_deleted', false)
+        if (statusFilter !== 'all') query = query.eq('status', statusFilter)
+        return query.order('created_at', { ascending: false })
+      }
 
-      if (statusFilter !== 'all') q = q.eq('status', statusFilter)
-
-      const { data, error: err } = await q
-      if (err) throw err
-      setFatwas(data || [])
+      let result = await buildQuery(true)
+      // Older environments may not have the moderation columns yet.
+      if (result.error?.message?.includes('is_deleted')) {
+        result = await buildQuery(false)
+      }
+      if (result.error) throw result.error
+      setFatwas(result.data || [])
     } catch (err) {
       setError(err.message)
     } finally {
@@ -48,12 +55,20 @@ export function FatwaList({ onEdit, canManage }) {
   }
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this fatwa question and all its responses?')) return
+    if (!window.confirm('Remove this question from the active workflow?')) return
     setDeleting(id)
     try {
-      await supabase.from('fatwa_responses').delete().eq('question_id', id)
-      await supabase.from('fatwa_audit_log').delete().eq('question_id', id)
-      const { error: err } = await supabase.from('fatwa_questions').delete().eq('id', id)
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('Your session has expired. Please sign in again.')
+
+      const { error: err } = await supabase
+        .from('fatwa_questions')
+        .update({
+          is_deleted: true,
+          deleted_at: new Date().toISOString(),
+          deleted_by: user.id,
+        })
+        .eq('id', id)
       if (err) throw err
       setFatwas(f => f.filter(x => x.id !== id))
     } catch (err) {
@@ -139,12 +154,9 @@ export function FatwaList({ onEdit, canManage }) {
                 )}
               </div>
 
-              {/* Question */}
+              {/* Question — identical field formatting to submitter confirmation */}
               <CardContent>
-                <p className="text-sm font-medium text-neutral-800 mb-1">{fatwa.question_text}</p>
-                {fatwa.context && (
-                  <p className="text-xs text-neutral-500 mt-1"><span className="font-semibold">Context:</span> {fatwa.context}</p>
-                )}
+                <QuestionDetails question={fatwa} compact />
                 <p className="text-xs text-neutral-400 mt-2">
                   Submitted by: {fatwa.profiles?.full_name || 'Anonymous'}
                   {fatwa.assigned_profiles && ` · Assigned to: ${fatwa.assigned_profiles.full_name}`}

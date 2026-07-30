@@ -9,12 +9,14 @@ import ShareButtons from '../components/ShareButtons'
 import { RelatedFatwas } from '../components/RelatedFatwas'
 import { FatwaCard } from '../components/FatwaCard'
 import SaveFatwaButton from '../components/SaveFatwaButton'
+import FatwaAnswerContent from '../components/FatwaAnswerContent'
 import { useFatwaStore } from '../stores/fatwaStore'
 import { useCategories, getCategoryPath } from '../hooks/useCategories'
 import { useLocalSavedFatwas } from '../hooks/useLocalSavedFatwas'
 import { calculateReadingTime } from '../utils/readingTime'
 import { detectDirection } from '../utils/rtlDetection'
 import { getRelatedFatwas } from '../utils/relatedFatwas'
+import { prepareFatwaAnswer } from '../utils/answerContent'
 import {
   generateFAQPageSchema,
   generateArticleSchema,
@@ -24,16 +26,6 @@ import {
 } from '../utils/structuredData'
 
 const BASE_URL = 'https://hidayat.org'
-
-/**
- * Count words in a text string.
- * @param {string} text
- * @returns {number}
- */
-function countWords(text) {
-  if (!text || typeof text !== 'string') return 0
-  return text.trim().split(/\s+/).filter((t) => t.length > 0).length
-}
 
 /**
  * Extract headings from answer text for table of contents.
@@ -153,27 +145,23 @@ export default function FatwaDetailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fatwa?.id])
 
-  // Computed values
-  const answerWordCount = useMemo(
-    () => countWords(fatwa?.response_text),
+  // Sanitize, structure, and classify the answer once per fatwa.
+  const answerContent = useMemo(
+    () => prepareFatwaAnswer(fatwa?.response_text, 500),
     [fatwa?.response_text]
   )
-  const showReadMore = answerWordCount > 500
+  const showReadMore = answerContent.wordCount > 500
   const readingTime = useMemo(
     () =>
       calculateReadingTime(
-        `${fatwa?.question_text || ''} ${fatwa?.response_text || ''}`
+        `${fatwa?.question_text || ''} ${answerContent.text}`
       ),
-    [fatwa?.question_text, fatwa?.response_text]
+    [fatwa?.question_text, answerContent.text]
   )
 
   const questionDir = useMemo(
     () => detectDirection(fatwa?.question_text),
     [fatwa?.question_text]
-  )
-  const answerDir = useMemo(
-    () => detectDirection(fatwa?.response_text),
-    [fatwa?.response_text]
   )
 
   const relatedFatwas = useMemo(
@@ -189,8 +177,8 @@ export default function FatwaDetailPage() {
   }, [fatwa, getFatwasByCategory])
 
   const headings = useMemo(
-    () => extractHeadings(fatwa?.response_text),
-    [fatwa?.response_text]
+    () => extractHeadings(answerContent.text),
+    [answerContent.text]
   )
 
   // Breadcrumb items
@@ -240,15 +228,6 @@ export default function FatwaDetailPage() {
 
     return schemas
   }, [fatwa, breadcrumbItems])
-
-  // Truncated answer text for "Read More"
-  const displayedAnswer = useMemo(() => {
-    if (!fatwa?.response_text) return ''
-    if (!showReadMore || expanded) return fatwa.response_text
-    // Truncate to approximately 500 words
-    const words = fatwa.response_text.trim().split(/\s+/)
-    return words.slice(0, 500).join(' ') + '…'
-  }, [fatwa?.response_text, showReadMore, expanded])
 
   // 404 page
   if (notFound) {
@@ -432,24 +411,17 @@ export default function FatwaDetailPage() {
                 >
                   Answer
                 </h2>
-                <div
-                  className="prose prose-gray max-w-none"
-                  dir={answerDir}
-                  lang={answerDir === 'rtl' ? 'ar' : undefined}
-                >
-                  <p
-                    className="text-gray-700 leading-relaxed whitespace-pre-wrap"
-                    style={{ lineHeight: '1.7', maxWidth: '720px' }}
-                  >
-                    {displayedAnswer}
-                  </p>
-                </div>
+                <FatwaAnswerContent
+                  id="fatwa-answer-content"
+                  prepared={answerContent}
+                  expanded={!showReadMore || expanded}
+                />
                 {showReadMore && (
                   <button
                     onClick={() => setExpanded(!expanded)}
                     className="mt-4 flex items-center gap-1 text-green-600 hover:text-green-700 font-medium text-sm transition-colors min-h-[44px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:rounded-sm"
                     aria-expanded={expanded}
-                    aria-controls="answer-heading"
+                    aria-controls="fatwa-answer-content"
                   >
                     {expanded ? (
                       <>

@@ -3,7 +3,6 @@ import {
   searchFatwas,
   getSuggestions,
   getSearchFacets,
-  logSearchQuery,
   logSearchClick,
   getSearchSessionId,
 } from '../services/searchService'
@@ -40,6 +39,7 @@ export function useEnterpriseSearch(query, options = {}) {
 
   const searchTimer = useRef(null)
   const suggestTimer = useRef(null)
+  const requestVersion = useRef(0)
 
   // Serialize filters for dependency comparison
   const filterKey = JSON.stringify(filters)
@@ -47,7 +47,10 @@ export function useEnterpriseSearch(query, options = {}) {
   // ─── Debounced search ──────────────────────────────────────
   useEffect(() => {
     if (searchTimer.current) clearTimeout(searchTimer.current)
+    const version = ++requestVersion.current
+    let cancelled = false
 
+    setQueryId(null)
     if (!query || !query.trim()) {
       setResults([])
       setTotal(0)
@@ -55,45 +58,49 @@ export function useEnterpriseSearch(query, options = {}) {
       setError(null)
       setIsSearching(false)
       setLatencyMs(null)
-      return
+      return () => { cancelled = true }
     }
 
     setIsSearching(true)
     setError(null)
 
     searchTimer.current = setTimeout(async () => {
+      const offset = (page - 1) * limit
+      const normalizedQuery = query.trim()
+
+      // Facets start at the same time, but are optional and never block results.
+      const facetsPromise = getSearchFacets(normalizedQuery).catch(() => ({ facets: {} }))
+
       try {
-        const offset = (page - 1) * limit
+        const searchRes = await searchFatwas(normalizedQuery, {
+          limit,
+          offset,
+          filters,
+          sessionId: getSearchSessionId(),
+        })
 
-        const [searchRes, facetsRes] = await Promise.all([
-          searchFatwas(query.trim(), { limit, offset, filters }),
-          getSearchFacets(query.trim()),
-        ])
-
+        if (cancelled || version !== requestVersion.current) return
         setResults(searchRes.results || [])
         setTotal(searchRes.total || 0)
-        setLatencyMs(searchRes.latency_ms || null)
-        setFacets(facetsRes.facets || {})
+        setLatencyMs(searchRes.latency_ms ?? null)
+        setQueryId(searchRes.query_id || null)
         setIsSearching(false)
 
-        // Log analytics (non-blocking)
-        const sessionId = getSearchSessionId()
-        logSearchQuery(
-          query.trim(),
-          searchRes.total || 0,
-          searchRes.latency_ms,
-          Object.keys(filters).length > 0 ? filters : undefined,
-          sessionId
-        ).then(res => {
-          if (res.query_id) setQueryId(res.query_id)
-        })
+        const facetsRes = await facetsPromise
+        if (!cancelled && version === requestVersion.current) {
+          setFacets(facetsRes.facets || {})
+        }
       } catch (err) {
+        if (cancelled || version !== requestVersion.current) return
         setError(err.message || 'Search failed')
         setIsSearching(false)
       }
     }, SEARCH_DEBOUNCE_MS)
 
-    return () => { if (searchTimer.current) clearTimeout(searchTimer.current) }
+    return () => {
+      cancelled = true
+      if (searchTimer.current) clearTimeout(searchTimer.current)
+    }
   }, [query, limit, page, filterKey])
 
   // ─── Debounced suggestions (faster) ────────────────────────

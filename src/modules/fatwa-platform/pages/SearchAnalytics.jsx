@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { BarChart3, Search, MousePointerClick, TrendingUp, AlertCircle } from 'lucide-react'
+import { BarChart3, Search, MousePointerClick, TrendingUp, AlertCircle, Eye } from 'lucide-react'
 import { supabase } from '../../../lib/supabase'
 import { Spinner, Card, CardContent, Badge, PageWrapper, PageHeader, Tabs } from '../../../shared/ui'
 
@@ -30,6 +30,9 @@ export default function SearchAnalytics() {
     } else if (tab === 'ctr') {
       const { data: res } = await supabase.rpc('get_search_analytics_ctr', { p_days: days, p_limit: 50 })
       setData(res || [])
+    } else if (tab === 'most') {
+      const { data: res } = await supabase.rpc('get_search_analytics_most_viewed', { p_limit: 50 })
+      setData(res || [])
     }
 
     setLoading(false)
@@ -48,14 +51,17 @@ export default function SearchAnalytics() {
 
       {/* Time range selector */}
       <div className="flex items-center gap-2 mb-6">
-        <span className="text-sm text-gray-500">Time range:</span>
+        <span className="text-sm text-gray-500">
+          {tab === 'most' ? 'Most viewed is all-time:' : 'Time range:'}
+        </span>
         {[7, 14, 30, 90].map((d) => (
           <button
             key={d}
             onClick={() => setDays(d)}
+            disabled={tab === 'most'}
             className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
               days === d ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
+            } disabled:opacity-40 disabled:cursor-not-allowed`}
           >
             {d}d
           </button>
@@ -68,6 +74,7 @@ export default function SearchAnalytics() {
           { key: 'top', label: 'Top Queries', icon: TrendingUp },
           { key: 'zero', label: 'Zero Results', icon: AlertCircle },
           { key: 'ctr', label: 'Click-Through', icon: MousePointerClick },
+          { key: 'most', label: 'Most Viewed', icon: Eye },
           { key: 'volume', label: 'Volume', icon: BarChart3 },
         ].map(({ key, label, icon: Icon }) => (
           <button
@@ -162,6 +169,12 @@ export default function SearchAnalytics() {
                     <th className="px-4 py-2.5 text-right text-xs font-medium text-gray-500 uppercase">CTR</th>
                   </>
                 )}
+                {tab === 'most' && (
+                  <>
+                    <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase">Institution</th>
+                    <th className="px-4 py-2.5 text-right text-xs font-medium text-gray-500 uppercase">Views</th>
+                  </>
+                )}
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
@@ -169,7 +182,7 @@ export default function SearchAnalytics() {
                 <tr key={i} className="hover:bg-gray-50/50">
                   <td className="px-4 py-2 text-gray-400 text-xs">{i + 1}</td>
                   <td className="px-4 py-2 font-medium text-gray-800 max-w-xs truncate" dir="auto">
-                    {row.query}
+                    {tab === 'most' ? row.title : row.query}
                   </td>
                   {tab === 'top' && (
                     <>
@@ -199,6 +212,12 @@ export default function SearchAnalytics() {
                           {row.ctr}%
                         </span>
                       </td>
+                    </>
+                  )}
+                  {tab === 'most' && (
+                    <>
+                      <td className="px-4 py-2 text-gray-500 text-xs">{row.dar_ul_ifta || '—'}</td>
+                      <td className="px-4 py-2 text-right font-semibold text-primary">{Number(row.view_count || 0).toLocaleString()}</td>
                     </>
                   )}
                 </tr>

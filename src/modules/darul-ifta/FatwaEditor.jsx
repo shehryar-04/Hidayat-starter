@@ -5,10 +5,6 @@ import { Button, Input, Textarea, Label, Select, SelectTrigger, SelectContent, S
 
 const STATUSES = ['pending', 'assigned', 'under_review', 'approved', 'published', 'closed']
 
-function generateRef() {
-  return `FQ-${Date.now()}-${Math.floor(Math.random() * 9000) + 1000}`
-}
-
 export function FatwaEditor({ fatwa, onComplete, onCancel }) {
   const { role } = useRole()
   const isEdit = !!fatwa
@@ -71,18 +67,13 @@ export function FatwaEditor({ fatwa, onComplete, onCancel }) {
         }
         setMsg('Fatwa updated.')
       } else {
-        const ref = generateRef()
-        const { error: err } = await supabase
-          .from('fatwa_questions')
-          .insert({
-            reference_number: ref,
-            submitted_by: user.id,
-            question_text: questionText,
-            context: context || null,
-            status: 'pending',
-          })
+        const { data: created, error: err } = await supabase.rpc('submit_fatwa_question', {
+          p_question_text: questionText.trim(),
+          p_context: context.trim() || null,
+        })
         if (err) throw err
-        setMsg(`Fatwa created. Reference: ${ref}`)
+        const question = Array.isArray(created) ? created[0] : created
+        setMsg(`Fatwa created. Reference: ${question?.reference_number || ''}`)
         setTimeout(() => onComplete(), 1500)
       }
     } catch (err) {

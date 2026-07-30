@@ -54,12 +54,85 @@
   line-height: 1.7;
 }
 
-/* Apply Jameel Noori Nastaleeq to all RTL (Urdu/Arabic) content */
+/* Preserve the existing Nastaleeq treatment for Urdu/RTL content. */
 .fatwa-platform [dir="rtl"],
-.fatwa-platform .font-urdu {
+.fatwa-platform .font-urdu,
+.fatwa-answer-content .font-urdu {
   font-family: 'Jameel Noori Nastaleeq', serif;
   font-size: 1.35em;
   line-height: 2.4;
+}
+
+/* Published answer typography. Classification is added only to the rendered,
+   sanitized DOM; stored answer HTML is never changed. */
+.fatwa-answer-content {
+  max-width: 720px;
+  overflow-wrap: anywhere;
+  line-height: 1.7;
+}
+
+.fatwa-answer-content > * {
+  margin: 0;
+}
+
+.fatwa-answer-content > * + * {
+  margin-top: 1rem;
+}
+
+.fatwa-answer-content p,
+.fatwa-answer-content li,
+.fatwa-answer-content blockquote {
+  white-space: pre-wrap;
+}
+
+.fatwa-answer-content ul {
+  list-style: disc;
+  padding-inline-start: 1.5rem;
+}
+
+.fatwa-answer-content ol {
+  list-style: decimal;
+  padding-inline-start: 1.5rem;
+}
+
+.fatwa-answer-content a {
+  color: #15803d;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.fatwa-answer-arabic,
+.fatwa-answer-quran,
+.fatwa-answer-hadith {
+  font-family: 'Amiri', 'Noto Naskh Arabic', 'Traditional Arabic', serif !important;
+  direction: rtl;
+  font-size: 1.45em !important;
+  line-height: 2.05 !important;
+  text-align: right;
+  margin-block: 1.4rem !important;
+}
+
+.fatwa-answer-quran {
+  color: #14532d;
+  background: linear-gradient(90deg, rgba(240, 253, 244, 0.35), #f0fdf4, rgba(240, 253, 244, 0.35));
+  border-block: 1px solid #dcfce7;
+  border-radius: 0.5rem;
+  font-size: 1.65em !important;
+  line-height: 2.2 !important;
+  padding: 1rem 1.25rem;
+  text-align: center;
+}
+
+.fatwa-answer-hadith {
+  color: #374151;
+  background: #f9fafb;
+  border-inline-start: 4px solid #16a34a;
+  border-radius: 0.375rem;
+  padding: 0.9rem 1.1rem;
+}
+
+.fatwa-answer-urdu {
+  text-align: right;
 }
 
 @media (min-width: 1024px) {

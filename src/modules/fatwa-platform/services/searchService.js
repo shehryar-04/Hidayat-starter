@@ -13,7 +13,7 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
 /**
  * Call the search Edge Function.
  */
-async function callSearchAPI(body) {
+async function callSearchAPI(body, options = {}) {
   const response = await fetch(SEARCH_ENDPOINT, {
     method: 'POST',
     headers: {
@@ -22,6 +22,7 @@ async function callSearchAPI(body) {
       'apikey': SUPABASE_ANON_KEY,
     },
     body: JSON.stringify(body),
+    signal: options.signal,
   })
 
   if (!response.ok) {
@@ -45,7 +46,14 @@ async function callSearchAPI(body) {
  * @returns {Promise<{ results: Array, total: number, query: string, latency_ms: number, mode: string }>}
  */
 export async function searchFatwas(query, options = {}) {
-  const { limit = 20, offset = 0, filters = {}, embedding } = options
+  const {
+    limit = 20,
+    offset = 0,
+    filters = {},
+    embedding,
+    sessionId,
+    signal,
+  } = options
 
   return callSearchAPI({
     action: 'search',
@@ -57,7 +65,8 @@ export async function searchFatwas(query, options = {}) {
     category_3: filters.category_3,
     dar_ul_ifta: filters.dar_ul_ifta,
     embedding,
-  })
+    session_id: sessionId,
+  }, { signal })
 }
 
 /**
@@ -101,24 +110,6 @@ export async function getSearchFacets(query) {
 export async function getRelatedFatwas(fatwaId, limit = 10) {
   if (!fatwaId) return { related: [] }
   return callSearchAPI({ action: 'related', fatwa_id: fatwaId, limit })
-}
-
-/**
- * Log a search query for analytics (non-blocking).
- */
-export async function logSearchQuery(query, resultsCount, latencyMs, filters, sessionId) {
-  try {
-    return await callSearchAPI({
-      action: 'log_query',
-      query,
-      results_count: resultsCount,
-      latency_ms: latencyMs,
-      filters,
-      session_id: sessionId,
-    })
-  } catch {
-    return { ok: false }
-  }
 }
 
 /**

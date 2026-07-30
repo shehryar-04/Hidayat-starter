@@ -1,10 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { Button, Textarea, Label } from '../../shared/ui'
-
-function generateRef() {
-  return `FQ-${Date.now()}-${Math.floor(Math.random() * 9000) + 1000}`
-}
+import { QuestionDetails } from './QuestionDetails'
 
 export function QuestionSubmitForm({ onComplete }) {
   const [questionText, setQuestionText] = useState('')
@@ -18,17 +15,17 @@ export function QuestionSubmitForm({ onComplete }) {
     if (!questionText.trim()) return
     setSaving(true); setError(null)
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      const ref = generateRef()
-      const { error: err } = await supabase.from('fatwa_questions').insert({
-        reference_number: ref,
-        submitted_by: user.id,
-        question_text: questionText,
-        context: context || null,
-        status: 'pending',
+      const { data, error: authError } = await supabase.auth.getUser()
+      if (authError || !data.user) throw new Error('Please sign in to submit a question.')
+
+      const { data: question, error: err } = await supabase.rpc('submit_fatwa_question', {
+        p_question_text: questionText.trim(),
+        p_context: context.trim() || null,
       })
       if (err) throw err
-      setSubmitted(ref)
+      const submittedQuestion = Array.isArray(question) ? question[0] : question
+      if (!submittedQuestion) throw new Error('Question submission did not return a reference.')
+      setSubmitted(submittedQuestion)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -42,8 +39,11 @@ export function QuestionSubmitForm({ onComplete }) {
         <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6 text-center py-10">
           <div className="text-4xl mb-4">✅</div>
           <h2 className="font-serif text-xl text-primary-600 mb-2">Question Submitted</h2>
-          <p className="text-sm text-gray-500 mb-1">Your question has been received and will be reviewed by our scholars.</p>
-          <p className="text-xs font-mono text-gray-400 mt-3 mb-6">Reference: {submitted}</p>
+          <p className="text-sm text-gray-500 mb-4">Your question has been received and will be reviewed by our scholars.</p>
+          <div className="text-left bg-neutral-50 border border-neutral-200 rounded-lg p-4 mb-4">
+            <QuestionDetails question={submitted} />
+          </div>
+          <p className="text-xs font-mono text-gray-400 mb-6">Reference: {submitted.reference_number}</p>
           <Button variant="primary" onClick={onComplete}>Back to Fatwas</Button>
         </div>
       </div>

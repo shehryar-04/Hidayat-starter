@@ -140,12 +140,20 @@ export const useFatwaStore = create((set, get) => ({
     set({ loading: true })
 
     try {
-      // Fetch in parallel: latest fatwas, categories, total count, institutions
-      const [latestRes, categoriesRes, countRes, institutionsRes] = await Promise.all([
+      // Fetch lightweight home-page data in parallel.
+      const [latestRes, popularRes, categoriesRes, countRes, institutionsRes] = await Promise.all([
         // Latest 6 fatwas
         supabase
           .from('fatwas')
-          .select('id, title, question, answer, fatwa_ref, dar_ul_ifta, category_1, category_2, category_3, created_at')
+          .select('id, title, question, answer, fatwa_ref, dar_ul_ifta, category_1, category_2, category_3, created_at, view_count')
+          .order('created_at', { ascending: false })
+          .limit(6),
+
+        // Most viewed fatwas
+        supabase
+          .from('fatwas')
+          .select('id, title, question, answer, fatwa_ref, dar_ul_ifta, category_1, category_2, category_3, created_at, view_count')
+          .order('view_count', { ascending: false, nullsFirst: false })
           .order('created_at', { ascending: false })
           .limit(6),
 
@@ -165,9 +173,11 @@ export const useFatwaStore = create((set, get) => ({
           .limit(100),
       ])
 
-      // Process latest fatwas
-      const existingSlugs = new Set()
-      const latestFatwas = (latestRes.data || []).map(row => normalizeFatwa(row, existingSlugs))
+      // Process latest and most-viewed fatwas independently.
+      const latestSlugs = new Set()
+      const popularSlugs = new Set()
+      const latestFatwas = (latestRes.data || []).map(row => normalizeFatwa(row, latestSlugs))
+      const popularFatwas = (popularRes.data || []).map(row => normalizeFatwa(row, popularSlugs))
 
       // Process categories — use RPC if available, otherwise fallback
       let categories = {}
@@ -218,9 +228,6 @@ export const useFatwaStore = create((set, get) => ({
         }
       }
       const institutionList = [...institutionSet]
-
-      // Popular fatwas = same as latest for now (view_count not tracked in table yet)
-      const popularFatwas = latestFatwas
 
       set({
         fatwas: latestFatwas,
@@ -446,14 +453,45 @@ export const useFatwaStore = create((set, get) => ({
    * Increment view count for a fatwa.
    */
   incrementView: async (id) => {
-    await incrementFatwaView(id)
+    const incremented = await incrementFatwaView(id)
+    // Undefined keeps compatibility with older/mocked helpers; false is a real failure.
+    if (incremented === false) return
+
+    const bump = (fatwa) => String(fatwa.id) === String(id)
+      ? { ...fatwa, view_count: (fatwa.view_count || 0) + 1 }
+      : fatwa
+
+    set(state => ({
+      fatwas: state.fatwas.map(bump),
+      latestFatwas: state.latestFatwas.map(bump),
+      popularFatwas: state.popularFatwas.map(bump),
+      categoryFatwas: Object.fromEntries(
+        Object.entries(state.categoryFatwas).map(([key, fatwas]) => [key, fatwas.map(bump)])
+      ),
+    }))
   },
 
   /**
    * Get the computed category tree.
    */
   getCategoryTree: () => {
-    return get().categories
+    const { categories, fatwas } = get()
+    if (Object.keys(categories).length > 0 || fatwas.length === 0) return categories
+
+    const counts = new Map()
+    for (const fatwa of fatwas) {
+      if (!fatwa.category_1) continue
+      const key = `${fatwa.category_1}||${fatwa.category_2 || ''}||${fatwa.category_3 || ''}`
+      const current = counts.get(key) || {
+        category_1: fatwa.category_1,
+        category_2: fatwa.category_2,
+        category_3: fatwa.category_3,
+        count: 0,
+      }
+      current.count += 1
+      counts.set(key, current)
+    }
+    return buildCategoryTreeFromCounts([...counts.values()])
   },
 
   /**

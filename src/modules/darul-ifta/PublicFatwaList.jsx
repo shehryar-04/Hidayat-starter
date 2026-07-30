@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '../../lib/supabase'
 import { Input, Spinner, SearchResultsSkeleton } from '../../shared/ui'
 import { ChevronDown, ChevronRight } from 'lucide-react'
+import FatwaAnswerContent from '../fatwa-platform/components/FatwaAnswerContent'
 
 const fmt = (d) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 
@@ -239,7 +240,10 @@ export function PublicFatwaList({ hideHeader = false }) {
                                     </div>
                                   </div>
                                   <div className="bg-neutral-50 rounded-lg px-4 py-4 border-l-4 border-primary-500">
-                                    <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{answer.response_text}</p>
+                                    <FatwaAnswerContent
+                                      answer={answer.response_text}
+                                      className="text-sm"
+                                    />
                                     {answer.quotes && (
                                       <div className="mt-3 pt-3 border-t border-gray-200">
                                         <p className="text-xs font-semibold text-gray-500 mb-1">📚 References</p>
