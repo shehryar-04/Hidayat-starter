@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useRole } from './RoleProvider'
 import PublicTopNav from './PublicTopNav'
-import Logo from './Logo'
+import SiteFooter from './SiteFooter'
 import FlashcardSlider from './FlashcardSlider'
 import { supabase } from '../lib/supabase'
 import { slugify } from '../modules/fatwa-platform/utils/slugGenerator'
@@ -20,8 +20,6 @@ import {
   Lightbulb,
   ChevronRight,
   ChevronLeft,
-  MapPin,
-  Mail,
   Verified,
 } from 'lucide-react'
 
@@ -334,6 +332,7 @@ function UpcomingCourseVideo() {
 
 // ─── Featured Courses Bento Grid ─────────────────────────────
 function Courses() {
+  const navigate = useNavigate()
   return (
     <section id="programs" className="py-16 sm:py-24 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-8">
@@ -349,7 +348,10 @@ function Courses() {
               <span className="bg-primary-500 text-white px-3 py-1 rounded-md text-[10px] sm:text-xs font-bold w-fit mb-3 sm:mb-4">8 YEAR PROGRAM</span>
               <h3 className="font-display font-bold text-xl sm:text-3xl text-white mb-2 sm:mb-4">Darse Nizami (Alim Course)</h3>
               <p className="text-white/80 text-sm sm:text-base mb-4 sm:mb-8 line-clamp-2 sm:line-clamp-none">Comprehensive study of Arabic linguistics, Fiqh, Usul, Hadith, and Tafsir.</p>
-              <button className="text-white font-medium flex items-center space-x-2 group-hover:translate-x-2 transition-transform">
+              <button
+                onClick={() => navigate('/dars-e-nizami')}
+                className="text-white font-medium flex items-center space-x-2 group-hover:translate-x-2 transition-transform"
+              >
                 <span>Learn More</span>
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -365,7 +367,7 @@ function Courses() {
             <p className="text-sm sm:text-base text-neutral-500 mb-4 sm:mb-auto leading-relaxed">Dedicated environment for the memorization of the Holy Qur'an with focus on Tajweed.</p>
             <div className="pt-4 sm:pt-6 border-t border-neutral-200 mt-4 sm:mt-6 flex justify-between items-center">
               <span className="text-xs font-bold text-neutral-900">Limited Seats</span>
-              <a href="#" className="text-primary-500 font-medium text-sm underline underline-offset-4">Enroll Now</a>
+              <Link to="/hifz" className="text-primary-500 font-medium text-sm underline underline-offset-4">Enroll Now</Link>
             </div>
           </div>
 
@@ -709,58 +711,6 @@ function Newsletter() {
   )
 }
 
-
-// ─── Footer ──────────────────────────────────────────────────
-function Footer() {
-  return (
-    <footer className="w-full border-t border-neutral-200 bg-neutral-50">
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-6 px-4 sm:px-8 py-10 sm:py-16 max-w-7xl mx-auto">
-        <div className="col-span-2 sm:col-span-2 md:col-span-1">
-          <Logo size="md" className="mb-4" />
-          <p className="font-sans text-sm leading-relaxed text-neutral-500">Dedicated to professional excellence, intellectual development, Islamic guidance, and capacity building through modern education and training.</p>
-        </div>
-        <div>
-          <h4 className="font-display font-semibold text-neutral-900 text-base mb-4 sm:mb-6">Programs</h4>
-          <ul className="space-y-3 sm:space-y-4">
-            {['Darse Nizami', 'Hifz & Nazrah', 'Short Courses', 'Darul Ifta'].map(l => (
-              <li key={l}><a href="#" className="font-sans text-sm text-neutral-500 hover:text-primary-500 transition-colors">{l}</a></li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <h4 className="font-display font-semibold text-neutral-900 text-base mb-4 sm:mb-6">Resources</h4>
-          <ul className="space-y-3 sm:space-y-4">
-            {['Research Journal', 'Fatwa Archive', 'Student Portal', 'Library'].map(l => (
-              <li key={l}><a href="#" className="font-sans text-sm text-neutral-500 hover:text-primary-500 transition-colors">{l}</a></li>
-            ))}
-          </ul>
-        </div>
-        <div className="col-span-2 sm:col-span-1">
-          <h4 className="font-display font-semibold text-neutral-900 text-base mb-4 sm:mb-6">Contact</h4>
-          <ul className="space-y-3 sm:space-y-4">
-            <li className="flex items-start space-x-3 text-neutral-500">
-              <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-              <span className="font-sans text-sm">12 Scholars Row, Educational District</span>
-            </li>
-            <li className="flex items-center space-x-3 text-neutral-500">
-              <Mail className="w-4 h-4 flex-shrink-0" />
-              <span className="font-sans text-sm">info@hidayat.edu</span>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div className="w-full py-6 sm:py-8 px-4 sm:px-8 flex flex-col sm:flex-row justify-between items-center max-w-7xl mx-auto border-t border-neutral-200 gap-4">
-        <p className="font-sans text-sm text-neutral-500 text-center sm:text-left">© {new Date().getFullYear()} HIDAYAT Academy. Preserving Sacred Tradition.</p>
-        <div className="flex flex-wrap justify-center gap-4 sm:gap-8">
-          {['Privacy Policy', 'Terms of Service', 'Contact Us'].map(l => (
-            <a key={l} href="#" className="text-neutral-500 hover:text-primary-500 font-sans text-sm transition-colors">{l}</a>
-          ))}
-        </div>
-      </div>
-    </footer>
-  )
-}
-
 // ─── Page Assembly ───────────────────────────────────────────
 const DOOR_IMAGES = ['/assets/closed.webp', '/assets/semi-open.webp', '/assets/open.webp']
 
@@ -971,7 +921,7 @@ export default function HomePage() {
       <Courses />
       <FatwaSection />
       <Newsletter />
-      <Footer />
+      <SiteFooter />
     </div>
   )
 }

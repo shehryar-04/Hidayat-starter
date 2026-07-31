@@ -20,6 +20,20 @@ import WazifaModule from '../modules/wazifa'
 // Lazy-loaded public pages
 const CertificateVerifyPage = lazy(() => import('../modules/short-courses/CertificateVerifyPage'))
 const CertificatePage = lazy(() => import('../modules/short-courses/CertificatePage'))
+
+// Lazy-loaded institutional content pages (company profile)
+const AboutPage = lazy(() => import('../modules/institution/AboutPage'))
+const DirectorMessagePage = lazy(() => import('../modules/institution/DirectorMessagePage'))
+const MissionValuesPage = lazy(() => import('../modules/institution/MissionValuesPage'))
+const TrainersPage = lazy(() => import('../modules/institution/TrainersPage'))
+const ServicesPage = lazy(() => import('../modules/institution/ServicesPage'))
+const TrainingPage = lazy(() => import('../modules/institution/TrainingPage'))
+const ConsultancyPage = lazy(() => import('../modules/institution/ConsultancyPage'))
+const DistanceLearningPage = lazy(() => import('../modules/institution/DistanceLearningPage'))
+const EventsPage = lazy(() => import('../modules/institution/EventsPage'))
+const ContactPage = lazy(() => import('../modules/institution/ContactPage'))
+const PrivacyPolicyPage = lazy(() => import('../modules/institution/PrivacyPolicyPage'))
+const TermsOfServicePage = lazy(() => import('../modules/institution/TermsOfServicePage'))
 import StudentReportsModule from '../modules/reports'
 import StudentAdminModule from '../modules/student-admin'
 import ScholarAdminModule from '../modules/scholar-admin'
@@ -41,6 +55,24 @@ function AppShell({ children }) {
         {children}
       </main>
     </div>
+  )
+}
+
+/** Suspense fallback for lazily loaded pages. */
+function PageFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <p className="text-neutral-400">Loading…</p>
+    </div>
+  )
+}
+
+/** Public content page: shared navbar + lazy boundary. */
+function ContentRoute({ children }) {
+  return (
+    <AppShell>
+      <Suspense fallback={<PageFallback />}>{children}</Suspense>
+    </AppShell>
   )
 }
 
@@ -85,6 +117,20 @@ export default function AppRouter() {
       <Route path="/downloads/*" element={<AppShell><DownloadsPage /></AppShell>} />
       <Route path="/fatwas/*" element={<AppShell><FatwaPlatformModule /></AppShell>} />
       <Route path="/darul-iftaa/*" element={<AppShell><FatwaPlatformModule /></AppShell>} />
+
+      {/* Institutional content pages — public, sourced from the company profile */}
+      <Route path="/about" element={<ContentRoute><AboutPage /></ContentRoute>} />
+      <Route path="/about/directors-message" element={<ContentRoute><DirectorMessagePage /></ContentRoute>} />
+      <Route path="/about/mission-values" element={<ContentRoute><MissionValuesPage /></ContentRoute>} />
+      <Route path="/about/trainers" element={<ContentRoute><TrainersPage /></ContentRoute>} />
+      <Route path="/services" element={<ContentRoute><ServicesPage /></ContentRoute>} />
+      <Route path="/services/training" element={<ContentRoute><TrainingPage /></ContentRoute>} />
+      <Route path="/services/consultancy" element={<ContentRoute><ConsultancyPage /></ContentRoute>} />
+      <Route path="/services/distance-learning" element={<ContentRoute><DistanceLearningPage /></ContentRoute>} />
+      <Route path="/events" element={<ContentRoute><EventsPage /></ContentRoute>} />
+      <Route path="/contact" element={<ContentRoute><ContactPage /></ContentRoute>} />
+      <Route path="/privacy-policy" element={<ContentRoute><PrivacyPolicyPage /></ContentRoute>} />
+      <Route path="/terms-of-service" element={<ContentRoute><TermsOfServicePage /></ContentRoute>} />
 
       {/* Certificate Verification — public, no login required */}
       <Route path="/certificate/verify/:code" element={
