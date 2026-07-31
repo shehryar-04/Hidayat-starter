@@ -30,8 +30,10 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 const DIST_DIR = join(__dirname, '..', 'dist')
 
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL
-const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY
+// Trim env values: pasted secrets often carry a trailing newline, which would
+// otherwise end up inside request URLs and auth headers.
+const SUPABASE_URL = (process.env.VITE_SUPABASE_URL || '').trim().replace(/\/+$/, '')
+const SUPABASE_ANON_KEY = (process.env.VITE_SUPABASE_ANON_KEY || '').trim()
 
 async function generateManifest() {
   console.log('\n📋 Generating prerender manifest\n')

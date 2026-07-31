@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
+import { FUNCTIONS_BASE_URL } from '../../lib/env'
 import { Button, Label, Textarea, Spinner } from '../../shared/ui'
 
 export function BulkStudentUpdate({ onComplete }) {
@@ -25,7 +26,7 @@ export function BulkStudentUpdate({ onComplete }) {
     setLoading(true); setMsg(null)
     try {
       const { data: { session } } = await supabase.auth.getSession()
-      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/bulk-student-update`, {
+      const res = await fetch(`${FUNCTIONS_BASE_URL}/bulk-student-update`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ student_ids: ids, operation, ...(operation === 'status' ? { new_status: newStatus } : { new_program: newProgram, new_level: newLevel }) }),

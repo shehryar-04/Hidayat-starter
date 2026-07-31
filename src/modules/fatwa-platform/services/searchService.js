@@ -7,8 +7,9 @@
  * NO LLM. NO AI generation. Pure retrieval.
  */
 
-const SEARCH_ENDPOINT = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/search`
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
+import { FUNCTIONS_BASE_URL, SUPABASE_ANON_KEY } from '../../../lib/env'
+
+const SEARCH_ENDPOINT = `${FUNCTIONS_BASE_URL}/search`
 
 /**
  * Call the search Edge Function.

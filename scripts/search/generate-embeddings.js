@@ -21,9 +21,11 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
-const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
-const EMBEDDING_API_URL = process.env.EMBEDDING_API_URL || 'http://localhost:8080/embed'
+// Trim env values: pasted secrets often carry a trailing newline, which would
+// otherwise end up inside request URLs and auth headers.
+const SUPABASE_URL = (process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '').trim().replace(/\/+$/, '')
+const SUPABASE_KEY = (process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim()
+const EMBEDDING_API_URL = (process.env.EMBEDDING_API_URL || 'http://localhost:8080/embed').trim()
 
 // Chunk configuration (token-based, ~600-800 tokens per chunk)
 // Approximation: 1 Urdu/Arabic word ≈ 2-3 tokens, 1 English word ≈ 1.3 tokens

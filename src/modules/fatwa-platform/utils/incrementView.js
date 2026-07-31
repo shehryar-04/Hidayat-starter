@@ -1,6 +1,8 @@
 // Client-side helper for incrementing fatwa view count.
 // Uses sessionStorage to prevent duplicate counts per browser session.
 
+import { FUNCTIONS_BASE_URL } from '../../../lib/env'
+
 const SESSION_STORAGE_KEY = 'hidayat_viewed_fatwas'
 const inFlight = new Set()
 
@@ -36,12 +38,11 @@ export async function incrementFatwaView(fatwaId) {
     return false
   }
 
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-  if (!supabaseUrl) return false
+  if (!FUNCTIONS_BASE_URL) return false
 
   inFlight.add(id)
   try {
-    const response = await fetch(`${supabaseUrl}/functions/v1/increment-fatwa-view`, {
+    const response = await fetch(`${FUNCTIONS_BASE_URL}/increment-fatwa-view`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ fatwa_id: id }),

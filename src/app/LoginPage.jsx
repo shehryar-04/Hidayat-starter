@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Mail, Lock, User } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import { FUNCTIONS_BASE_URL, SUPABASE_ANON_KEY } from '../lib/env'
 import { Button, Input, Label, cn } from '../shared/ui'
 
 export default function LoginPage() {
@@ -49,14 +50,11 @@ export default function LoginPage() {
     if (!fullName.trim()) { setError('Full name is required'); return }
     setLoading(true)
     try {
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-
-      const res = await fetch(`${supabaseUrl}/functions/v1/signup`, {
+      const res = await fetch(`${FUNCTIONS_BASE_URL}/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${anonKey}`,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({
           email,
@@ -116,14 +114,11 @@ export default function LoginPage() {
     if (!targetEmail) { setError('Please enter your email address.'); return }
     setResending(true)
     try {
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-
-      const res = await fetch(`${supabaseUrl}/functions/v1/resend-verification`, {
+      const res = await fetch(`${FUNCTIONS_BASE_URL}/resend-verification`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${anonKey}`,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({ email: targetEmail }),
       })

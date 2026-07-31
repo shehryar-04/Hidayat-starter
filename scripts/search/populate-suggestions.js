@@ -17,8 +17,10 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
-const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
+// Trim env values: pasted secrets often carry a trailing newline, which would
+// otherwise end up inside request URLs and auth headers.
+const SUPABASE_URL = (process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '').trim().replace(/\/+$/, '')
+const SUPABASE_KEY = (process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim()
 
 if (!SUPABASE_URL || !SUPABASE_KEY) {
   console.error('❌ Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY')
