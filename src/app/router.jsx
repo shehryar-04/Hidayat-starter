@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
 import LoginPage from './LoginPage'
+import AuthCallbackPage from './AuthCallbackPage'
 import ProtectedRoute from './ProtectedRoute'
 import FeatureFlagGuard from './FeatureFlagGuard'
 import HomePage from './HomePage'
@@ -95,6 +96,7 @@ export default function AppRouter() {
       {/* Home page — public landing for guests, module hub for authenticated */}
       <Route path="/" element={<SmartHome />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
       {/* Under construction modules — no auth required, no flag guard */}
       <Route path="/dars-e-nizami/*" element={<AppShell><FeatureFlagGuard flagKey="dars_e_nizami"><DarsENizamiModule /></FeatureFlagGuard></AppShell>} />
