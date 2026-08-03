@@ -7,16 +7,18 @@ import Logo from './Logo'
 /**
  * /auth/callback — Landing page for email verification links.
  *
- * With self-hosted Supabase the confirmation email contains a link like:
- *   https://supabase.hidayat.pk/auth/v1/verify?token=...&type=signup&redirect_to=<SITE_URL>/auth/callback
+ * Self-hosted confirmation supports two flows:
  *
- * After Supabase verifies the token server-side, it redirects the browser to:
- *   <SITE_URL>/auth/callback#access_token=...&refresh_token=...&type=signup
+ * 1. Custom template (preferred):
+ *    https://hidayat.pk/auth/callback?token_hash=...&type=signup
+ *    The page calls verifyOtp(), which confirms the email and returns a session.
  *
- * This page:
- * 1. Lets the Supabase JS client exchange the hash-fragment tokens for a session.
- * 2. Shows a success state and redirects to the dashboard after a brief pause.
- * 3. If something goes wrong, shows an error with a retry option.
+ * 2. GoTrue's default ConfirmationURL (backward compatibility):
+ *    https://supabase.hidayat.pk/auth/v1/verify?...&redirect_to=<callback>
+ *    GoTrue verifies first, then redirects here with session tokens in the hash.
+ *
+ * The custom template keeps the user-facing email link on the frontend domain
+ * and avoids relying on a post-verification browser redirect.
  */
 export default function AuthCallbackPage() {
   const navigate = useNavigate()
@@ -30,9 +32,11 @@ export default function AuthCallbackPage() {
 
   async function handleAuthCallback() {
     try {
-      // Check for error params (Supabase sometimes puts errors in query string)
-      const errorParam = searchParams.get('error')
-      const errorDescription = searchParams.get('error_description')
+      // GoTrue can report failures in either the query string or hash fragment.
+      const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''))
+      const errorParam = searchParams.get('error') || hashParams.get('error')
+      const errorDescription =
+        searchParams.get('error_description') || hashParams.get('error_description')
 
       if (errorParam) {
         setStatus('error')
@@ -40,8 +44,34 @@ export default function AuthCallbackPage() {
         return
       }
 
-      // The hash fragment (access_token, refresh_token) is automatically picked up
-      // by supabase-js when it initializes. We just need to get the session.
+      // Custom self-hosted email template flow. The email lands directly on
+      // this frontend route and supplies GoTrue's hashed one-time token. Calling
+      // verifyOtp confirms the email and stores the returned session locally.
+      const tokenHash = searchParams.get('token_hash')
+      if (tokenHash) {
+        const requestedType = searchParams.get('type') || 'signup'
+        const supportedTypes = new Set([
+          'signup', 'invite', 'magiclink', 'recovery', 'email_change', 'email',
+        ])
+        const type = supportedTypes.has(requestedType) ? requestedType : 'signup'
+        const { data, error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type })
+
+        // Remove the one-time token from browser history as soon as it is used.
+        window.history.replaceState({}, document.title, '/auth/callback')
+
+        if (error || !data?.session) {
+          setStatus('error')
+          setErrorMessage(error?.message || 'Could not verify your email. The link may have expired.')
+          return
+        }
+
+        setStatus('success')
+        setTimeout(() => navigate('/', { replace: true }), 2500)
+        return
+      }
+
+      // Compatibility with GoTrue's default ConfirmationURL flow. Supabase-js
+      // automatically consumes access/refresh tokens from the URL hash.
       const { data, error } = await supabase.auth.getSession()
 
       if (error) {
@@ -52,24 +82,16 @@ export default function AuthCallbackPage() {
 
       if (data?.session) {
         setStatus('success')
-        // Give the user a moment to see the success message, then redirect
-        setTimeout(() => {
-          navigate('/', { replace: true })
-        }, 2500)
+        setTimeout(() => navigate('/', { replace: true }), 2500)
       } else {
-        // No session yet — could be the hash hasn't been consumed yet.
-        // Listen for the auth state to change.
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
           if (event === 'SIGNED_IN' && session) {
             setStatus('success')
-            setTimeout(() => {
-              navigate('/', { replace: true })
-            }, 2500)
+            setTimeout(() => navigate('/', { replace: true }), 2500)
             subscription.unsubscribe()
           }
         })
 
-        // Set a timeout so we don't wait forever
         setTimeout(() => {
           subscription.unsubscribe()
           setStatus((prev) => {
@@ -81,7 +103,7 @@ export default function AuthCallbackPage() {
           })
         }, 10000)
       }
-    } catch (err) {
+    } catch {
       setStatus('error')
       setErrorMessage('An unexpected error occurred. Please try again.')
     }
