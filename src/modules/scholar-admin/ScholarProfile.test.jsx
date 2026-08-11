@@ -57,33 +57,72 @@ describe('ScholarProfile', () => {
     ],
   }
 
+  let currentSubjects = mockAssignments.subjects
+  let currentPrograms = mockAssignments.programs
+  let currentDarsSubjects = []
+  let currentDarsLevels = []
+
+  const mockUpdate = vi.fn().mockReturnValue({
+    eq: vi.fn().mockResolvedValue({ error: null }),
+  })
+
+  const mockFrom = vi.fn((table) => {
+    if (table === 'scholar_subject_assignments') {
+      return {
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockImplementation(() => Promise.resolve({ data: currentSubjects })),
+        }),
+      }
+    }
+    if (table === 'scholar_program_assignments') {
+      return {
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockImplementation(() => Promise.resolve({ data: currentPrograms })),
+        }),
+      }
+    }
+    if (table === 'dars_e_nizami_subjects') {
+      return {
+        select: vi.fn().mockReturnValue({
+          order: vi.fn().mockImplementation(() => Promise.resolve({ data: currentDarsSubjects })),
+        }),
+      }
+    }
+    if (table === 'dars_e_nizami_levels') {
+      return {
+        select: vi.fn().mockReturnValue({
+          order: vi.fn().mockImplementation(() => Promise.resolve({ data: currentDarsLevels })),
+        }),
+      }
+    }
+    if (table === 'scholars') {
+      return {
+        update: mockUpdate,
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockResolvedValue({ data: [] }),
+          }),
+        }),
+      }
+    }
+    return {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockResolvedValue({ data: [] }),
+      single: vi.fn().mockResolvedValue({ data: null }),
+      update: mockUpdate,
+    }
+  })
+
   beforeEach(() => {
     vi.clearAllMocks()
+    currentSubjects = mockAssignments.subjects
+    currentPrograms = mockAssignments.programs
+    currentDarsSubjects = []
+    currentDarsLevels = []
   })
 
   it('renders scholar profile with basic information', async () => {
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: mockAssignments.subjects }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: mockAssignments.programs }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          order: vi.fn().mockResolvedValue({ data: [] }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          order: vi.fn().mockResolvedValue({ data: [] }),
-        }),
-      })
-
     supabaseModule.supabase.from = mockFrom
 
     render(
@@ -99,28 +138,6 @@ describe('ScholarProfile', () => {
   })
 
   it('displays scholar qualifications and specializations', async () => {
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: mockAssignments.subjects }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: mockAssignments.programs }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          order: vi.fn().mockResolvedValue({ data: [] }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          order: vi.fn().mockResolvedValue({ data: [] }),
-        }),
-      })
-
     supabaseModule.supabase.from = mockFrom
 
     render(
@@ -138,28 +155,6 @@ describe('ScholarProfile', () => {
   })
 
   it('displays subject assignments', async () => {
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: mockAssignments.subjects }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: mockAssignments.programs }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          order: vi.fn().mockResolvedValue({ data: [] }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          order: vi.fn().mockResolvedValue({ data: [] }),
-        }),
-      })
-
     supabaseModule.supabase.from = mockFrom
 
     render(
@@ -172,33 +167,11 @@ describe('ScholarProfile', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Tafsir')).toBeInTheDocument()
-      expect(screen.getByText('Level 1')).toBeInTheDocument()
+      expect(screen.getByText(/Level 1/)).toBeInTheDocument()
     })
   })
 
   it('displays program assignments', async () => {
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: mockAssignments.subjects }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: mockAssignments.programs }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          order: vi.fn().mockResolvedValue({ data: [] }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          order: vi.fn().mockResolvedValue({ data: [] }),
-        }),
-      })
-
     supabaseModule.supabase.from = mockFrom
 
     render(
@@ -215,27 +188,8 @@ describe('ScholarProfile', () => {
   })
 
   it('shows deactivation button for active scholars', async () => {
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: [] }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: [] }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          order: vi.fn().mockResolvedValue({ data: [] }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          order: vi.fn().mockResolvedValue({ data: [] }),
-        }),
-      })
+    currentSubjects = []
+    currentPrograms = []
 
     supabaseModule.supabase.from = mockFrom
 
@@ -248,7 +202,7 @@ describe('ScholarProfile', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByText('Deactivate Scholar')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Deactivate Scholar/i })).toBeInTheDocument()
     })
   })
 
@@ -257,41 +211,8 @@ describe('ScholarProfile', () => {
       data: { user: { id: 'admin1' } },
     })
 
-    const mockUpdate = vi.fn().mockReturnValue({
-      eq: vi.fn().mockResolvedValue({ error: null }),
-    })
-
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: [] }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: [] }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          order: vi.fn().mockResolvedValue({ data: [] }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          order: vi.fn().mockResolvedValue({ data: [] }),
-        }),
-      })
-      .mockReturnValueOnce({
-        update: mockUpdate,
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            eq: vi.fn().mockResolvedValue({ data: [] }),
-          }),
-        }),
-      })
+    currentSubjects = []
+    currentPrograms = []
 
     supabaseModule.supabase.from = mockFrom
     supabaseModule.supabase.auth.getUser = mockGetUser
@@ -307,14 +228,14 @@ describe('ScholarProfile', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByText('Deactivate Scholar')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Deactivate Scholar/i })).toBeInTheDocument()
     })
 
-    fireEvent.click(screen.getByText('Deactivate Scholar'))
+    fireEvent.click(screen.getByRole('button', { name: /Deactivate Scholar/i }))
 
     await waitFor(() => {
       expect(
-        screen.getByText('Are you sure?')
+        screen.getByText(/Are you sure/i)
       ).toBeInTheDocument()
     })
 
@@ -326,28 +247,6 @@ describe('ScholarProfile', () => {
   })
 
   it('calls onBack when back button is clicked', () => {
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: [] }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: [] }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          order: vi.fn().mockResolvedValue({ data: [] }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          order: vi.fn().mockResolvedValue({ data: [] }),
-        }),
-      })
-
     supabaseModule.supabase.from = mockFrom
 
     const onBack = vi.fn()

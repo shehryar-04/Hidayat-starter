@@ -4,18 +4,27 @@ import { BrowserRouter } from 'react-router-dom'
 import App from '../App'
 import { supabase } from '../lib/supabase'
 
-// Mock supabase
-vi.mock('../lib/supabase', () => ({
-  supabase: {
-    auth: {
-      getSession: vi.fn(),
-      onAuthStateChange: vi.fn(),
-      signInWithPassword: vi.fn(),
-      signOut: vi.fn(),
+vi.mock('../lib/supabase', () => {
+  const mockSubscription = { unsubscribe: vi.fn() }
+  return {
+    supabase: {
+      auth: {
+        getSession: vi.fn(),
+        onAuthStateChange: vi.fn(() => ({ data: { subscription: mockSubscription } })),
+        signInWithPassword: vi.fn(),
+        signOut: vi.fn(),
+      },
+      from: vi.fn(() => ({
+        select: vi.fn().mockResolvedValue({ data: [] })
+      })),
+      channel: vi.fn(() => ({
+        on: vi.fn().mockReturnThis(),
+        subscribe: vi.fn().mockReturnValue({}),
+      })),
+      removeChannel: vi.fn(),
     },
-    from: vi.fn(),
-  },
-}))
+  }
+})
 
 describe('Authentication Integration', () => {
   beforeEach(() => {
@@ -23,6 +32,9 @@ describe('Authentication Integration', () => {
   })
 
   it('should show login page when user is not authenticated', async () => {
+    // Navigate to /login
+    window.history.pushState({}, '', '/login')
+
     // Mock no session
     vi.mocked(supabase.auth.getSession).mockResolvedValue({
       data: { session: null },
@@ -40,7 +52,7 @@ describe('Authentication Integration', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Hidayat')).toBeInTheDocument()
-      expect(screen.getByText('Sign In')).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: /Sign In/i })).toBeInTheDocument()
     })
   })
 
@@ -81,11 +93,14 @@ describe('Authentication Integration', () => {
     render(<App />)
 
     await waitFor(() => {
-      expect(screen.getByText('Dashboard')).toBeInTheDocument()
+      expect(screen.getByText(/Here's everything available to you/i)).toBeInTheDocument()
     })
   })
 
   it('should handle sign-in flow correctly', async () => {
+    // Navigate to /login
+    window.history.pushState({}, '', '/login')
+
     const mockUserId = 'test-user-id'
     const mockRole = 'admin'
 
@@ -128,12 +143,12 @@ describe('Authentication Integration', () => {
 
     // Initially on login page
     await waitFor(() => {
-      expect(screen.getByText('Sign In')).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: /Sign In/i })).toBeInTheDocument()
     })
 
     // Fill in login form
-    const emailInput = screen.getByLabelText('Email:')
-    const passwordInput = screen.getByLabelText('Password:')
+    const emailInput = screen.getByLabelText(/Email/i)
+    const passwordInput = screen.getByLabelText(/Password/i)
     const submitButton = screen.getByRole('button', { name: /Sign In/i })
 
     fireEvent.change(emailInput, { target: { value: 'admin@example.com' } })
@@ -149,7 +164,7 @@ describe('Authentication Integration', () => {
 
     // Should now show dashboard
     await waitFor(() => {
-      expect(screen.getByText('Dashboard')).toBeInTheDocument()
+      expect(screen.getByText(/Here's everything available to you/i)).toBeInTheDocument()
     })
   })
 })

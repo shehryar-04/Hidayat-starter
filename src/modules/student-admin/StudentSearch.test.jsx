@@ -54,8 +54,8 @@ describe('StudentSearch', () => {
 
     render(<StudentSearch onSelectStudent={vi.fn()} />)
 
-    expect(screen.getByPlaceholderText('Search by name...')).toBeInTheDocument()
-    expect(screen.getByPlaceholderText('Search by enrollment number...')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText(/Search by name/i)).toBeInTheDocument()
+    expect(screen.getByPlaceholderText(/Search by enrollment number/i)).toBeInTheDocument()
     expect(screen.getByText('Program')).toBeInTheDocument()
     expect(screen.getByText('Academic Level')).toBeInTheDocument()
     expect(screen.getByText('Status')).toBeInTheDocument()
@@ -81,7 +81,7 @@ describe('StudentSearch', () => {
 
     render(<StudentSearch onSelectStudent={vi.fn()} />)
 
-    const enrollmentInput = screen.getByPlaceholderText('Search by enrollment number...')
+    const enrollmentInput = screen.getByPlaceholderText(/Search by enrollment number/i)
     fireEvent.change(enrollmentInput, { target: { value: 'NONEXISTENT' } })
 
     const searchButton = screen.getByText('Search')

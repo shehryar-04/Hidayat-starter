@@ -90,7 +90,7 @@ describe('EligibilityEvaluation', () => {
     render(<EligibilityEvaluation />)
 
     await waitFor(() => {
-      expect(screen.getByText('Version: 1')).toBeInTheDocument()
+      expect(screen.getByText((content, element) => element.textContent.replace(/\s+/g, ' ').trim() === 'Version: 1')).toBeInTheDocument()
     })
   })
 
@@ -170,9 +170,12 @@ describe('EligibilityEvaluation', () => {
     fireEvent.click(screen.getByText('Run Eligibility Evaluation'))
 
     await waitFor(() => {
-      expect(screen.getByText('Total Students Evaluated: 100')).toBeInTheDocument()
-      expect(screen.getByText('Eligible Students: 45')).toBeInTheDocument()
-      expect(screen.getByText(/Total Stipend Amount: \$22500/)).toBeInTheDocument()
+      expect(screen.getByText((content, el) => el.textContent.replace(/\s+/g, ' ').trim() === 'Total Students Evaluated: 100')).toBeInTheDocument()
+      expect(screen.getByText((content, el) => el.textContent.replace(/\s+/g, ' ').trim() === 'Eligible Students: 45')).toBeInTheDocument()
+      expect(screen.getByText((content, el) => {
+        const text = el.textContent.replace(/\s+/g, ' ').trim()
+        return text.startsWith('Total Stipend Amount:') && text.includes('22500')
+      })).toBeInTheDocument()
     })
   })
 

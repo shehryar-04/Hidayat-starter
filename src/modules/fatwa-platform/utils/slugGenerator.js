@@ -1,7 +1,7 @@
 /**
- * Slugify helper that supports Unicode (Urdu/Arabic) text.
- * Produces URL-friendly strings while preserving non-Latin characters.
- * Replaces slashes and spaces with hyphens to avoid URL path conflicts.
+ * Slugify helper that supports lowercase ASCII alphanumeric text and hyphens.
+ * Produces URL-friendly strings matching /^[a-z0-9]+(-[a-z0-9]+)*$/.
+ * Replaces spaces, slashes, and special characters with hyphens or removes them.
  *
  * @param {string} text - Text to slugify
  * @returns {string} URL-safe slug
@@ -10,19 +10,17 @@ export function slugify(text) {
   if (!text || typeof text !== 'string') return ''
 
   return text
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')     // Remove non-alphanumeric characters (except space/hyphen)
     .trim()
-    .replace(/C-جامعہ-علوم-اسلامیہ-علامہ-محمد-یوسف-بنوری-ٹاؤن|/g, '')
-    .replace(/جامعہ علوم اسلامیہ علامہ محمد یوسف بنوری ٹاؤن|/g, '')
-    .replace(/[/\\]+/g, '-')         // Replace slashes with hyphens
-    .replace(/[?#&=]+/g, '')         // Remove URL-unsafe query characters
-    .replace(/\s+/g, '-')            // Replace spaces with hyphens
+    .replace(/[\s_]+/g, '-')          // Replace spaces and underscores with hyphens
     .replace(/-+/g, '-')             // Collapse multiple hyphens
     .replace(/^-|-$/g, '')           // Trim leading/trailing hyphens
 }
 
 /**
  * Generates a URL-friendly slug from a fatwa title/question.
- * Preserves Unicode characters (Urdu/Arabic) for readable URLs.
+ * Preserves alphanumeric characters and matches formatting regex.
  * Appends ID suffix if slug already exists in the provided set.
  *
  * @param {string} title - The fatwa title/question to slugify
@@ -33,14 +31,22 @@ export function slugify(text) {
 export function generateSlug(title, id, existingSlugs = new Set()) {
   let slug = slugify(title)
 
-  // If slug is empty (e.g., no usable text), use the ID
+  // Truncate to 80 chars max (safe limit before appending ID if needed)
+  if (slug.length > 80) {
+    slug = slug.slice(0, 80).replace(/-$/, '')
+  }
+
+  const cleanId = String(id).toLowerCase().replace(/[^a-z0-9]/g, '')
+  const safeId = cleanId || 'id'
+
+  // If slug is empty (e.g., all characters were non-latin), use the ID
   if (!slug) {
-    slug = `fatwa-${String(id)}`
+    slug = `fatwa-${safeId}`
   }
 
   // Ensure uniqueness by appending ID if slug already exists
   if (existingSlugs.has(slug)) {
-    slug = `${slug}-${String(id)}`
+    slug = `${slug}-${safeId}`
   }
 
   return slug

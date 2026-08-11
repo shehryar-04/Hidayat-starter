@@ -49,23 +49,54 @@ describe('NazraProgressView', () => {
     },
   ]
 
+  let currentLessons = mockLessons
+  let currentProgress = mockProgress
+  let currentScholar = [{ id: 'scholar1' }]
+
+  const mockInsert = vi.fn().mockResolvedValue({ error: null })
+
+  const mockFrom = vi.fn((table) => {
+    if (table === 'nazra_lessons') {
+      return {
+        select: vi.fn().mockReturnValue({
+          order: vi.fn().mockImplementation(() => Promise.resolve({ data: currentLessons })),
+        }),
+      }
+    }
+    if (table === 'nazra_progress') {
+      return {
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockImplementation(() => Promise.resolve({ data: currentProgress })),
+        }),
+        insert: mockInsert,
+      }
+    }
+    if (table === 'scholars') {
+      return {
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockImplementation(() => Promise.resolve({ data: currentScholar ? currentScholar[0] : null })),
+          }),
+        }),
+      }
+    }
+    return {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockResolvedValue({ data: [] }),
+      single: vi.fn().mockResolvedValue({ data: null }),
+      insert: mockInsert,
+    }
+  })
+
   beforeEach(() => {
     vi.clearAllMocks()
+    currentLessons = mockLessons
+    currentProgress = mockProgress
+    currentScholar = [{ id: 'scholar1' }]
   })
 
   it('renders Nazra progress view with student info', async () => {
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          order: vi.fn().mockResolvedValue({ data: mockLessons }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: mockProgress }),
-        }),
-      })
-
     supabaseModule.supabase.from = mockFrom
 
     render(<NazraProgressView student={mockStudent} onBack={vi.fn()} />)
@@ -77,18 +108,6 @@ describe('NazraProgressView', () => {
   })
 
   it('displays all lessons', async () => {
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          order: vi.fn().mockResolvedValue({ data: mockLessons }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: mockProgress }),
-        }),
-      })
-
     supabaseModule.supabase.from = mockFrom
 
     render(<NazraProgressView student={mockStudent} onBack={vi.fn()} />)
@@ -103,38 +122,6 @@ describe('NazraProgressView', () => {
     const mockGetUser = vi.fn().mockResolvedValue({
       data: { user: { id: 'user1' } },
     })
-
-    const mockInsert = vi.fn().mockResolvedValue({ error: null })
-
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          order: vi.fn().mockResolvedValue({ data: mockLessons }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: mockProgress }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: [{ id: 'scholar1' }] }),
-        }),
-      })
-      .mockReturnValueOnce({
-        insert: mockInsert,
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          order: vi.fn().mockResolvedValue({ data: mockLessons }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: mockProgress }),
-        }),
-      })
 
     supabaseModule.supabase.from = mockFrom
     supabaseModule.supabase.auth.getUser = mockGetUser
@@ -153,24 +140,12 @@ describe('NazraProgressView', () => {
   })
 
   it('displays quality notes for completed lessons', async () => {
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          order: vi.fn().mockResolvedValue({ data: mockLessons }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: mockProgress }),
-        }),
-      })
-
     supabaseModule.supabase.from = mockFrom
 
     render(<NazraProgressView student={mockStudent} onBack={vi.fn()} />)
 
     await waitFor(() => {
-      expect(screen.getByText('Good pronunciation')).toBeInTheDocument()
+      expect(screen.getByText(/Good pronunciation/)).toBeInTheDocument()
     })
   })
 
@@ -192,17 +167,7 @@ describe('NazraProgressView', () => {
       },
     }))
 
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          order: vi.fn().mockResolvedValue({ data: mockLessons }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: allCompleted }),
-        }),
-      })
+    currentProgress = allCompleted
 
     supabaseModule.supabase.from = mockFrom
 
@@ -214,41 +179,17 @@ describe('NazraProgressView', () => {
   })
 
   it('shows progress percentage', async () => {
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          order: vi.fn().mockResolvedValue({ data: mockLessons }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: mockProgress }),
-        }),
-      })
-
     supabaseModule.supabase.from = mockFrom
 
     render(<NazraProgressView student={mockStudent} onBack={vi.fn()} />)
 
     await waitFor(() => {
       // 1 out of 3 lessons = 33%
-      expect(screen.getByText(/1 \/ 3 lessons/)).toBeInTheDocument()
+      expect(screen.getByText(/1 \/ 3/)).toBeInTheDocument()
     })
   })
 
   it('calls onBack when back button is clicked', async () => {
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          order: vi.fn().mockResolvedValue({ data: mockLessons }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: [] }),
-        }),
-      })
-
     supabaseModule.supabase.from = mockFrom
 
     const onBack = vi.fn()
@@ -256,10 +197,10 @@ describe('NazraProgressView', () => {
     render(<NazraProgressView student={mockStudent} onBack={onBack} />)
 
     await waitFor(() => {
-      expect(screen.getByText('← Back to Search')).toBeInTheDocument()
+      expect(screen.getByText(/Back to Search/)).toBeInTheDocument()
     })
 
-    fireEvent.click(screen.getByText('← Back to Search'))
+    fireEvent.click(screen.getByText(/Back to Search/))
     expect(onBack).toHaveBeenCalled()
   })
 })

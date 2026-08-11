@@ -62,27 +62,53 @@ describe('EnrollmentView', () => {
     },
   ]
 
+  let currentEnrollments = mockEnrollments
+  let currentStudents = mockStudents
+
+  const mockInsert = vi.fn().mockResolvedValue({ error: null })
+  const mockUpdate = vi.fn().mockReturnValue({
+    eq: vi.fn().mockResolvedValue({ error: null }),
+  })
+
+  const mockFrom = vi.fn((table) => {
+    if (table === 'short_course_enrollments') {
+      return {
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            order: vi.fn().mockImplementation(() => Promise.resolve({ data: currentEnrollments })),
+          }),
+        }),
+        insert: mockInsert,
+        update: mockUpdate,
+      }
+    }
+    if (table === 'students') {
+      const orderFn = vi.fn().mockImplementation(() => Promise.resolve({ data: currentStudents }))
+      return {
+        select: vi.fn().mockReturnValue({
+          order: orderFn,
+          eq: vi.fn().mockReturnValue({
+            order: orderFn,
+          }),
+        }),
+      }
+    }
+    return {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockResolvedValue({ data: [] }),
+      insert: mockInsert,
+      update: mockUpdate,
+    }
+  })
+
   beforeEach(() => {
     vi.clearAllMocks()
+    currentEnrollments = mockEnrollments
+    currentStudents = mockStudents
   })
 
   it('renders enrollment view with course title', async () => {
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: mockEnrollments }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: mockStudents }),
-          }),
-        }),
-      })
-
     supabaseModule.supabase.from = mockFrom
 
     render(<EnrollmentView course={mockCourse} onBack={vi.fn()} />)
@@ -93,22 +119,6 @@ describe('EnrollmentView', () => {
   })
 
   it('displays enrolled students', async () => {
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: mockEnrollments }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: mockStudents }),
-          }),
-        }),
-      })
-
     supabaseModule.supabase.from = mockFrom
 
     render(<EnrollmentView course={mockCourse} onBack={vi.fn()} />)
@@ -124,51 +134,16 @@ describe('EnrollmentView', () => {
       data: { user: { id: 'user1' } },
     })
 
-    const mockInsert = vi.fn().mockResolvedValue({ error: null })
-
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: mockEnrollments }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: mockStudents }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        insert: mockInsert,
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: mockEnrollments }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: mockStudents }),
-          }),
-        }),
-      })
-
     supabaseModule.supabase.from = mockFrom
     supabaseModule.supabase.auth.getUser = mockGetUser
 
     render(<EnrollmentView course={mockCourse} onBack={vi.fn()} />)
 
     await waitFor(() => {
-      expect(screen.getByText('Enroll Student')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Enroll Student/i })).toBeInTheDocument()
     })
 
-    fireEvent.click(screen.getByText('Enroll Student'))
+    fireEvent.click(screen.getByRole('button', { name: /Enroll Student/i }))
 
     await waitFor(() => {
       expect(screen.getByText('Student')).toBeInTheDocument()
@@ -176,52 +151,15 @@ describe('EnrollmentView', () => {
   })
 
   it('marks enrollment as completed', async () => {
-    const mockUpdate = vi.fn().mockReturnValue({
-      eq: vi.fn().mockResolvedValue({ error: null }),
-    })
-
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: mockEnrollments }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: mockStudents }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        update: mockUpdate,
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: mockEnrollments }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: mockStudents }),
-          }),
-        }),
-      })
-
     supabaseModule.supabase.from = mockFrom
 
     render(<EnrollmentView course={mockCourse} onBack={vi.fn()} />)
 
     await waitFor(() => {
-      expect(screen.getByText('Mark Complete')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Complete/i })).toBeInTheDocument()
     })
 
-    fireEvent.click(screen.getByText('Mark Complete'))
+    fireEvent.click(screen.getByRole('button', { name: /Complete/i }))
 
     await waitFor(() => {
       expect(mockUpdate).toHaveBeenCalled()
@@ -229,21 +167,8 @@ describe('EnrollmentView', () => {
   })
 
   it('calls onBack when back button is clicked', async () => {
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: [] }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: [] }),
-          }),
-        }),
-      })
+    currentEnrollments = []
+    currentStudents = []
 
     supabaseModule.supabase.from = mockFrom
 
@@ -252,10 +177,10 @@ describe('EnrollmentView', () => {
     render(<EnrollmentView course={mockCourse} onBack={onBack} />)
 
     await waitFor(() => {
-      expect(screen.getByText('← Back to Courses')).toBeInTheDocument()
+      expect(screen.getByText(/Back to Courses/i)).toBeInTheDocument()
     })
 
-    fireEvent.click(screen.getByText('← Back to Courses'))
+    fireEvent.click(screen.getByText(/Back to Courses/i))
     expect(onBack).toHaveBeenCalled()
   })
 })

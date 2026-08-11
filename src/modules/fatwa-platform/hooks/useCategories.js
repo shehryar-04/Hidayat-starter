@@ -70,18 +70,26 @@ export function buildCategoryTree(fatwas) {
  */
 export function useCategories() {
   const categories = useFatwaStore((state) => state.categories)
+  const fatwas = useFatwaStore((state) => state.fatwas)
 
   const tree = useMemo(() => {
-    if (!categories || Object.keys(categories).length === 0) return {}
+    let source = categories
+    if (!source || Object.keys(source).length === 0) {
+      if (fatwas && fatwas.length > 0) {
+        source = buildCategoryTree(fatwas)
+      }
+    }
+
+    if (!source || Object.keys(source).length === 0) return {}
 
     // Filter out categories with corrupted names
     const filtered = {}
-    for (const [name, node] of Object.entries(categories)) {
+    for (const [name, node] of Object.entries(source)) {
       if (!isValidCategoryName(name)) continue
       filtered[name] = node
     }
     return filtered
-  }, [categories])
+  }, [categories, fatwas])
 
   const topLevelCategories = useMemo(
     () => Object.values(tree),

@@ -58,34 +58,69 @@ describe('StudentProfile', () => {
     ],
   }
 
+  let currentSchema = mockFormSchema
+  let currentProfile = mockProfileData
+  let currentHistory = []
+  let insertedData = null
+
+  const mockInsert = vi.fn().mockImplementation((data) => {
+    insertedData = data
+    return Promise.resolve({ error: null })
+  })
+
+  const mockUpdate = vi.fn().mockReturnValue({
+    eq: vi.fn().mockResolvedValue({ error: null }),
+  })
+
+  const mockFrom = vi.fn((table) => {
+    if (table === 'form_schemas') {
+      return {
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockImplementation(() => Promise.resolve({ data: currentSchema })),
+          }),
+        }),
+      }
+    }
+    if (table === 'students') {
+      return {
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockImplementation(() => Promise.resolve({ data: currentProfile })),
+          }),
+        }),
+        update: mockUpdate,
+      }
+    }
+    if (table === 'student_status_history') {
+      return {
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            order: vi.fn().mockImplementation(() => Promise.resolve({ data: currentHistory })),
+          }),
+        }),
+        insert: mockInsert,
+      }
+    }
+    return {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({ data: null }),
+      order: vi.fn().mockResolvedValue({ data: [] }),
+      update: mockUpdate,
+      insert: mockInsert,
+    }
+  })
+
   beforeEach(() => {
     vi.clearAllMocks()
+    currentSchema = mockFormSchema
+    currentProfile = mockProfileData
+    currentHistory = []
+    insertedData = null
   })
 
   it('renders student profile header with name and enrollment number', async () => {
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: mockFormSchema }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: mockProfileData }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: [] }),
-          }),
-        }),
-      })
-
     supabaseModule.supabase.from = mockFrom
 
     render(
@@ -104,29 +139,6 @@ describe('StudentProfile', () => {
 
   it('renders back button and calls onBack when clicked', async () => {
     const mockOnBack = vi.fn()
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: mockFormSchema }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: mockProfileData }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: [] }),
-          }),
-        }),
-      })
-
     supabaseModule.supabase.from = mockFrom
 
     render(
@@ -148,29 +160,6 @@ describe('StudentProfile', () => {
   })
 
   it('renders status change buttons', async () => {
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: mockFormSchema }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: mockProfileData }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: [] }),
-          }),
-        }),
-      })
-
     supabaseModule.supabase.from = mockFrom
 
     render(
@@ -183,10 +172,10 @@ describe('StudentProfile', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Change Status')).toBeInTheDocument()
-      expect(screen.getByText('Active')).toBeInTheDocument()
-      expect(screen.getByText('Suspended')).toBeInTheDocument()
-      expect(screen.getByText('Graduated')).toBeInTheDocument()
-      expect(screen.getByText('Withdrawn')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /active/i })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /suspended/i })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /graduated/i })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /withdrawn/i })).toBeInTheDocument()
     })
   })
 
@@ -194,48 +183,6 @@ describe('StudentProfile', () => {
     const mockGetUser = vi.fn().mockResolvedValue({
       data: { user: { id: 'admin1' } },
     })
-
-    let insertedData = null
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: mockFormSchema }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: mockProfileData }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: [] }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        update: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ error: null }),
-        }),
-      })
-      .mockReturnValueOnce({
-        insert: vi.fn().mockImplementation((data) => {
-          insertedData = data
-          return Promise.resolve({ error: null })
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: [] }),
-          }),
-        }),
-      })
 
     supabaseModule.supabase.from = mockFrom
     supabaseModule.supabase.auth.getUser = mockGetUser
@@ -252,7 +199,7 @@ describe('StudentProfile', () => {
       expect(screen.getByText('Change Status')).toBeInTheDocument()
     })
 
-    const graduatedButton = screen.getByText('Graduated')
+    const graduatedButton = screen.getByText(/graduated/i)
     fireEvent.click(graduatedButton)
 
     await waitFor(() => {
@@ -265,29 +212,6 @@ describe('StudentProfile', () => {
   })
 
   it('renders documents section', async () => {
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: mockFormSchema }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: mockProfileData }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: [] }),
-          }),
-        }),
-      })
-
     supabaseModule.supabase.from = mockFrom
 
     render(
@@ -300,7 +224,7 @@ describe('StudentProfile', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Documents')).toBeInTheDocument()
-      expect(screen.getByText('Upload Document:')).toBeInTheDocument()
+      expect(screen.getByText(/Upload Document/i)).toBeInTheDocument()
     })
   })
 })

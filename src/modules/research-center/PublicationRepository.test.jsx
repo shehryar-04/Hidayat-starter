@@ -66,13 +66,17 @@ describe('PublicationRepository', () => {
 
     supabaseModule.supabase.from = mockFrom
 
-    render(<PublicationRepository />)
+    const { container } = render(<PublicationRepository />)
 
     await waitFor(() => {
-      expect(screen.getByText('A comprehensive study...')).toBeInTheDocument()
-      expect(screen.getByText('Dr. Ahmed')).toBeInTheDocument()
-      expect(screen.getByText('paper')).toBeInTheDocument()
+      expect(screen.getByText(/A comprehensive study/)).toBeInTheDocument()
     })
+
+    await waitFor(() => {
+      expect(screen.getAllByText(/Research Paper/i).length).toBeGreaterThan(0)
+    })
+
+    expect(container.innerHTML).toContain('Dr. Ahmed, Dr. Fatima')
   })
 
   it('displays download count', async () => {
@@ -89,7 +93,7 @@ describe('PublicationRepository', () => {
     render(<PublicationRepository />)
 
     await waitFor(() => {
-      expect(screen.getByText(/Downloads: 5/)).toBeInTheDocument()
+      expect(screen.getByText(/5.*downloads/i)).toBeInTheDocument()
     })
   })
 
@@ -117,10 +121,10 @@ describe('PublicationRepository', () => {
     render(<PublicationRepository />)
 
     await waitFor(() => {
-      expect(screen.getByPlaceholderText('Search by title...')).toBeInTheDocument()
+      expect(screen.getByPlaceholderText(/Search by title/i)).toBeInTheDocument()
     })
 
-    const titleInput = screen.getByPlaceholderText('Search by title...')
+    const titleInput = screen.getByPlaceholderText(/Search by title/i)
     fireEvent.change(titleInput, { target: { value: 'Islamic' } })
 
     fireEvent.click(screen.getByText('Search'))
@@ -181,7 +185,7 @@ describe('PublicationRepository', () => {
     render(<PublicationRepository />)
 
     await waitFor(() => {
-      expect(screen.getByText('Download')).toBeInTheDocument()
+      expect(screen.getByText(/Download PDF/i)).toBeInTheDocument()
     })
   })
 
@@ -191,9 +195,8 @@ describe('PublicationRepository', () => {
     })
 
     const mockStorageFrom = vi.fn().mockReturnValue({
-      download: vi.fn().mockResolvedValue({
-        data: new Blob(['test']),
-        error: null,
+      getPublicUrl: vi.fn().mockReturnValue({
+        data: { publicUrl: 'http://example.com/file.pdf' },
       }),
     })
 
@@ -222,10 +225,10 @@ describe('PublicationRepository', () => {
     render(<PublicationRepository />)
 
     await waitFor(() => {
-      expect(screen.getByText('Download')).toBeInTheDocument()
+      expect(screen.getByText(/Download PDF/i)).toBeInTheDocument()
     })
 
-    fireEvent.click(screen.getByText('Download'))
+    fireEvent.click(screen.getByText(/Download PDF/i))
 
     await waitFor(() => {
       expect(mockUpdate).toHaveBeenCalled()

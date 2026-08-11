@@ -26,7 +26,7 @@ describe('ProtectedRoute', () => {
       </BrowserRouter>
     )
 
-    expect(screen.getByText('Loading...')).toBeInTheDocument()
+    expect(screen.getByText(/Loading/)).toBeInTheDocument()
   })
 
   it('should render protected content when user is authenticated', () => {

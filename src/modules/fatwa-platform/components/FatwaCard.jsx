@@ -7,11 +7,12 @@ import { detectDirection } from '../utils/rtlDetection'
  * category, and issuing institution. Links to the fatwa detail page.
  */
 export function FatwaCard({ fatwa }) {
-  const { title, slug, category_1, dar_ul_ifta } = fatwa
+  const { title, slug, category_1, dar_ul_ifta, fatwa_ref, reference_number } = fatwa
   const basePath = useBasePath()
   const location = useLocation()
   const isRtl = detectDirection(title) === 'rtl'
   const isFromSearch = location.pathname.includes('/search')
+  const refNum = fatwa_ref || reference_number
 
   return (
     <Link
@@ -27,6 +28,11 @@ export function FatwaCard({ fatwa }) {
       </h3>
 
       <div className="flex items-center gap-2 flex-wrap">
+        {refNum && (
+          <span className="inline-block text-[10px] font-medium px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-mono">
+            {refNum.startsWith('#') ? refNum : `#${refNum}`}
+          </span>
+        )}
         {category_1 && (
           <span className={`inline-block text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-50 text-green-700 ${detectDirection(category_1) === 'rtl' ? 'font-urdu' : ''}`}>
             {category_1}

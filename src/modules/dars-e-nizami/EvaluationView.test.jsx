@@ -184,6 +184,7 @@ describe('EvaluationView', () => {
         subject_id: 'subj2',
         score: 80,
         flagged: false,
+        dars_e_nizami_subjects: { id: 'subj2', name: 'Hadith' },
       },
     ]
 
@@ -211,7 +212,9 @@ describe('EvaluationView', () => {
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: mockSubjects }),
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockResolvedValue({ data: passingEvaluations }),
+          }),
         }),
       })
 

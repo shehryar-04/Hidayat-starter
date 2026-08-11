@@ -57,35 +57,70 @@ describe('FatwaResponseEditor', () => {
     },
   ]
 
+  let currentRole = 'mufti'
+  let currentResponses = mockResponses
+  let currentAuditLog = mockAuditLog
+
+  const mockInsert = vi.fn().mockResolvedValue({ error: null })
+  const mockUpdate = vi.fn().mockReturnValue({
+    eq: vi.fn().mockResolvedValue({ error: null }),
+  })
+
+  const mockFrom = vi.fn((table) => {
+    if (table === 'profiles') {
+      return {
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockImplementation(() => Promise.resolve({ data: { role: currentRole } })),
+          }),
+        }),
+      }
+    }
+    if (table === 'fatwa_responses') {
+      return {
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            order: vi.fn().mockImplementation(() => Promise.resolve({ data: currentResponses })),
+          }),
+        }),
+        insert: mockInsert,
+      }
+    }
+    if (table === 'fatwa_audit_log') {
+      return {
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            order: vi.fn().mockImplementation(() => Promise.resolve({ data: currentAuditLog })),
+          }),
+        }),
+        insert: mockInsert,
+      }
+    }
+    if (table === 'fatwa_questions') {
+      return {
+        update: mockUpdate,
+      }
+    }
+    return {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockResolvedValue({ data: [] }),
+      insert: mockInsert,
+      update: mockUpdate,
+    }
+  })
+
   beforeEach(() => {
     vi.clearAllMocks()
+    currentRole = 'mufti'
+    currentResponses = mockResponses
+    currentAuditLog = mockAuditLog
   })
 
   it('renders question content', async () => {
     const mockGetUser = vi.fn().mockResolvedValue({
       data: { user: { id: 'user1' } },
     })
-
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: [{ role: 'mufti' }] }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: mockResponses }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: mockAuditLog }),
-          }),
-        }),
-      })
 
     supabaseModule.supabase.from = mockFrom
     supabaseModule.supabase.auth.getUser = mockGetUser
@@ -109,27 +144,6 @@ describe('FatwaResponseEditor', () => {
       data: { user: { id: 'user1' } },
     })
 
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: [{ role: 'mufti' }] }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: mockResponses }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: mockAuditLog }),
-          }),
-        }),
-      })
-
     supabaseModule.supabase.from = mockFrom
     supabaseModule.supabase.auth.getUser = mockGetUser
 
@@ -152,40 +166,8 @@ describe('FatwaResponseEditor', () => {
       data: { user: { id: 'mufti1' } },
     })
 
-    const mockInsert = vi.fn().mockResolvedValue({ error: null })
-    const mockUpdate = vi.fn().mockReturnValue({
-      eq: vi.fn().mockResolvedValue({ error: null }),
-    })
-
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: [{ role: 'mufti' }] }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: [] }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: [] }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        insert: mockInsert,
-      })
-      .mockReturnValueOnce({
-        update: mockUpdate,
-      })
-      .mockReturnValueOnce({
-        insert: mockInsert,
-      })
+    currentResponses = []
+    currentAuditLog = []
 
     supabaseModule.supabase.from = mockFrom
     supabaseModule.supabase.auth.getUser = mockGetUser
@@ -217,26 +199,9 @@ describe('FatwaResponseEditor', () => {
       data: { user: { id: 'user1' } },
     })
 
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: [{ role: 'admin' }] }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: [] }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: mockAuditLog }),
-          }),
-        }),
-      })
+    currentRole = 'admin'
+    currentResponses = []
+    currentAuditLog = mockAuditLog
 
     supabaseModule.supabase.from = mockFrom
     supabaseModule.supabase.auth.getUser = mockGetUser
@@ -266,26 +231,8 @@ describe('FatwaResponseEditor', () => {
       data: { user: { id: 'user1' } },
     })
 
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: [{ role: 'mufti' }] }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: [] }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: [] }),
-          }),
-        }),
-      })
+    currentResponses = []
+    currentAuditLog = []
 
     supabaseModule.supabase.from = mockFrom
     supabaseModule.supabase.auth.getUser = mockGetUser

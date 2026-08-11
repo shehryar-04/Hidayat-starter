@@ -144,6 +144,7 @@ export function NazraProgressView({ student, onBack }) {
   const totalLessons = lessons.length
   const progressPercentage =
     totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0
+  const isComplete = totalLessons > 0 && completedCount === totalLessons
 
   return (
     <div className="space-y-6">
@@ -164,8 +165,8 @@ export function NazraProgressView({ student, onBack }) {
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <Badge variant={nazraStatus === 'complete' ? 'success' : 'warning'} dot>
-                {nazraStatus === 'complete' ? 'Complete' : 'In Progress'}
+              <Badge variant={isComplete ? 'success' : 'warning'} dot>
+                {isComplete ? 'Complete' : 'In Progress'}
               </Badge>
               <span className="text-sm text-neutral-600">
                 {completedCount} / {totalLessons} ({progressPercentage}%)
@@ -189,7 +190,7 @@ export function NazraProgressView({ student, onBack }) {
         </div>
       )}
 
-      {nazraStatus === 'complete' && (
+      {isComplete && (
         <Card className="border-l-4 border-l-green-500 bg-green-50">
           <CardContent>
             <p className="font-semibold text-green-800">Nazra Complete!</p>

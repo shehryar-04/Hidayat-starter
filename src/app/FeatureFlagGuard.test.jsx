@@ -5,13 +5,24 @@ import FeatureFlagGuard from './FeatureFlagGuard'
 import { FeatureFlagProvider, useFeatureFlags } from './FeatureFlagProvider'
 import { supabase } from '../lib/supabase'
 
-// Mock supabase
 vi.mock('../lib/supabase', () => {
+  const mockSubscription = { unsubscribe: vi.fn() }
   return {
     supabase: {
-      from: vi.fn(),
-      channel: vi.fn(),
+      from: vi.fn(() => ({
+        select: vi.fn().mockResolvedValue({ data: [] }),
+      })),
+      channel: vi.fn(() => ({
+        on: vi.fn().mockReturnThis(),
+        subscribe: vi.fn().mockReturnValue({}),
+      })),
       removeChannel: vi.fn(),
+      auth: {
+        getSession: vi.fn().mockResolvedValue({ data: { session: null } }),
+        onAuthStateChange: vi.fn(() => ({ data: { subscription: mockSubscription } })),
+        signInWithPassword: vi.fn(),
+        signOut: vi.fn(),
+      },
     },
   }
 })

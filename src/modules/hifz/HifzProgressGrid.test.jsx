@@ -58,25 +58,62 @@ describe('HifzProgressGrid', () => {
     },
   ]
 
+  let currentProgress = mockProgress
+  let currentAuditLog = mockAuditLog
+  let currentScholar = [{ id: 'scholar1' }]
+
+  const mockInsert = vi.fn().mockResolvedValue({ error: null })
+  const mockUpdate = vi.fn().mockReturnValue({
+    eq: vi.fn().mockResolvedValue({ error: null }),
+  })
+
+  const mockFrom = vi.fn((table) => {
+    if (table === 'hifz_progress') {
+      return {
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockImplementation(() => Promise.resolve({ data: currentProgress })),
+        }),
+        update: mockUpdate,
+        insert: mockInsert,
+      }
+    }
+    if (table === 'hifz_audit_log') {
+      return {
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            order: vi.fn().mockImplementation(() => Promise.resolve({ data: currentAuditLog })),
+          }),
+        }),
+        insert: mockInsert,
+      }
+    }
+    if (table === 'scholars') {
+      return {
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockImplementation(() => Promise.resolve({ data: currentScholar ? currentScholar[0] : null })),
+          }),
+        }),
+      }
+    }
+    return {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockResolvedValue({ data: [] }),
+      single: vi.fn().mockResolvedValue({ data: null }),
+      insert: mockInsert,
+      update: mockUpdate,
+    }
+  })
+
   beforeEach(() => {
     vi.clearAllMocks()
+    currentProgress = mockProgress
+    currentAuditLog = mockAuditLog
+    currentScholar = [{ id: 'scholar1' }]
   })
 
   it('renders Hifz progress grid with student info', async () => {
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: mockProgress }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: mockAuditLog }),
-          }),
-        }),
-      })
-
     supabaseModule.supabase.from = mockFrom
 
     render(<HifzProgressGrid student={mockStudent} onBack={vi.fn()} />)
@@ -88,20 +125,6 @@ describe('HifzProgressGrid', () => {
   })
 
   it('displays all 30 Juz cards', async () => {
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: mockProgress }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: [] }),
-          }),
-        }),
-      })
-
     supabaseModule.supabase.from = mockFrom
 
     render(<HifzProgressGrid student={mockStudent} onBack={vi.fn()} />)
@@ -116,48 +139,6 @@ describe('HifzProgressGrid', () => {
     const mockGetUser = vi.fn().mockResolvedValue({
       data: { user: { id: 'user1' } },
     })
-
-    const mockInsert = vi.fn().mockResolvedValue({ error: null })
-    const mockUpdate = vi.fn().mockReturnValue({
-      eq: vi.fn().mockResolvedValue({ error: null }),
-    })
-
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: mockProgress }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: mockAuditLog }),
-          }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: [{ id: 'scholar1' }] }),
-        }),
-      })
-      .mockReturnValueOnce({
-        update: mockUpdate,
-      })
-      .mockReturnValueOnce({
-        insert: mockInsert,
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: mockProgress }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: mockAuditLog }),
-          }),
-        }),
-      })
 
     supabaseModule.supabase.from = mockFrom
     supabaseModule.supabase.auth.getUser = mockGetUser
@@ -191,19 +172,8 @@ describe('HifzProgressGrid', () => {
       scholar_id: 'scholar1',
     }))
 
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: allMemorized }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: [] }),
-          }),
-        }),
-      })
+    currentProgress = allMemorized
+    currentAuditLog = []
 
     supabaseModule.supabase.from = mockFrom
 
@@ -215,20 +185,6 @@ describe('HifzProgressGrid', () => {
   })
 
   it('displays audit log when toggled', async () => {
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: mockProgress }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: mockAuditLog }),
-          }),
-        }),
-      })
-
     supabaseModule.supabase.from = mockFrom
 
     render(<HifzProgressGrid student={mockStudent} onBack={vi.fn()} />)
@@ -246,20 +202,6 @@ describe('HifzProgressGrid', () => {
   })
 
   it('calls onBack when back button is clicked', async () => {
-    const mockFrom = vi.fn()
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ data: mockProgress }),
-        }),
-      })
-      .mockReturnValueOnce({
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockResolvedValue({ data: [] }),
-          }),
-        }),
-      })
-
     supabaseModule.supabase.from = mockFrom
 
     const onBack = vi.fn()
@@ -267,10 +209,10 @@ describe('HifzProgressGrid', () => {
     render(<HifzProgressGrid student={mockStudent} onBack={onBack} />)
 
     await waitFor(() => {
-      expect(screen.getByText('← Back to Search')).toBeInTheDocument()
+      expect(screen.getByText(/Back to Search/)).toBeInTheDocument()
     })
 
-    fireEvent.click(screen.getByText('← Back to Search'))
+    fireEvent.click(screen.getByText(/Back to Search/))
     expect(onBack).toHaveBeenCalled()
   })
 })
