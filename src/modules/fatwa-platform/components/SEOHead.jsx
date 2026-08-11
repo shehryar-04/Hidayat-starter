@@ -18,12 +18,17 @@ export default function SEOHead({
   description,
   canonicalUrl,
   ogType = 'website',
-  structuredData = []
+  structuredData = [],
+  lang = 'en'
 }) {
   const truncatedDescription = description ? description.slice(0, 160) : ''
+  const locale = lang === 'ur' ? 'ur_PK' : 'en_US'
 
   return (
     <Helmet>
+      {/* HTML Lang */}
+      <html lang={lang} />
+
       {/* Page title */}
       <title>{title}</title>
 
@@ -39,6 +44,7 @@ export default function SEOHead({
       <meta property="og:type" content={ogType} />
       <meta property="og:url" content={canonicalUrl} />
       <meta property="og:site_name" content="Hidayat Darul Ifta" />
+      <meta property="og:locale" content={locale} />
 
       {/* Twitter Card tags */}
       <meta name="twitter:card" content="summary" />

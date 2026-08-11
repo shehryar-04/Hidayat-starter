@@ -6,6 +6,7 @@ import { useBasePath } from '../hooks/useBasePath'
 import { isValidCategoryName } from '../utils/categoryFilter'
 import { detectDirection } from '../utils/rtlDetection'
 import SEOHead from '../components/SEOHead'
+import { generateFAQListSchema } from '../utils/structuredData'
 import BreadcrumbNav from '../components/BreadcrumbNav'
 import { FatwaCard } from '../components/FatwaCard'
 
@@ -197,6 +198,15 @@ export default function CategoryPage() {
   const canonicalUrl = `https://hidayat.org/fatwas/category/${[cat1, cat2, cat3].filter(Boolean).join('/')}`
 
   // Loading state
+  const lang = useMemo(() => {
+    return detectDirection(currentCategoryName) === 'rtl' ? 'ur' : 'en'
+  }, [currentCategoryName])
+
+  const faqSchema = useMemo(() => {
+    if (!fatwas || fatwas.length === 0) return []
+    return [generateFAQListSchema(fatwas, lang)]
+  }, [fatwas, lang])
+
   if (loading && !tree) {
     return (
       <main className="min-h-screen flex items-center justify-center">
@@ -215,6 +225,8 @@ export default function CategoryPage() {
         description={seoDescription}
         canonicalUrl={canonicalUrl}
         ogType="website"
+        structuredData={faqSchema}
+        lang={lang}
       />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

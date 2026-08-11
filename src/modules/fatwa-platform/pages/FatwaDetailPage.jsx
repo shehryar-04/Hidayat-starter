@@ -19,11 +19,13 @@ import { getRelatedFatwas } from '../utils/relatedFatwas'
 import { prepareFatwaAnswer } from '../utils/answerContent'
 import {
   generateFAQPageSchema,
+  generateQAPageSchema,
   generateArticleSchema,
   generateBreadcrumbSchema,
   generateSEOTitle,
   truncateDescription,
 } from '../utils/structuredData'
+import { WhatsAppButton } from '../../../shared/WhatsAppButton'
 
 const BASE_URL = 'https://hidayat.org'
 
@@ -202,9 +204,15 @@ export default function FatwaDetailPage() {
   const structuredData = useMemo(() => {
     if (!fatwa) return []
     const schemas = []
+    
+    const lang = detectDirection(fatwa.question_text || fatwa.title) === 'rtl' ? 'ur' : 'en'
 
     schemas.push(
-      generateFAQPageSchema(fatwa.question_text || '', fatwa.response_text || '')
+      generateQAPageSchema(fatwa.title, fatwa.question_text || '', fatwa.response_text || '', lang)
+    )
+
+    schemas.push(
+      generateFAQPageSchema(fatwa.question_text || '', fatwa.response_text || '', lang)
     )
 
     schemas.push(
@@ -317,6 +325,7 @@ export default function FatwaDetailPage() {
           canonicalUrl={canonicalUrl}
           ogType="article"
           structuredData={structuredData}
+          lang={detectDirection(fatwa?.question_text || fatwa?.title) === 'rtl' ? 'ur' : 'en'}
         />
 
         <div className="max-w-7xl mx-auto px-4 py-6">
@@ -442,6 +451,18 @@ export default function FatwaDetailPage() {
                   Share
                 </h2>
                 <ShareButtons url={canonicalUrl} title={fatwa.title} />
+              </section>
+
+              {/* WhatsApp Inquiry Button */}
+              <section className="mb-8" aria-label="Inquire via WhatsApp">
+                <h2 className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+                  Spiritual Guidance
+                </h2>
+                <WhatsAppButton
+                  message={`Assalamu Alaikum, I am interested in seeking further clarification regarding Fatwa: ${fatwa.title} (${canonicalUrl})`}
+                  label="Inquire via WhatsApp"
+                  className="w-full sm:w-auto justify-center text-sm py-2.5 px-5"
+                />
               </section>
 
               {/* Related Fatwas */}

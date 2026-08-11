@@ -21,6 +21,7 @@ import WazifaModule from '../modules/wazifa'
 // Lazy-loaded public pages
 const CertificateVerifyPage = lazy(() => import('../modules/short-courses/CertificateVerifyPage'))
 const CertificatePage = lazy(() => import('../modules/short-courses/CertificatePage'))
+const KnowledgeTestPage = lazy(() => import('./KnowledgeTestPage'))
 
 // Lazy-loaded institutional content pages (company profile)
 const AboutPage = lazy(() => import('../modules/institution/AboutPage'))
@@ -119,6 +120,7 @@ export default function AppRouter() {
       <Route path="/downloads/*" element={<AppShell><DownloadsPage /></AppShell>} />
       <Route path="/fatwas/*" element={<AppShell><FatwaPlatformModule /></AppShell>} />
       <Route path="/darul-iftaa/*" element={<AppShell><FatwaPlatformModule /></AppShell>} />
+      <Route path="/knowledge-test" element={<ContentRoute><KnowledgeTestPage /></ContentRoute>} />
 
       {/* Institutional content pages — public, sourced from the company profile */}
       <Route path="/about" element={<ContentRoute><AboutPage /></ContentRoute>} />

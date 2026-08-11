@@ -1,8 +1,11 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useRole } from '../../app/RoleProvider'
 import { Button, Input, Label, Spinner } from '../../shared/ui'
+import { Helmet } from 'react-helmet-async'
+import { WhatsAppButton } from '../../shared/WhatsAppButton'
+import { generateCourseSchema } from '../fatwa-platform/utils/structuredData'
 import { getCourseQuizzes, getStudentAttempts } from './services/quizService'
 import { QuizTaker } from './components/QuizTaker'
 import { QuizAttemptHistory } from './components/QuizAttemptHistory'
@@ -686,6 +689,17 @@ export function StudentCourseView({ course, onBack }) {
   const totalMinutes = sections.reduce((sum, s) =>
     sum + s.lectures.reduce((ls, l) => ls + (parseInt(l.duration_minutes) || 0), 0), 0)
 
+  const courseSchema = useMemo(() => {
+    if (!course) return null
+    return generateCourseSchema({
+      title: course.title,
+      description: course.description,
+      duration: course.level || 'Self-paced',
+      schedule: 'Weekly',
+      url: `https://hidayat.pk/short-courses`
+    })
+  }, [course])
+
   const canAccessLecture = (lecture) => {
     if (enrolled) return true
     if (lecture.is_free_preview) return true
@@ -699,6 +713,13 @@ export function StudentCourseView({ course, onBack }) {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Helmet>
+        {courseSchema && (
+          <script type="application/ld+json">
+            {JSON.stringify(courseSchema)}
+          </script>
+        )}
+      </Helmet>
       {/* Paywall Modal */}
       {showPaywall && (
         <PaymentPaywall
@@ -899,6 +920,13 @@ export function StudentCourseView({ course, onBack }) {
               <Button variant="primary" className="w-full py-3 font-bold" onClick={handleEnroll} disabled={enrolling || pendingEnrollment}>
                 {enrolling ? 'Enrolling…' : 'Enroll Now'}
               </Button>
+              <div className="mt-3">
+                <WhatsAppButton
+                  message={`Hi, I'm interested in enrolling in ${course.title}`}
+                  label="Enroll via WhatsApp"
+                  className="w-full justify-center text-sm py-2.5 px-4 font-bold shadow-none"
+                />
+              </div>
               <p className="text-[10px] text-gray-400 text-center mt-2">Full access to all lectures and materials</p>
             </div>
           )}

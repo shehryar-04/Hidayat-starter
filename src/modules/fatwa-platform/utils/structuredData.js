@@ -34,10 +34,11 @@ export function generateSEOTitle(title, fatwaNumber) {
  * @param {string} answer - The answer text
  * @returns {object} FAQPage JSON-LD object
  */
-export function generateFAQPageSchema(question, answer) {
+export function generateFAQPageSchema(question, answer, language = 'en') {
   return {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
+    inLanguage: language,
     mainEntity: [
       {
         '@type': 'Question',
@@ -113,5 +114,89 @@ export function generateWebSiteSchema({ name, url, searchUrl }) {
       target: searchUrl,
       'query-input': 'required name=search_term_string'
     }
+  }
+}
+
+/**
+ * Generate QAPage JSON-LD schema.
+ * @param {string} questionTitle - Short title
+ * @param {string} questionText - Full question
+ * @param {string} answerText - Vetted answer
+ * @param {string} [language='en'] - 'ur' or 'en'
+ * @returns {object} QAPage JSON-LD object
+ */
+export function generateQAPageSchema(questionTitle, questionText, answerText, language = 'en') {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'QAPage',
+    inLanguage: language,
+    mainEntity: {
+      '@type': 'Question',
+      name: questionTitle,
+      text: questionText,
+      answerCount: 1,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: answerText
+      }
+    }
+  }
+}
+
+/**
+ * Generate FAQList JSON-LD schema for multiple items on listing pages.
+ * @param {Array<object>} fatwas - Array of fatwa items
+ * @param {string} [language='en'] - 'ur' or 'en'
+ * @returns {object} FAQPage JSON-LD object
+ */
+export function generateFAQListSchema(fatwas, language = 'en') {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    inLanguage: language,
+    mainEntity: (fatwas || []).map(f => ({
+      '@type': 'Question',
+      name: f.title || (f.question_text ? f.question_text.slice(0, 100) : ''),
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: f.response_text || 'Under review by Darul Ifta.'
+      }
+    }))
+  }
+}
+
+/**
+ * Generate Course JSON-LD schema.
+ * @param {object} params
+ * @param {string} params.title
+ * @param {string} params.description
+ * @param {string} [params.duration]
+ * @param {string} [params.schedule]
+ * @param {string} [params.providerName]
+ * @param {string} [params.url]
+ * @returns {object} Course JSON-LD object
+ */
+export function generateCourseSchema({ title, description, duration, schedule, providerName = 'Hidayat Academy of Islamic Sciences', url = 'https://hidayat.pk' }) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Course',
+    name: title,
+    description: description || title,
+    provider: {
+      '@type': 'Organization',
+      name: providerName,
+      sameAs: 'https://hidayat.pk'
+    },
+    hasCourseInstance: {
+      '@type': 'CourseInstance',
+      courseMode: 'Online',
+      duration: duration || 'Self-paced',
+      courseSchedule: {
+        '@type': 'Schedule',
+        duration: duration || 'Self-paced',
+        repeatFrequency: schedule || 'Weekly'
+      }
+    },
+    url: url
   }
 }

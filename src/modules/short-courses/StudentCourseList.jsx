@@ -1,8 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useRole } from '../../app/RoleProvider'
 import { GraduationCap, Search, Signal, Landmark } from 'lucide-react'
 import { Button, Input, Badge, EmptyState, Spinner, CourseGridSkeleton } from '../../shared/ui'
+import { Helmet } from 'react-helmet-async'
+import { WhatsAppButton } from '../../shared/WhatsAppButton'
+import { generateCourseSchema } from '../fatwa-platform/utils/structuredData'
 
 export function StudentCourseList({ onSelectCourse }) {
   const { userId } = useRole()
@@ -59,6 +62,16 @@ export function StudentCourseList({ onSelectCourse }) {
     return true
   })
 
+  const courseSchemas = useMemo(() => {
+    return (filtered || []).map(course => generateCourseSchema({
+      title: course.title,
+      description: course.description,
+      duration: course.level || 'Self-paced',
+      schedule: 'Weekly',
+      url: `https://hidayat.pk/short-courses`
+    }))
+  }, [filtered])
+
   if (loading) return (
     <div className="max-w-7xl mx-auto px-4 sm:px-8 py-12">
       <CourseGridSkeleton count={6} />
@@ -67,6 +80,13 @@ export function StudentCourseList({ onSelectCourse }) {
 
   return (
     <div className="bg-background min-h-screen">
+      <Helmet>
+        {courseSchemas.map((schema, index) => (
+          <script key={index} type="application/ld+json">
+            {JSON.stringify(schema)}
+          </script>
+        ))}
+      </Helmet>
       {/* Hero */}
       <section className="max-w-7xl mx-auto px-4 sm:px-8 py-10 sm:py-16">
         <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
@@ -199,6 +219,19 @@ export function StudentCourseList({ onSelectCourse }) {
                         {course.is_free ? 'Free' : `$${course.fee}`}
                       </span>
                     </div>
+
+                    {/* WhatsApp CTA Button */}
+                    {!isEnrolled && !isPending && (
+                      <div className="pt-2">
+                        <WhatsAppButton
+                          message={`Hi, I'm interested in enrolling in ${course.title}`}
+                          label="Enroll via WhatsApp"
+                          className="w-full justify-center text-xs py-2 px-3 font-semibold shadow-none border border-[#25D366]/20"
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                      </div>
+                    )}
+                  </div>
                   </div>
                 </div>
               )

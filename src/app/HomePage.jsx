@@ -146,7 +146,7 @@ function Hero() {
           <div className="inline-flex items-center space-x-2 bg-primary-50 text-primary-700 px-3 sm:px-4 py-1 rounded-full border border-primary-200">
             <BookOpen className="w-4 h-4" />
             <span className="text-[10px] sm:text-xs font-bold tracking-wider">
-              ENROLLMENT OPEN 2024
+              ENROLLMENT OPEN 2026
             </span>
           </div>
 
@@ -159,24 +159,60 @@ function Hero() {
             A dynamic platform dedicated to professional excellence, intellectual development, Islamic guidance, and capacity building through modern education, training, research, and consultancy services.
           </p>
 
-          <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 pt-2 sm:pt-4 justify-center lg:justify-start">
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={() => navigate(role ? "/short-courses" : "/login")}
-              className="shadow-lg shadow-primary-500/20"
-            >
-              <span>Explore Courses</span>
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
+          {/* Dual Pathways */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 text-left">
+            {/* Path A */}
+            <div className="p-5 rounded-xl border border-neutral-200 bg-neutral-50 hover:bg-white hover:shadow-md hover:border-primary-300 transition-all duration-200 flex flex-col justify-between space-y-4">
+              <div>
+                <h3 className="font-display font-bold text-base text-neutral-900 flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-primary-500" />
+                  For Students & Seekers
+                </h3>
+                <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed">
+                  Traditional and specialized academic pathways for individuals seeking personal and spiritual growth.
+                </p>
+                <div className="flex flex-wrap gap-1.5 mt-3">
+                  <span className="text-[10px] bg-primary-50 text-primary-700 px-2 py-0.5 rounded font-medium border border-primary-100">Darse Nizami</span>
+                  <span className="text-[10px] bg-primary-50 text-primary-700 px-2 py-0.5 rounded font-medium border border-primary-100">Short Courses</span>
+                  <span className="text-[10px] bg-primary-50 text-primary-700 px-2 py-0.5 rounded font-medium border border-primary-100">Fatwa</span>
+                </div>
+              </div>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => navigate(role ? "/short-courses" : "/login")}
+                className="w-full mt-2 justify-center text-xs font-semibold py-2"
+              >
+                <span>Explore Academy</span>
+                <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+              </Button>
+            </div>
 
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={() => navigate("/darul-ifta")}
-            >
-              <span>Darul Ifta</span>
-            </Button>
+            {/* Path B */}
+            <div className="p-5 rounded-xl border border-neutral-200 bg-neutral-50 hover:bg-white hover:shadow-md hover:border-secondary-300 transition-all duration-200 flex flex-col justify-between space-y-4">
+              <div>
+                <h3 className="font-display font-bold text-base text-neutral-900 flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-secondary-500" />
+                  For Businesses & Institutions
+                </h3>
+                <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed">
+                  Shariah compliance solutions, corporate training programs, and institutional consultancy.
+                </p>
+                <div className="flex flex-wrap gap-1.5 mt-3">
+                  <span className="text-[10px] bg-secondary-50 text-secondary-800 px-2 py-0.5 rounded font-medium border border-secondary-100">Shariah Advisory</span>
+                  <span className="text-[10px] bg-secondary-50 text-secondary-800 px-2 py-0.5 rounded font-medium border border-secondary-100">Corporate Training</span>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate("/services")}
+                className="w-full mt-2 justify-center text-xs font-semibold py-2 border-secondary text-secondary hover:bg-secondary/10"
+              >
+                <span>Consultancy & Training</span>
+                <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+              </Button>
+            </div>
           </div>
         </div>
 
