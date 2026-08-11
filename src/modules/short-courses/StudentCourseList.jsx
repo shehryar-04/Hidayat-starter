@@ -232,7 +232,6 @@ export function StudentCourseList({ onSelectCourse }) {
                       </div>
                     )}
                   </div>
-                  </div>
                 </div>
               )
             })}
