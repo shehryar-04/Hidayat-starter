@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { useRole } from '../../app/RoleProvider'
 import { Search, Plus, Download, FileText, Trash2, ArrowLeft } from 'lucide-react'
 import { Button, Input, Textarea, Label, EmptyState, Spinner, ListSkeleton } from '../../shared/ui'
+import SEOHead from '../fatwa-platform/components/SEOHead'
 
 export default function DownloadsPage() {
   const { role } = useRole()
@@ -56,6 +57,11 @@ export default function DownloadsPage() {
 
   return (
     <div className="bg-neutral-50 min-h-screen">
+      <SEOHead
+        title="Islamic PDF Library & Downloads · Hidayat"
+        description="Access our collection of Islamic PDFs, course study materials, guides, and downloadable resources."
+        canonicalUrl="https://hidayat.org/downloads"
+      />
       {/* Hero */}
       <section className="bg-primary text-white relative overflow-hidden">
         <div className="absolute inset-0 pattern-overlay opacity-20" />

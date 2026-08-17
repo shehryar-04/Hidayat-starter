@@ -37,6 +37,23 @@ const PORT = 4173
  * at build time by reading from the Supabase database or a manifest file.
  */
 const STATIC_ROUTES = [
+  '/',
+  '/about',
+  '/about/directors-message',
+  '/about/mission-values',
+  '/about/trainers',
+  '/services',
+  '/services/training',
+  '/services/consultancy',
+  '/services/distance-learning',
+  '/events',
+  '/contact',
+  '/privacy-policy',
+  '/terms-of-service',
+  '/knowledge-test',
+  '/darul-ifta',
+  '/articles',
+  '/downloads',
   '/fatwas',
   '/fatwas/search',
 ]

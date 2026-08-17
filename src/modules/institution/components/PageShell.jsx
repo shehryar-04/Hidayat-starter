@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { CheckCircle } from 'lucide-react'
 import SiteFooter from '../../../app/SiteFooter'
+import SEOHead from '../../fatwa-platform/components/SEOHead'
 
 /**
  * Shared layout primitives for the institutional (company profile) pages.
@@ -86,8 +87,17 @@ export function CheckList({ items, columns = 2 }) {
 /** Wraps a static content page: content + site footer. */
 export function ContentPage({ title, children }) {
   usePageTitle(title)
+  const currentPath = typeof window !== 'undefined' ? window.location.pathname : ''
+  const finalCanonical = `https://hidayat.org${currentPath}`
+  const finalDescription = `${title} at Hidayat — Islamic Knowledge & Professional Development Platform. Guided by classical scholarship and contemporary precision.`
+
   return (
     <div className="bg-white">
+      <SEOHead
+        title={`${title} · Hidayat`}
+        description={finalDescription}
+        canonicalUrl={finalCanonical}
+      />
       {children}
       <SiteFooter />
     </div>

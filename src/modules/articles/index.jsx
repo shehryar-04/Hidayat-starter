@@ -5,6 +5,7 @@ import ReactQuill from 'react-quill'
 import 'react-quill/dist/quill.snow.css'
 import { Search, Plus, ArrowLeft, Image, CloudUpload, FileText, Download, User } from 'lucide-react'
 import { Button, Input, Textarea, Label, EmptyState, Spinner, buttonVariants, CourseGridSkeleton } from '../../shared/ui'
+import SEOHead from '../fatwa-platform/components/SEOHead'
 
 export default function ArticlesPage() {
   const { role } = useRole()
@@ -56,6 +57,11 @@ export default function ArticlesPage() {
 
   return (
     <div className="bg-neutral-50 min-h-screen">
+      <SEOHead
+        title="Articles & Research Publications · Hidayat"
+        description="Explore our collection of Islamic articles, research papers, and downloadable resources."
+        canonicalUrl="https://hidayat.org/articles"
+      />
       {/* Hero */}
       <section className="bg-primary text-white relative overflow-hidden">
         <div className="absolute inset-0 pattern-overlay opacity-20" />
@@ -428,6 +434,11 @@ function ArticleCard({ article, onClick }) {
 function ArticleDetail({ article, onBack }) {
   return (
     <div className="bg-neutral-50 min-h-screen">
+      <SEOHead
+        title={`${article.title} · Hidayat`}
+        description={article.excerpt || `Read the article ${article.title} at Hidayat.`}
+        canonicalUrl="https://hidayat.org/articles"
+      />
       <div className="max-w-4xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
         <Button variant="ghost" onClick={onBack} className="mb-6">
           <ArrowLeft className="w-4 h-4 mr-1" /> Back to Articles

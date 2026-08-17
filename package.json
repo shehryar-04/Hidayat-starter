@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "build:prerender": "vite build && node scripts/generate-prerender-manifest.js && node scripts/prerender.js",
+    "build": "vite build && node scripts/generate-seo.js",
+    "build:prerender": "vite build && node scripts/generate-prerender-manifest.js && node scripts/prerender.js && node scripts/generate-seo.js",
     "prerender": "node scripts/prerender.js",
     "generate:manifest": "node scripts/generate-prerender-manifest.js",
     "preview": "vite preview",

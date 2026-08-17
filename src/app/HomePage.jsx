@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useRole } from './RoleProvider'
 import PublicTopNav from './PublicTopNav'
 import SiteFooter from './SiteFooter'
+import SEOHead from '../modules/fatwa-platform/components/SEOHead'
 import FlashcardSlider from './FlashcardSlider'
 import { supabase } from '../lib/supabase'
 import { slugify } from '../modules/fatwa-platform/utils/slugGenerator'
@@ -22,97 +23,6 @@ import {
   ChevronLeft,
   Verified,
 } from 'lucide-react'
-
-// ─── Door Opening Overlay ────
-function DoorOverlay({ scrollProgress }) {
-  const getClosedOpacity = () => {
-    if (scrollProgress <= 0.25) return 1
-    if (scrollProgress <= 0.45) return 1 - (scrollProgress - 0.25) / 0.2
-    return 0
-  }
-
-  const getSemiOpenOpacity = () => {
-    if (scrollProgress <= 0.25) return 0
-    if (scrollProgress <= 0.45) return (scrollProgress - 0.25) / 0.2
-    if (scrollProgress <= 0.6) return 1
-    if (scrollProgress <= 0.78) return 1 - (scrollProgress - 0.6) / 0.18
-    return 0
-  }
-
-  const getOpenOpacity = () => {
-    if (scrollProgress <= 0.6) return 0
-    if (scrollProgress <= 0.78) return (scrollProgress - 0.6) / 0.18
-    return 1
-  }
-
-  const getOverlayOpacity = () => {
-    if (scrollProgress <= 0.82) return 1
-    if (scrollProgress >= 1) return 0
-    return 1 - (scrollProgress - 0.82) / 0.18
-  }
-
-  const getScale = () => {
-    if (scrollProgress <= 0.78) return 1
-    return 1 + (scrollProgress - 0.78) * 1.5
-  }
-
-  const getGlowOpacity = () => {
-    if (scrollProgress <= 0.25) return 0
-    if (scrollProgress <= 0.6) return (scrollProgress - 0.25) * 2
-    return 0.7
-  }
-
-  if (scrollProgress >= 1) return null
-
-  return (
-    <div
-      className="fixed inset-0 z-[60] pointer-events-none"
-      style={{ opacity: getOverlayOpacity() }}
-    >
-      <div className="absolute inset-0 bg-[#080808]">
-        <div
-          className="absolute inset-0 flex items-center justify-center"
-          style={{ opacity: getGlowOpacity() }}
-        >
-          <div className="w-[500px] h-[700px] rounded-full bg-gradient-radial from-amber-200/40 via-amber-100/15 to-transparent blur-3xl" />
-        </div>
-        <img
-          src="/assets/closed.webp"
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover object-center"
-          style={{ opacity: getClosedOpacity() }}
-          draggable={false}
-        />
-        <img
-          src="/assets/semi-open.webp"
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover object-center"
-          style={{ opacity: getSemiOpenOpacity() }}
-          draggable={false}
-        />
-        <img
-          src="/assets/open.webp"
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover object-center"
-          style={{
-            opacity: getOpenOpacity(),
-            transform: `scale(${getScale()})`,
-          }}
-          draggable={false}
-        />
-      </div>
-      <div
-        className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 text-white/70"
-        style={{ opacity: scrollProgress < 0.08 ? 1 - scrollProgress * 12 : 0 }}
-      >
-        <span className="text-xl font-display tracking-widest">Scroll to Enter</span>
-        <svg className="w-8 h-8 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-        </svg>
-      </div>
-    </div>
-  )
-}
 
 
 // ─── Hero ────────────────────────────────────────────────────
@@ -748,140 +658,42 @@ function Newsletter() {
 }
 
 // ─── Page Assembly ───────────────────────────────────────────
-const DOOR_IMAGES = ['/assets/closed.webp', '/assets/semi-open.webp', '/assets/open.webp']
-
 export default function HomePage() {
   const { role } = useRole()
-  const [scrollProgress, setScrollProgress] = useState(0)
-  const [animationDone, setAnimationDone] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
-  const [imagesLoaded, setImagesLoaded] = useState(false)
-  const scrollSectionRef = useRef(null)
 
-  // Detect mobile — skip animation on touch devices or small screens
-  useEffect(() => {
-    const checkMobile = () => {
-      const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0
-      const isNarrow = window.innerWidth < 1024
-      setIsMobile(isTouch || isNarrow)
-    }
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
-
-  // Skip animation if already seen this session or user is logged in
-  useEffect(() => {
-    if (sessionStorage.getItem('doorAnimationSeen') || role) {
-      setAnimationDone(true)
-      setImagesLoaded(true)
-    }
-  }, [role])
-
-  // Preload door images before showing the animation
-  useEffect(() => {
-    if (isMobile || animationDone) {
-      setImagesLoaded(true)
-      return
-    }
-
-    let loaded = 0
-    const total = DOOR_IMAGES.length
-
-    DOOR_IMAGES.forEach((src) => {
-      const img = new Image()
-      img.onload = () => {
-        loaded++
-        if (loaded >= total) setImagesLoaded(true)
+  const homeStructuredData = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      'name': 'Hidayat',
+      'url': 'https://hidayat.org',
+      'potentialAction': {
+        '@type': 'SearchAction',
+        'target': 'https://hidayat.org/fatwas/search?q={search_term_string}',
+        'query-input': 'required name=search_term_string'
       }
-      img.onerror = () => {
-        loaded++
-        if (loaded >= total) setImagesLoaded(true)
-      }
-      img.src = src
-    })
-
-    // Fallback: show after 5 seconds even if images fail
-    const timeout = setTimeout(() => setImagesLoaded(true), 5000)
-    return () => clearTimeout(timeout)
-  }, [isMobile, animationDone])
-
-  useEffect(() => {
-    if (isMobile || animationDone) return
-    let ticking = false
-    const handleScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          if (scrollSectionRef.current) {
-            const sectionHeight = scrollSectionRef.current.offsetHeight
-            const viewportHeight = window.innerHeight
-            const scrolled = window.scrollY
-            const totalScrollable = sectionHeight - viewportHeight
-            const progress = Math.min(Math.max(scrolled / totalScrollable, 0), 1)
-            setScrollProgress(progress)
-            if (progress >= 1) {
-              setAnimationDone(true)
-            }
-          }
-          ticking = false
-        })
-        ticking = true
-      }
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      'name': 'Hidayat',
+      'url': 'https://hidayat.org',
+      'logo': 'https://hidayat.org/assets/LOGO_HIDAYAT.png'
     }
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [isMobile, animationDone])
-
-  const showAnimation = !isMobile && !animationDone
-  const navbarOpacity = showAnimation
-    ? (scrollProgress >= 0.85 ? Math.min((scrollProgress - 0.85) / 0.15, 1) : 0)
-    : 1
-
-  useEffect(() => {
-    if (animationDone) {
-      sessionStorage.setItem('doorAnimationSeen', 'true')
-      window.scrollTo({ top: 0, behavior: 'instant' })
-    }
-  }, [animationDone])
+  ]
 
   return (
     <div className="font-sans scroll-smooth bg-neutral-50 text-neutral-800 selection:bg-primary-100 selection:text-primary-900">
-      {/* Loading screen while door images preload */}
-      {!imagesLoaded && (
-        <div className="fixed inset-0 z-[100] bg-[#080808] flex flex-col items-center justify-center gap-6">
-          <img src="/assets/LOGO_HIDAYAT.png" alt="Hidayat" className="w-24 h-24 object-contain opacity-80" />
-          <div className="w-10 h-10 border-[3px] border-white/30 border-t-white rounded-full animate-spin" />
-        </div>
-      )}
-
-      {/* Door animation phase — desktop only */}
-      {showAnimation && imagesLoaded && (
-        <>
-          <div ref={scrollSectionRef} style={{ height: '300vh' }}>
-            <div className="sticky top-0">
-              <div style={{ opacity: navbarOpacity }}>
-                <PublicTopNav />
-              </div>
-              <div className="pt-[57px] sm:pt-[65px]">
-                <Hero />
-              </div>
-            </div>
-          </div>
-          <DoorOverlay scrollProgress={scrollProgress} />
-        </>
-      )}
-
-      {/* Normal page — shown on mobile always, or after animation on desktop */}
-      {!showAnimation && (
-        <>
-          <PublicTopNav />
-          <div className="pt-[57px] sm:pt-[65px]">
-            <Hero />
-          </div>
-        </>
-      )}
+      <SEOHead
+        title="Hidayat | Islamic Knowledge & Professional Development Platform"
+        description="Hidayat is a comprehensive platform for Islamic education, traditional academic courses, research publications, and scholarly Darul Ifta fatwa guidance."
+        canonicalUrl="https://hidayat.org"
+        structuredData={homeStructuredData}
+      />
+      <PublicTopNav />
+      <div className="pt-[57px] sm:pt-[65px]">
+        <Hero />
+      </div>
 
       <Vision />
 

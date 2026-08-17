@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { HelpCircle, Lightbulb, Search, RotateCcw, Award } from 'lucide-react'
 import { flashcards, cardColors } from './flashcardsData'
 import { Button, Input } from '../shared/ui'
+import SEOHead from '../modules/fatwa-platform/components/SEOHead'
 
 function Flashcard({ card, index, onReveal }) {
   const [flipped, setFlipped] = useState(false)
@@ -101,6 +102,11 @@ export default function KnowledgeTestPage() {
 
   return (
     <div className="bg-neutral-50 min-h-screen py-10 sm:py-16">
+      <SEOHead
+        title="Islamic Knowledge Test · Hidayat"
+        description="Interact with our collection of 40+ flashcards covering essential Islamic ethical conduct, classical teachings, and traditional values."
+        canonicalUrl="https://hidayat.org/knowledge-test"
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-8">
         
         {/* Header Section */}
