@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { BarChart3, Search, MousePointerClick, TrendingUp, AlertCircle, Eye } from 'lucide-react'
+import { BarChart3, Search, MousePointerClick, TrendingUp, AlertCircle, Eye, History } from 'lucide-react'
 import { supabase } from '../../../lib/supabase'
 import { Spinner, Card, CardContent, Badge, PageWrapper, PageHeader, Tabs } from '../../../shared/ui'
 
@@ -32,6 +32,9 @@ export default function SearchAnalytics() {
       setData(res || [])
     } else if (tab === 'most') {
       const { data: res } = await supabase.rpc('get_search_analytics_most_viewed', { p_limit: 50 })
+      setData(res || [])
+    } else if (tab === 'history') {
+      const { data: res } = await supabase.rpc('get_search_analytics_history', { p_days: days, p_limit: 100 })
       setData(res || [])
     }
 
@@ -72,6 +75,7 @@ export default function SearchAnalytics() {
       <div className="flex gap-1 border-b border-gray-200 mb-6">
         {[
           { key: 'top', label: 'Top Queries', icon: TrendingUp },
+          { key: 'history', label: 'Search Log', icon: History },
           { key: 'zero', label: 'Zero Results', icon: AlertCircle },
           { key: 'ctr', label: 'Click-Through', icon: MousePointerClick },
           { key: 'most', label: 'Most Viewed', icon: Eye },
@@ -156,6 +160,15 @@ export default function SearchAnalytics() {
                     <th className="px-4 py-2.5 text-right text-xs font-medium text-gray-500 uppercase">Avg Latency</th>
                   </>
                 )}
+                {tab === 'history' && (
+                  <>
+                    <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase">Username</th>
+                    <th className="px-4 py-2.5 text-right text-xs font-medium text-gray-500 uppercase">Results Shown</th>
+                    <th className="px-4 py-2.5 text-right text-xs font-medium text-gray-500 uppercase">Latency</th>
+                    <th className="px-4 py-2.5 text-center text-xs font-medium text-gray-500 uppercase">Cache Hit</th>
+                    <th className="px-4 py-2.5 text-right text-xs font-medium text-gray-500 uppercase">Time</th>
+                  </>
+                )}
                 {tab === 'zero' && (
                   <>
                     <th className="px-4 py-2.5 text-right text-xs font-medium text-gray-500 uppercase">Count</th>
@@ -189,6 +202,43 @@ export default function SearchAnalytics() {
                       <td className="px-4 py-2 text-right text-gray-600">{row.search_count}</td>
                       <td className="px-4 py-2 text-right text-gray-600">{row.avg_results}</td>
                       <td className="px-4 py-2 text-right text-gray-500">{row.avg_latency}ms</td>
+                    </>
+                  )}
+                  {tab === 'history' && (
+                    <>
+                      <td className="px-4 py-2 text-left">
+                        <span className={`px-2 py-0.5 rounded text-xs font-semibold ${
+                          row.username === 'Guest' ? 'bg-gray-100 text-gray-600' : 'bg-primary/10 text-primary'
+                        }`}>
+                          {row.username}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2 text-right text-gray-600">
+                        {row.results_count === 0 ? (
+                          <Badge variant="destructive" className="text-xs">0</Badge>
+                        ) : (
+                          row.results_count
+                        )}
+                      </td>
+                      <td className="px-4 py-2 text-right text-gray-500">
+                        {row.latency_ms ? `${row.latency_ms}ms` : '—'}
+                      </td>
+                      <td className="px-4 py-2 text-center">
+                        {row.cache_hit ? (
+                          <span className="text-green-600 text-xs font-medium bg-green-50 px-1.5 py-0.5 rounded border border-green-200">Hit</span>
+                        ) : (
+                          <span className="text-gray-400 text-xs font-medium bg-gray-50 px-1.5 py-0.5 rounded border border-gray-200">Miss</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-2 text-right text-gray-500 text-xs">
+                        {row.created_at ? new Date(row.created_at).toLocaleString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          second: '2-digit'
+                        }) : '—'}
+                      </td>
                     </>
                   )}
                   {tab === 'zero' && (

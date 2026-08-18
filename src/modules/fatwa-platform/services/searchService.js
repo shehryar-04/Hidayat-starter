@@ -54,6 +54,7 @@ export async function searchFatwas(query, options = {}) {
     embedding,
     sessionId,
     signal,
+    username,
   } = options
 
   return callSearchAPI({
@@ -67,6 +68,7 @@ export async function searchFatwas(query, options = {}) {
     dar_ul_ifta: filters.dar_ul_ifta,
     embedding,
     session_id: sessionId,
+    username,
   }, { signal })
 }
 

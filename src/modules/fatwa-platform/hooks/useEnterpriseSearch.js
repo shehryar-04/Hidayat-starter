@@ -6,6 +6,7 @@ import {
   logSearchClick,
   getSearchSessionId,
 } from '../services/searchService'
+import { useProfile } from '../../../app/useProfile'
 
 const SEARCH_DEBOUNCE_MS = 300
 const SUGGEST_DEBOUNCE_MS = 150
@@ -26,6 +27,7 @@ const SUGGEST_DEBOUNCE_MS = 150
  */
 export function useEnterpriseSearch(query, options = {}) {
   const { limit = 20, page = 1, filters = {} } = options
+  const { profile } = useProfile()
 
   const [results, setResults] = useState([])
   const [suggestions, setSuggestions] = useState([])
@@ -77,6 +79,7 @@ export function useEnterpriseSearch(query, options = {}) {
           offset,
           filters,
           sessionId: getSearchSessionId(),
+          username: profile?.full_name || 'Guest',
         })
 
         if (cancelled || version !== requestVersion.current) return
@@ -101,7 +104,7 @@ export function useEnterpriseSearch(query, options = {}) {
       cancelled = true
       if (searchTimer.current) clearTimeout(searchTimer.current)
     }
-  }, [query, limit, page, filterKey])
+  }, [query, limit, page, filterKey, profile?.full_name])
 
   // ─── Debounced suggestions (faster) ────────────────────────
   useEffect(() => {
