@@ -9,6 +9,7 @@ vi.mock('../lib/supabase', () => ({
   supabase: {
     auth: {
       signInWithPassword: vi.fn(),
+      resetPasswordForEmail: vi.fn(),
     },
   },
 }))
@@ -90,6 +91,43 @@ describe('LoginPage', () => {
         email: 'test@example.com',
         password: 'password123',
       })
+    })
+  })
+
+  it('should switch to forgot password mode and trigger resetPasswordForEmail', async () => {
+    vi.mocked(supabase.auth.resetPasswordForEmail).mockResolvedValue({
+      error: null,
+    })
+
+    render(
+      <BrowserRouter>
+        <LoginPage />
+      </BrowserRouter>
+    )
+
+    // Click Forgot password?
+    const forgotPasswordLink = screen.getByRole('button', { name: /Forgot password\?/i })
+    fireEvent.click(forgotPasswordLink)
+
+    // Should render Reset Password heading and instruction
+    expect(screen.getByRole('heading', { name: 'Reset Password' })).toBeInTheDocument()
+    expect(screen.getByText(/Enter your email address and we'll send you a link to reset your password./i)).toBeInTheDocument()
+
+    // Enter email and submit
+    const emailInput = screen.getByLabelText('Email')
+    fireEvent.change(emailInput, { target: { value: 'reset@example.com' } })
+
+    const submitButton = screen.getByRole('button', { name: /Send Reset Link/i })
+    fireEvent.click(submitButton)
+
+    await waitFor(() => {
+      expect(supabase.auth.resetPasswordForEmail).toHaveBeenCalledWith('reset@example.com', {
+        redirectTo: expect.stringContaining('/auth/callback?type=recovery'),
+      })
+    })
+
+    await waitFor(() => {
+      expect(screen.getByText(/If an account exists with this email, a password reset link has been sent./i)).toBeInTheDocument()
     })
   })
 })
