@@ -44,12 +44,16 @@ export default function AuthCallbackPage() {
         return
       }
 
+      // Check if the current action is a password recovery flow
+      const requestedType = searchParams.get('type') || hashParams.get('type') || 'signup'
+      const isRecovery = requestedType === 'recovery'
+      const redirectUrl = isRecovery ? '/reset-password' : '/'
+
       // Custom self-hosted email template flow. The email lands directly on
       // this frontend route and supplies GoTrue's hashed one-time token. Calling
       // verifyOtp confirms the email and stores the returned session locally.
       const tokenHash = searchParams.get('token_hash')
       if (tokenHash) {
-        const requestedType = searchParams.get('type') || 'signup'
         const supportedTypes = new Set([
           'signup', 'invite', 'magiclink', 'recovery', 'email_change', 'email',
         ])
@@ -66,7 +70,7 @@ export default function AuthCallbackPage() {
         }
 
         setStatus('success')
-        setTimeout(() => navigate('/', { replace: true }), 2500)
+        setTimeout(() => navigate(redirectUrl, { replace: true }), 2500)
         return
       }
 
@@ -82,12 +86,12 @@ export default function AuthCallbackPage() {
 
       if (data?.session) {
         setStatus('success')
-        setTimeout(() => navigate('/', { replace: true }), 2500)
+        setTimeout(() => navigate(redirectUrl, { replace: true }), 2500)
       } else {
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
           if (event === 'SIGNED_IN' && session) {
             setStatus('success')
-            setTimeout(() => navigate('/', { replace: true }), 2500)
+            setTimeout(() => navigate(redirectUrl, { replace: true }), 2500)
             subscription.unsubscribe()
           }
         })
