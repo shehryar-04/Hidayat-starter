@@ -31,7 +31,7 @@ const moduleCards = [
   { to: '/darul-ifta',      label: 'Darul Ifta',             icon: Scale,         desc: 'Submit questions and manage the full fatwa workflow.',               roles: ['admin','scholar','mufti','student'],  flag: 'darul_ifta' },
   { to: '/research-center', label: 'Research Center',        icon: FlaskConical,  desc: 'Academic publications, approvals, and searchable repository.',       roles: ['admin','scholar','student'],          flag: 'research_center' },
   { to: '/wazifa',          label: 'Wazifa',                 icon: Wallet,        desc: 'Stipend eligibility evaluation and disbursement reports.',           roles: ['admin'],                              flag: 'wazifa' },
-  { to: '/reports',         label: 'Reports',                icon: BarChart3,     desc: 'Schema-driven institutional reports with PDF and CSV export.',       roles: ['admin','scholar','student'],          flag: 'student_reports' },
+  { to: '/reports',         label: 'Reports',                icon: BarChart3,     desc: 'Schema-driven institutional reports with PDF and CSV export.',       roles: ['admin','scholar'],                    flag: 'student_reports' },
 ]
 
 /**
