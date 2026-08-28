@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Mail, Lock, User } from 'lucide-react'
+import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { FUNCTIONS_BASE_URL, SUPABASE_ANON_KEY } from '../lib/env'
 import { Button, Input, Label, cn } from '../shared/ui'
@@ -21,6 +21,9 @@ export default function LoginPage() {
   const [googleLoading, setGoogleLoading] = useState(false)
   const [showForgotPassword, setShowForgotPassword] = useState(false)
   const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showSignUpPassword, setShowSignUpPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
 
@@ -311,16 +314,27 @@ export default function LoginPage() {
                     )}
                   </div>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" />
                     <Input
                       id="password"
-                      type="password"
+                      type={isSignUp ? (showSignUpPassword ? 'text' : 'password') : (showPassword ? 'text' : 'password')}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       placeholder={isSignUp ? 'At least 6 characters' : 'Enter your password'}
-                      className="pl-9 min-h-[44px]"
+                      className="pl-9 pr-10 min-h-[44px]"
                     />
+                    <button
+                      type="button"
+                      tabIndex={-1}
+                      onClick={() => isSignUp ? setShowSignUpPassword(s => !s) : setShowPassword(s => !s)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 transition-colors"
+                      aria-label={(isSignUp ? showSignUpPassword : showPassword) ? 'Hide password' : 'Show password'}
+                    >
+                      {(isSignUp ? showSignUpPassword : showPassword)
+                        ? <EyeOff className="w-4 h-4" />
+                        : <Eye className="w-4 h-4" />}
+                    </button>
                   </div>
                 </div>
 
@@ -328,16 +342,27 @@ export default function LoginPage() {
                   <div className="space-y-1.5">
                     <Label htmlFor="confirmPassword">Confirm Password</Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" />
                       <Input
                         id="confirmPassword"
-                        type="password"
+                        type={showConfirmPassword ? 'text' : 'password'}
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         required
                         placeholder="Confirm your password"
-                        className="pl-9 min-h-[44px]"
+                        className="pl-9 pr-10 min-h-[44px]"
                       />
+                      <button
+                        type="button"
+                        tabIndex={-1}
+                        onClick={() => setShowConfirmPassword(s => !s)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 transition-colors"
+                        aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                      >
+                        {showConfirmPassword
+                          ? <EyeOff className="w-4 h-4" />
+                          : <Eye className="w-4 h-4" />}
+                      </button>
                     </div>
                   </div>
                 )}
