@@ -16,7 +16,8 @@ import Logo from './Logo'
  * 2. GoTrue's default ConfirmationURL (backward compatibility):
  *    https://supabase.hidayat.pk/auth/v1/verify?...&redirect_to=<callback>
  *    GoTrue verifies first, then redirects here with session tokens in the hash.
- *
+ *docker logs supabase-auth --tail 100
+
  * The custom template keeps the user-facing email link on the frontend domain
  * and avoids relying on a post-verification browser redirect.
  */

@@ -1,8 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { KeyRound } from 'lucide-react'
 import { useRole } from './RoleProvider'
 import { useProfile } from './useProfile'
 
 export default function ProfileModal({ onClose }) {
+  const navigate = useNavigate()
   const { role } = useRole()
   const { profile, scholarData, avatarUrl, loading, uploadAvatar, saveStudentProfile, saveScholarProfile } = useProfile()
 
@@ -178,6 +181,23 @@ export default function ProfileModal({ onClose }) {
 
             <button type="submit" disabled={saving || uploading} className="btn-primary w-full">
               {saving ? 'Saving…' : 'Save Profile'}
+            </button>
+
+            {/* Divider */}
+            <div className="relative my-1">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-neutral-100" />
+              </div>
+            </div>
+
+            {/* Change Password */}
+            <button
+              type="button"
+              onClick={() => { onClose(); navigate('/reset-password') }}
+              className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-neutral-600 hover:text-primary-700 hover:bg-neutral-50 rounded-lg border border-neutral-200 transition-colors"
+            >
+              <KeyRound className="w-4 h-4" />
+              Change Password
             </button>
           </form>
         )}

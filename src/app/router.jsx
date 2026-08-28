@@ -99,7 +99,7 @@ export default function AppRouter() {
       <Route path="/" element={<SmartHome />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
-      <Route path="/reset-password" element={<ProtectedRoute><ResetPasswordPage /></ProtectedRoute>} />
+      <Route path="/reset-password" element={<ProtectedRoute><AppShell><ResetPasswordPage /></AppShell></ProtectedRoute>} />
 
       {/* Under construction modules — no auth required, no flag guard */}
       <Route path="/dars-e-nizami/*" element={<AppShell><FeatureFlagGuard flagKey="dars_e_nizami"><DarsENizamiModule /></FeatureFlagGuard></AppShell>} />
