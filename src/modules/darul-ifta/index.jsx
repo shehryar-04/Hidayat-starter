@@ -6,7 +6,7 @@ import { FatwaEditor } from './FatwaEditor'
 import { QuestionSubmitForm } from './QuestionSubmitForm'
 import { WhatsAppButton } from '../../shared/WhatsAppButton'
 import { Star, PenLine, BookOpen, BadgeCheck, Search, BarChart3, Shield, FileText } from 'lucide-react'
-import { Card, CardContent, Tabs, cn } from '../../shared/ui'
+import { Card, CardContent, Tabs, cn, Modal } from '../../shared/ui'
 import FatwaPlatformModule from '../fatwa-platform'
 
 // ─── Hero Section (shared by all views) ──────────────────────
@@ -204,14 +204,16 @@ function AdminMuftiView() {
         </div>
       )}
 
-      {/* Question form overlay */}
-      {showForm && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6">
-            <QuestionSubmitForm onComplete={() => setShowForm(false)} />
-          </div>
-        </div>
-      )}
+      {/* Question form modal */}
+      <Modal
+        open={showForm}
+        onClose={() => setShowForm(false)}
+        size="lg"
+        title="Submit a Question"
+        description="Ask your question to the scholars at Darul Ifta"
+      >
+        <QuestionSubmitForm onComplete={() => setShowForm(false)} />
+      </Modal>
 
       {/* WhatsApp */}
       <div className="fixed bottom-6 right-6 z-50">

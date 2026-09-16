@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
 import App from '../App'
 import { supabase } from '../lib/supabase'
 
@@ -56,7 +55,9 @@ describe('Authentication Integration', () => {
     })
   })
 
-  it('should show dashboard when user is authenticated with valid role', async () => {
+  it('should show dashboard when user navigates to /dashboard with valid role', async () => {
+    window.history.pushState({}, '', '/dashboard')
+
     const mockUserId = 'test-user-id'
     const mockRole = 'student'
 
@@ -81,7 +82,7 @@ describe('Authentication Integration', () => {
     const mockSelect = vi.fn().mockReturnValue({
       eq: vi.fn().mockReturnValue({
         single: vi.fn().mockResolvedValue({
-          data: { role: mockRole },
+          data: { role: mockRole, first_name: 'Ahmad' },
         }),
       }),
     })
@@ -97,7 +98,52 @@ describe('Authentication Integration', () => {
     })
   })
 
-  it('should handle sign-in flow correctly', async () => {
+  it('should allow authenticated users to view home page and access dashboard', async () => {
+    window.history.pushState({}, '', '/')
+
+    const mockUserId = 'test-user-id'
+    const mockRole = 'student'
+
+    // Mock session
+    vi.mocked(supabase.auth.getSession).mockResolvedValue({
+      data: {
+        session: {
+          user: { id: mockUserId },
+        },
+      },
+    })
+
+    vi.mocked(supabase.auth.onAuthStateChange).mockReturnValue({
+      data: {
+        subscription: {
+          unsubscribe: vi.fn(),
+        },
+      },
+    })
+
+    // Mock profile query
+    const mockSelect = vi.fn().mockReturnValue({
+      eq: vi.fn().mockReturnValue({
+        single: vi.fn().mockResolvedValue({
+          data: { role: mockRole, first_name: 'Ahmad' },
+        }),
+      }),
+    })
+
+    vi.mocked(supabase.from).mockReturnValue({
+      select: mockSelect,
+    })
+
+    render(<App />)
+
+    // Authenticated user on HomePage should see home content and Dashboard link in nav
+    await waitFor(() => {
+      expect(screen.getByText(/Cultivating Spiritual Clarity/i)).toBeInTheDocument()
+      expect(screen.getAllByText('Dashboard').length).toBeGreaterThan(0)
+    })
+  })
+
+  it('should handle sign-in flow correctly and redirect to dashboard', async () => {
     // Navigate to /login
     window.history.pushState({}, '', '/login')
 
@@ -130,7 +176,7 @@ describe('Authentication Integration', () => {
     const mockSelect = vi.fn().mockReturnValue({
       eq: vi.fn().mockReturnValue({
         single: vi.fn().mockResolvedValue({
-          data: { role: mockRole },
+          data: { role: mockRole, first_name: 'Admin' },
         }),
       }),
     })
@@ -147,8 +193,8 @@ describe('Authentication Integration', () => {
     })
 
     // Fill in login form
-    const emailInput = screen.getByLabelText(/Email/i)
-    const passwordInput = screen.getByLabelText(/Password/i)
+    const emailInput = screen.getByLabelText(/^Email$/i)
+    const passwordInput = screen.getByLabelText(/^Password$/i)
     const submitButton = screen.getByRole('button', { name: /Sign In/i })
 
     fireEvent.change(emailInput, { target: { value: 'admin@example.com' } })

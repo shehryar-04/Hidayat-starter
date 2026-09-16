@@ -4,6 +4,7 @@ import { cn } from './utils'
 
 /**
  * Accessible tooltip built on Radix UI with entrance animation.
+ * Theme-aware in both Light and Dark modes.
  * @example
  * <TooltipProvider>
  *   <Tooltip>
@@ -22,7 +23,7 @@ export const TooltipContent = forwardRef(({ className, sideOffset = 4, children,
       ref={ref}
       sideOffset={sideOffset}
       className={cn(
-        'z-50 overflow-hidden rounded-md bg-neutral-800 px-3 py-1.5 text-xs text-white shadow-md',
+        'z-50 overflow-hidden rounded-lg bg-neutral-900 dark:bg-[#14221b] border border-neutral-700 dark:border-[#254433] px-3 py-1.5 text-xs text-white shadow-xl',
         'animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
         className
       )}
@@ -33,3 +34,5 @@ export const TooltipContent = forwardRef(({ className, sideOffset = 4, children,
   </TooltipPrimitive.Portal>
 ))
 TooltipContent.displayName = 'TooltipContent'
+
+export default Tooltip

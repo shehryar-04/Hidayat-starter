@@ -4,6 +4,7 @@ import { cn } from './utils'
 
 /**
  * Accessible dropdown menu built on Radix UI with entrance animations.
+ * Completely theme-aware in both Light and Dark modes.
  * @example
  * <DropdownMenu>
  *   <DropdownMenuTrigger asChild><Button>Open</Button></DropdownMenuTrigger>
@@ -21,7 +22,7 @@ export const DropdownMenuContent = forwardRef(({ className, children, sideOffset
       ref={ref}
       sideOffset={sideOffset}
       className={cn(
-        'z-50 min-w-[8rem] overflow-hidden rounded-xl border border-neutral-200 bg-white p-1 shadow-lg',
+        'z-50 min-w-[9rem] overflow-hidden rounded-xl border border-neutral-200/90 dark:border-[#1a2e23] bg-white dark:bg-[#0f1a14] text-neutral-900 dark:text-neutral-100 p-1 shadow-xl backdrop-blur-md',
         'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=open]:slide-in-from-top-1',
         'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
         className
@@ -38,8 +39,10 @@ export const DropdownMenuItem = forwardRef(({ className, ...props }, ref) => (
   <DropdownPrimitive.Item
     ref={ref}
     className={cn(
-      'relative flex cursor-pointer select-none items-center rounded-md px-3 py-2 text-sm outline-none transition-colors',
-      'focus:bg-neutral-100 data-[highlighted]:bg-neutral-100',
+      'relative flex cursor-pointer select-none items-center rounded-lg px-3 py-2 text-sm outline-none transition-colors duration-150',
+      'text-neutral-800 dark:text-neutral-200',
+      'focus:bg-neutral-100 dark:focus:bg-[#14221b] focus:text-neutral-900 dark:focus:text-white',
+      'data-[highlighted]:bg-neutral-100 dark:data-[highlighted]:bg-[#14221b] data-[highlighted]:text-neutral-900 dark:data-[highlighted]:text-white',
       'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       className
     )}
@@ -49,6 +52,8 @@ export const DropdownMenuItem = forwardRef(({ className, ...props }, ref) => (
 DropdownMenuItem.displayName = 'DropdownMenuItem'
 
 export const DropdownMenuSeparator = forwardRef(({ className, ...props }, ref) => (
-  <DropdownPrimitive.Separator ref={ref} className={cn('-mx-1 my-1 h-px bg-neutral-200', className)} {...props} />
+  <DropdownPrimitive.Separator ref={ref} className={cn('-mx-1 my-1 h-px bg-neutral-100 dark:bg-[#1a2e23]', className)} {...props} />
 ))
 DropdownMenuSeparator.displayName = 'DropdownMenuSeparator'
+
+export default DropdownMenu

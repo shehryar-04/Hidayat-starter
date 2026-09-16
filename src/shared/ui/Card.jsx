@@ -14,8 +14,8 @@ export const Card = forwardRef(({ interactive, variant, className, children, ...
   <div
     ref={ref}
     className={cn(
-      'bg-white border border-neutral-200 rounded-xl shadow-sm',
-      interactive && 'cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:outline-none',
+      'bg-white dark:bg-[#0f1a14] border border-neutral-200/80 dark:border-[#1a2e23] text-neutral-900 dark:text-neutral-100 rounded-2xl shadow-xs transition-colors duration-200',
+      interactive && 'cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 hover:border-primary-400 dark:hover:border-primary-500/50 dark:hover:bg-[#14221b] focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:outline-none',
       variant && `border-l-4 border-l-${variant}`,
       className
     )}
@@ -38,6 +38,6 @@ export const CardContent = forwardRef(({ className, children, ...props }, ref) =
 CardContent.displayName = 'CardContent'
 
 export const CardFooter = forwardRef(({ className, children, ...props }, ref) => (
-  <div ref={ref} className={cn('px-6 pb-6 pt-2 border-t border-neutral-100', className)} {...props}>{children}</div>
+  <div ref={ref} className={cn('px-6 pb-6 pt-3 border-t border-neutral-100 dark:border-[#1a2e23]', className)} {...props}>{children}</div>
 ))
 CardFooter.displayName = 'CardFooter'

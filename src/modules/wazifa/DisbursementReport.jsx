@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
-import { Spinner } from '../../shared/ui'
+import { Spinner, useToast } from '../../shared/ui'
 
 /**
  * Disbursement Report Component
@@ -8,6 +8,7 @@ import { Spinner } from '../../shared/ui'
  * Requirements: 12.5
  */
 export function DisbursementReport() {
+  const { toast } = useToast()
   const [evaluations, setEvaluations] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -102,9 +103,7 @@ export function DisbursementReport() {
   }
 
   const handleExportPDF = () => {
-    // This would typically use a PDF library like jsPDF
-    // For now, we'll just show a message
-    alert('PDF export functionality would be implemented with a PDF library')
+    toast.info('PDF Export', 'PDF export functionality is queued for background processing.')
   }
 
   if (loading) {

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useRole } from '../../app/RoleProvider'
 import { Search, Plus, Download, FileText, Trash2, ArrowLeft } from 'lucide-react'
-import { Button, Input, Textarea, Label, EmptyState, Spinner, ListSkeleton } from '../../shared/ui'
+import { Button, Input, Textarea, Label, EmptyState, Spinner, ListSkeleton, ConfirmDialog } from '../../shared/ui'
 import SEOHead from '../fatwa-platform/components/SEOHead'
 
 export default function DownloadsPage() {
@@ -15,6 +15,8 @@ export default function DownloadsPage() {
   const [categoryFilter, setCategoryFilter] = useState('')
   const [categories, setCategories] = useState([])
   const [showForm, setShowForm] = useState(false)
+  const [deleteTargetId, setDeleteTargetId] = useState(null)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => { loadDownloads() }, [])
 
@@ -118,17 +120,31 @@ export default function DownloadsPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map(item => (
-              <DownloadCard key={item.id} item={item} onDownload={() => handleDownload(item)} isAdmin={isAdmin} onDelete={() => handleDelete(item.id)} />
+              <DownloadCard key={item.id} item={item} onDownload={() => handleDownload(item)} isAdmin={isAdmin} onDelete={() => setDeleteTargetId(item.id)} />
             ))}
           </div>
         )}
       </section>
+
+      <ConfirmDialog
+        open={!!deleteTargetId}
+        onClose={() => setDeleteTargetId(null)}
+        onConfirm={confirmDelete}
+        loading={deleting}
+        title="Delete Download"
+        message="Are you sure you want to delete this download resource? This action cannot be undone."
+        confirmText="Delete"
+        variant="danger"
+      />
     </div>
   )
 
-  async function handleDelete(id) {
-    if (!confirm('Are you sure you want to delete this download?')) return
-    await supabase.from('downloads').delete().eq('id', id)
+  async function confirmDelete() {
+    if (!deleteTargetId) return
+    setDeleting(true)
+    await supabase.from('downloads').delete().eq('id', deleteTargetId)
+    setDeleting(false)
+    setDeleteTargetId(null)
     loadDownloads()
   }
 }

@@ -4,20 +4,20 @@ import { Loader2 } from 'lucide-react'
 import { cn } from './utils'
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center font-medium transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500 disabled:opacity-50 disabled:pointer-events-none hover:scale-[1.02] active:scale-[0.97] active:duration-100',
+  'inline-flex items-center justify-center font-medium transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500 disabled:opacity-50 disabled:pointer-events-none hover:scale-[1.01] active:scale-[0.98] active:duration-100 cursor-pointer select-none',
   {
     variants: {
       variant: {
-        primary: 'bg-primary-500 text-white hover:bg-primary-600 hover:shadow-md shadow-sm',
-        secondary: 'bg-neutral-600 text-white hover:bg-neutral-700 hover:shadow-md',
-        outline: 'border border-neutral-300 bg-transparent hover:bg-neutral-50 hover:shadow-sm',
-        ghost: 'bg-transparent hover:bg-neutral-100',
-        destructive: 'bg-error text-white hover:bg-red-700 hover:shadow-md shadow-sm',
+        primary: 'bg-primary-500 dark:bg-primary-600 text-white hover:bg-primary-600 dark:hover:bg-primary-500 shadow-xs hover:shadow-primary-500/20',
+        secondary: 'bg-neutral-800 dark:bg-neutral-800 text-white hover:bg-neutral-900 dark:hover:bg-neutral-700 shadow-xs',
+        outline: 'border border-neutral-300 dark:border-[#1a2e23] bg-transparent text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-[#14221b] hover:text-neutral-900 dark:hover:text-white',
+        ghost: 'bg-transparent text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100/80 dark:hover:bg-[#14221b] hover:text-neutral-900 dark:hover:text-white',
+        destructive: 'bg-red-600 dark:bg-red-700 text-white hover:bg-red-700 dark:hover:bg-red-600 shadow-xs hover:shadow-red-600/20',
       },
       size: {
-        sm: 'px-3 py-1.5 text-sm rounded',
-        md: 'px-5 py-2.5 text-base rounded-md',
-        lg: 'px-7 py-3.5 text-lg rounded-lg',
+        sm: 'px-3 py-1.5 text-xs font-medium rounded-lg gap-1.5',
+        md: 'px-4 py-2 text-sm font-medium rounded-xl gap-2',
+        lg: 'px-6 py-2.5 text-base font-medium rounded-xl gap-2.5',
       },
     },
     defaultVariants: { variant: 'primary', size: 'md' },

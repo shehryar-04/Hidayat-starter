@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useRole } from '../../app/RoleProvider'
-import { Button, Input, Label, Textarea, Spinner, EmptyState, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../shared/ui'
+import { Button, Input, Label, Textarea, Spinner, EmptyState, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Modal, ConfirmDialog } from '../../shared/ui'
 import { ClipboardList } from 'lucide-react'
 
 const STATUS_STYLES = {
@@ -36,6 +36,7 @@ export function EnrollmentView({ course, onBack }) {
   // Rejection modal
   const [rejectingInvoice, setRejectingInvoice] = useState(null)
   const [rejectionReason, setRejectionReason] = useState('')
+  const [confirmAction, setConfirmAction] = useState(null) // { type: 'reject'|'remove', id, title, message }
 
   useEffect(() => { loadAll() }, [course.id])
 
@@ -164,16 +165,11 @@ export function EnrollmentView({ course, onBack }) {
     } catch (err) { setError(err.message) }
   }
 
-  const handleReject = async (id) => {
-    if (!window.confirm('Reject this enrollment request?')) return
+  const executeConfirmAction = async () => {
+    if (!confirmAction) return
+    const { id } = confirmAction
     const { error: err } = await supabase.from('short_course_enrollments').delete().eq('id', id)
-    if (err) { setError(err.message); return }
-    await loadAll()
-  }
-
-  const handleRemove = async (id) => {
-    if (!window.confirm('Remove this enrollment?')) return
-    const { error: err } = await supabase.from('short_course_enrollments').delete().eq('id', id)
+    setConfirmAction(null)
     if (err) { setError(err.message); return }
     await loadAll()
   }
@@ -330,7 +326,16 @@ export function EnrollmentView({ course, onBack }) {
                                 Reject Payment
                               </Button>
                             ) : (
-                              <Button variant="destructive" size="sm" onClick={() => handleReject(e.id)}>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => setConfirmAction({
+                                  type: 'reject',
+                                  id: e.id,
+                                  title: 'Reject Enrollment',
+                                  message: `Reject enrollment request for ${e.students?.full_name || 'this student'}?`
+                                })}
+                              >
                                 Reject
                               </Button>
                             )}
@@ -341,7 +346,16 @@ export function EnrollmentView({ course, onBack }) {
                             ✓ Complete
                           </Button>
                         )}
-                        <Button variant="destructive" size="sm" onClick={() => handleRemove(e.id)}>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => setConfirmAction({
+                            type: 'remove',
+                            id: e.id,
+                            title: 'Remove Enrollment',
+                            message: `Remove enrollment record for ${e.students?.full_name || 'this student'}?`
+                          })}
+                        >
                           Remove
                         </Button>
                       </div>
@@ -355,32 +369,49 @@ export function EnrollmentView({ course, onBack }) {
       )}
       
       {/* Rejection reason modal */}
-      {rejectingInvoice && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white rounded-xl shadow-xl max-w-sm w-full p-6 space-y-4">
-            <h3 className="font-semibold text-gray-800">Reject Payment</h3>
-            <p className="text-sm text-gray-500">
-              Invoice: <span className="font-mono">{rejectingInvoice.invoice_number}</span><br />
-              TXN: <span className="font-mono">{rejectingInvoice.transaction_id}</span> · Rs. {rejectingInvoice.amount}
+      <Modal
+        open={!!rejectingInvoice}
+        onClose={() => setRejectingInvoice(null)}
+        size="sm"
+        title="Reject Payment"
+        description={rejectingInvoice ? `Invoice: ${rejectingInvoice.invoice_number} · Rs. ${rejectingInvoice.amount}` : ''}
+        footer={
+          <div className="flex gap-2 justify-end w-full">
+            <Button variant="ghost" size="sm" onClick={() => setRejectingInvoice(null)}>Cancel</Button>
+            <Button variant="destructive" size="sm" onClick={handleRejectPayment}>
+              Reject Payment
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-3">
+          {rejectingInvoice && (
+            <p className="text-xs text-neutral-500">
+              TXN: <span className="font-mono font-bold text-neutral-800 dark:text-neutral-200">{rejectingInvoice.transaction_id}</span>
             </p>
-            <div className="space-y-2">
-              <Label>Reason for rejection</Label>
-              <Textarea
-                rows={3}
-                value={rejectionReason}
-                onChange={(e) => setRejectionReason(e.target.value)}
-                placeholder="e.g. Transaction ID not found, amount mismatch…"
-              />
-            </div>
-            <div className="flex gap-3 justify-end">
-              <Button variant="ghost" size="sm" onClick={() => setRejectingInvoice(null)}>Cancel</Button>
-              <Button variant="destructive" onClick={handleRejectPayment}>
-                Reject Payment
-              </Button>
-            </div>
+          )}
+          <div className="space-y-1.5">
+            <Label>Reason for rejection</Label>
+            <Textarea
+              rows={3}
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              placeholder="e.g. Transaction ID not found, amount mismatch…"
+            />
           </div>
         </div>
-      )}
+      </Modal>
+
+      {/* Confirmation Dialog */}
+      <ConfirmDialog
+        open={!!confirmAction}
+        onClose={() => setConfirmAction(null)}
+        onConfirm={executeConfirmAction}
+        title={confirmAction?.title || 'Confirm Action'}
+        message={confirmAction?.message || 'Are you sure you want to proceed?'}
+        confirmText="Confirm"
+        variant="danger"
+      />
     </div>
   )
 }

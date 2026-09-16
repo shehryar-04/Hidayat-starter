@@ -17,11 +17,11 @@ function scorePassword(pwd) {
 
 const STRENGTH_LABELS = ['Too short', 'Weak', 'Fair', 'Good', 'Strong']
 const STRENGTH_COLORS = [
-  'bg-neutral-200',
+  'bg-neutral-200 dark:bg-neutral-800',
   'bg-red-400',
   'bg-orange-400',
-  'bg-yellow-400',
-  'bg-green-500',
+  'bg-amber-400',
+  'bg-emerald-500',
 ]
 
 function StrengthBar({ password }) {
@@ -35,12 +35,12 @@ function StrengthBar({ password }) {
           <div
             key={i}
             className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
-              score >= i ? STRENGTH_COLORS[score] : 'bg-neutral-200'
+              score >= i ? STRENGTH_COLORS[score] : 'bg-neutral-200 dark:bg-neutral-800'
             }`}
           />
         ))}
       </div>
-      <p className={`text-xs font-medium ${score <= 1 ? 'text-red-500' : score === 2 ? 'text-orange-500' : score === 3 ? 'text-yellow-600' : 'text-green-600'}`}>
+      <p className={`text-xs font-semibold ${score <= 1 ? 'text-red-500' : score === 2 ? 'text-orange-500' : score === 3 ? 'text-amber-500' : 'text-emerald-500'}`}>
         {label}
       </p>
     </div>
@@ -53,7 +53,7 @@ function PasswordInput({ id, value, onChange, placeholder, label, htmlFor }) {
     <div className="space-y-1.5">
       <Label htmlFor={htmlFor || id}>{label}</Label>
       <div className="relative">
-        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" />
+        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 dark:text-neutral-500 pointer-events-none" />
         <Input
           id={id}
           type={show ? 'text' : 'password'}
@@ -67,7 +67,7 @@ function PasswordInput({ id, value, onChange, placeholder, label, htmlFor }) {
           type="button"
           tabIndex={-1}
           onClick={() => setShow((s) => !s)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 transition-colors"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors cursor-pointer"
           aria-label={show ? 'Hide password' : 'Show password'}
         >
           {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -105,7 +105,6 @@ export default function ResetPasswordPage() {
 
     setLoading(true)
     try {
-      // Re-authenticate with current password first to verify identity
       const { data: { user } } = await supabase.auth.getUser()
       if (!user?.email) {
         setError('Unable to verify your session. Please sign in again.')
@@ -124,7 +123,6 @@ export default function ResetPasswordPage() {
         return
       }
 
-      // Now update to the new password
       const { error: updateError } = await supabase.auth.updateUser({
         password: newPassword,
       })
@@ -148,8 +146,8 @@ export default function ResetPasswordPage() {
     <PageWrapper className="max-w-2xl">
       {/* Back link */}
       <Link
-        to="/"
-        className="inline-flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-800 transition-colors mb-6 group"
+        to="/dashboard"
+        className="inline-flex items-center gap-1.5 text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-white transition-colors mb-6 group"
       >
         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
         Back to Dashboard
@@ -164,20 +162,20 @@ export default function ResetPasswordPage() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: [0, 0, 0.2, 1] }}
-        className="bg-white border border-neutral-200 rounded-xl shadow-sm overflow-hidden"
+        className="bg-white dark:bg-[#0f1a14] border border-neutral-200/90 dark:border-[#1a2e23] rounded-2xl shadow-xl overflow-hidden"
       >
         {/* Card header strip */}
-        <div className="flex items-center gap-3 px-6 py-4 border-b border-neutral-100 bg-neutral-50">
-          <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
-            <ShieldCheck className="w-5 h-5 text-primary" />
+        <div className="flex items-center gap-3 px-6 py-4 border-b border-neutral-100 dark:border-[#1a2e23] bg-neutral-50/70 dark:bg-[#14221b]">
+          <div className="w-9 h-9 rounded-xl bg-primary-50 dark:bg-primary-950/60 flex items-center justify-center text-primary-600 dark:text-emerald-400">
+            <ShieldCheck className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-neutral-800">Password & Security</p>
-            <p className="text-xs text-neutral-500">Use a strong, unique password you don't use elsewhere.</p>
+            <p className="text-sm font-semibold text-neutral-800 dark:text-neutral-100">Password & Security</p>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">Use a strong, unique password you don't use elsewhere.</p>
           </div>
         </div>
 
-        <div className="p-6">
+        <div className="p-6 sm:p-8">
           <AnimatePresence mode="wait">
             {success ? (
               <motion.div
@@ -187,12 +185,12 @@ export default function ResetPasswordPage() {
                 exit={{ opacity: 0 }}
                 className="flex flex-col items-center text-center py-10 gap-4"
               >
-                <div className="w-16 h-16 rounded-full bg-green-50 border border-green-200 flex items-center justify-center">
-                  <CheckCircle2 className="w-8 h-8 text-green-500" />
+                <div className="w-16 h-16 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/40 flex items-center justify-center">
+                  <CheckCircle2 className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-neutral-900">Password Updated!</h3>
-                  <p className="text-sm text-neutral-500 mt-1">
+                  <h3 className="text-lg font-display font-bold text-neutral-900 dark:text-white">Password Updated!</h3>
+                  <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
                     Your password has been changed successfully.
                   </p>
                 </div>
@@ -200,7 +198,7 @@ export default function ResetPasswordPage() {
                   variant="primary"
                   size="md"
                   className="min-h-[44px] px-8 mt-2"
-                  onClick={() => navigate('/')}
+                  onClick={() => navigate('/dashboard')}
                 >
                   Back to Dashboard
                 </Button>
@@ -226,10 +224,10 @@ export default function ResetPasswordPage() {
                 {/* Divider */}
                 <div className="relative my-1">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-neutral-100" />
+                    <div className="w-full border-t border-neutral-100 dark:border-[#1a2e23]" />
                   </div>
                   <div className="relative flex justify-center">
-                    <span className="bg-white px-3 text-xs text-neutral-400 uppercase tracking-wider">
+                    <span className="bg-white dark:bg-[#0f1a14] px-3 text-xs text-neutral-400 uppercase tracking-wider">
                       New Password
                     </span>
                   </div>
@@ -259,8 +257,8 @@ export default function ResetPasswordPage() {
                   {/* Match indicator */}
                   {confirmPassword && newPassword && (
                     <p
-                      className={`text-xs font-medium ${
-                        confirmPassword === newPassword ? 'text-green-600' : 'text-red-500'
+                      className={`text-xs font-semibold ${
+                        confirmPassword === newPassword ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500'
                       }`}
                     >
                       {confirmPassword === newPassword ? '✓ Passwords match' : '✗ Passwords do not match'}
@@ -269,8 +267,8 @@ export default function ResetPasswordPage() {
                 </div>
 
                 {/* Password requirements hint */}
-                <div className="rounded-lg bg-neutral-50 border border-neutral-200 px-4 py-3 space-y-1">
-                  <p className="text-xs font-semibold text-neutral-600 mb-1.5">Password requirements:</p>
+                <div className="rounded-xl bg-neutral-50 dark:bg-[#14221b] border border-neutral-200/80 dark:border-[#1a2e23] px-4 py-3.5 space-y-1.5">
+                  <p className="text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5">Password requirements:</p>
                   {[
                     { label: 'At least 8 characters', met: newPassword.length >= 8 },
                     { label: 'One uppercase letter (A–Z)', met: /[A-Z]/.test(newPassword) },
@@ -280,10 +278,10 @@ export default function ResetPasswordPage() {
                     <div key={label} className="flex items-center gap-2">
                       <div
                         className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                          met ? 'bg-green-500' : 'bg-neutral-300'
+                          met ? 'bg-emerald-500' : 'bg-neutral-300 dark:bg-neutral-600'
                         }`}
                       />
-                      <span className={`text-xs ${met ? 'text-green-700' : 'text-neutral-500'}`}>
+                      <span className={`text-xs ${met ? 'text-emerald-700 dark:text-emerald-300 font-medium' : 'text-neutral-500 dark:text-neutral-400'}`}>
                         {label}
                       </span>
                     </div>
@@ -297,7 +295,7 @@ export default function ResetPasswordPage() {
                       initial={{ opacity: 0, y: -4 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -4 }}
-                      className="bg-error-light text-error-dark rounded-lg p-4 text-sm"
+                      className="p-4 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-300 text-sm"
                       role="alert"
                     >
                       {error}
@@ -306,7 +304,7 @@ export default function ResetPasswordPage() {
                 </AnimatePresence>
 
                 {/* Actions */}
-                <div className="flex flex-col-reverse sm:flex-row gap-3 pt-1">
+                <div className="flex flex-col-reverse sm:flex-row gap-3 pt-2">
                   <Button
                     type="button"
                     variant="outline"

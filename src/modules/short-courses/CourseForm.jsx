@@ -19,18 +19,18 @@ function StepIndicator({ current }) {
       {STEPS.map((step, i) => (
         <div key={step.id} className="flex items-center flex-1 last:flex-none">
           <div className="flex flex-col items-center">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-colors
-              ${current === step.id ? 'bg-primary border-primary text-white'
-                : current > step.id ? 'bg-secondary border-secondary text-white'
-                : 'bg-white border-gray-300 text-gray-400'}`}>
+            <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold border transition-colors shadow-xs
+              ${current === step.id ? 'bg-primary-500 border-primary-500 text-white'
+                : current > step.id ? 'bg-emerald-600 border-emerald-600 text-white'
+                : 'bg-white dark:bg-[#14221b] border-neutral-300 dark:border-[#1a2e23] text-neutral-400'}`}>
               {current > step.id ? '✓' : step.id}
             </div>
-            <span className={`text-xs mt-1 whitespace-nowrap ${current === step.id ? 'text-primary font-medium' : 'text-gray-400'}`}>
+            <span className={`text-xs mt-1.5 whitespace-nowrap font-medium ${current === step.id ? 'text-primary-600 dark:text-emerald-400 font-semibold' : 'text-neutral-400 dark:text-neutral-500'}`}>
               {step.label}
             </span>
           </div>
           {i < STEPS.length - 1 && (
-            <div className={`flex-1 h-0.5 mx-2 mb-4 ${current > step.id ? 'bg-secondary' : 'bg-gray-200'}`} />
+            <div className={`flex-1 h-0.5 mx-2 mb-4 ${current > step.id ? 'bg-emerald-500' : 'bg-neutral-200 dark:bg-[#1a2e23]'}`} />
           )}
         </div>
       ))}
@@ -56,11 +56,11 @@ function ListEditor({ label, placeholder, items, onChange }) {
         <Button type="button" variant="secondary" size="sm" onClick={add} className="flex-shrink-0">Add</Button>
       </div>
       {items.length > 0 && (
-        <ul className="space-y-1">
+        <ul className="space-y-1.5">
           {items.map((item, i) => (
-            <li key={i} className="flex items-center gap-2 bg-neutral-50 px-3 py-1.5 rounded text-sm">
+            <li key={i} className="flex items-center gap-2 bg-neutral-50 dark:bg-[#14221b] border border-neutral-200/60 dark:border-[#1a2e23] px-3.5 py-2 rounded-xl text-sm text-neutral-800 dark:text-neutral-200">
               <span className="flex-1">{item}</span>
-              <button type="button" onClick={() => remove(i)} className="text-red-400 hover:text-red-600 text-xs" aria-label="Remove item">✕</button>
+              <button type="button" onClick={() => remove(i)} className="text-red-400 hover:text-red-600 text-xs px-1" aria-label="Remove item">✕</button>
             </li>
           ))}
         </ul>
@@ -87,26 +87,26 @@ function CurriculumBuilder({ sections, onChange }) {
   return (
     <div className="space-y-4">
       {sections.map((section, si) => (
-        <div key={section.id} className="border border-neutral-200 rounded-lg overflow-hidden">
-          <div className="bg-neutral-50 px-4 py-3 flex items-center gap-3">
-            <span className="text-xs font-bold text-primary-600 uppercase tracking-wide">Section {si + 1}</span>
+        <div key={section.id} className="border border-neutral-200/80 dark:border-[#1a2e23] rounded-2xl overflow-hidden shadow-xs">
+          <div className="bg-neutral-50/80 dark:bg-[#14221b] px-4 py-3 flex items-center gap-3 border-b border-neutral-200/80 dark:border-[#1a2e23]">
+            <span className="text-xs font-bold text-primary-600 dark:text-emerald-400 uppercase tracking-wide">Section {si + 1}</span>
             <Input className="flex-1 py-1.5 text-sm" value={section.title}
               onChange={e => updateSection(si, e.target.value)} placeholder="Section title" />
             <button type="button" onClick={() => removeSection(si)} className="text-red-400 hover:text-red-600 text-sm px-2" aria-label="Remove section">✕</button>
           </div>
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-neutral-100 dark:divide-[#1a2e23]">
             {section.lectures.map((lecture, li) => (
-              <div key={lecture.id} className="px-4 py-3 bg-white">
+              <div key={lecture.id} className="px-4 py-3 bg-white dark:bg-[#0f1a14]">
                 {/* Row 1: title, duration, free preview, remove */}
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xs text-gray-400 w-16 flex-shrink-0">Lecture {li + 1}</span>
+                  <span className="text-xs text-neutral-400 w-16 flex-shrink-0">Lecture {li + 1}</span>
                   <Input className="flex-1 py-1.5 text-sm" value={lecture.title}
                     onChange={e => updateLecture(si, li, 'title', e.target.value)} placeholder="Lecture title" />
                   <Input className="w-24 py-1.5 text-sm" type="number" min="1"
                     value={lecture.duration_minutes}
                     onChange={e => updateLecture(si, li, 'duration_minutes', e.target.value)} placeholder="Min" />
-                  <label className="flex items-center gap-1 text-xs text-gray-500 flex-shrink-0 cursor-pointer">
-                    <input type="checkbox" className="rounded border-neutral-300 text-primary-500 focus:ring-primary-500" checked={lecture.is_free_preview}
+                  <label className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400 flex-shrink-0 cursor-pointer">
+                    <input type="checkbox" className="rounded border-neutral-300 dark:border-[#1a2e23] text-primary-500 focus:ring-primary-500" checked={lecture.is_free_preview}
                       onChange={e => updateLecture(si, li, 'is_free_preview', e.target.checked)} />
                     Free preview
                   </label>
@@ -128,9 +128,9 @@ function CurriculumBuilder({ sections, onChange }) {
               </div>
             ))}
           </div>
-          <div className="px-4 py-2 bg-neutral-50 border-t border-gray-100">
+          <div className="px-4 py-2.5 bg-neutral-50/60 dark:bg-[#14221b]/60 border-t border-neutral-100 dark:border-[#1a2e23]">
             <button type="button" onClick={() => addLecture(si)}
-              className="text-primary text-sm font-medium hover:text-primary-600">+ Add Lecture</button>
+              className="text-primary-600 dark:text-emerald-400 text-sm font-medium hover:underline cursor-pointer">+ Add Lecture</button>
           </div>
         </div>
       ))}
@@ -368,14 +368,14 @@ export function CourseForm({ onComplete, editCourse = null }) {
         </div>
       </div>
 
-      <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6">
+        <div className="bg-white dark:bg-[#0f1a14] border border-neutral-200/80 dark:border-[#1a2e23] rounded-2xl shadow-xs p-6 sm:p-8 transition-colors">
         <StepIndicator current={step} />
 
-        {error && <div className="bg-error-light text-error-dark rounded-lg p-4 text-sm mb-4">{error}</div>}
+        {error && <div className="p-4 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-300 text-sm mb-6">{error}</div>}
 
         {/* ── Step 1: Basic Info ── */}
         {step === 1 && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div className="space-y-2">
               <Label>Course Title <span className="text-red-500">*</span></Label>
               <Input value={title} onChange={e => setField('title', e.target.value)}
@@ -388,14 +388,14 @@ export function CourseForm({ onComplete, editCourse = null }) {
             </div>
             <div className="space-y-2">
               <Label>Description <span className="text-red-500">*</span></Label>
-              <Textarea rows={5} value={description} onChange={e => setField('description', e.target.value)}
-                placeholder="Describe what this course covers, who it's for, and what makes it valuable…" />
+              <Textarea rows={4} value={description} onChange={e => setField('description', e.target.value)}
+                placeholder="Detailed description of course topics, methodology, and relevance…" />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Category</Label>
                 <Input value={category} onChange={e => setField('category', e.target.value)}
-                  placeholder="e.g. Islamic Studies" />
+                  placeholder="e.g. Islamic Studies, Quran, Hadith" />
               </div>
               <div className="space-y-2">
                 <Label>Subcategory</Label>
@@ -403,17 +403,17 @@ export function CourseForm({ onComplete, editCourse = null }) {
                   placeholder="e.g. Fiqh" />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Language</Label>
-                <select className="h-10 w-full rounded-lg border border-neutral-200 px-3 text-sm shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] transition-all duration-150 outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500" value={language} onChange={e => setField('language', e.target.value)}>
-                  {['English', 'Arabic', 'Urdu', 'French', 'Turkish', 'Other'].map(l => <option key={l}>{l}</option>)}
+                <select className="h-10 w-full rounded-xl border border-neutral-200/90 dark:border-[#1a2e23] bg-white dark:bg-[#0f1a14] text-neutral-900 dark:text-neutral-100 px-3 text-sm transition-all duration-150 outline-none focus:ring-2 focus:ring-primary-500" value={language} onChange={e => setField('language', e.target.value)}>
+                  {['English', 'Arabic', 'Urdu', 'French', 'Turkish', 'Other'].map(l => <option key={l} value={l}>{l}</option>)}
                 </select>
               </div>
               <div className="space-y-2">
                 <Label>Level</Label>
-                <select className="h-10 w-full rounded-lg border border-neutral-200 px-3 text-sm shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] transition-all duration-150 outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500" value={level} onChange={e => setField('level', e.target.value)}>
-                  {['Beginner', 'Intermediate', 'Advanced', 'All levels'].map(l => <option key={l}>{l}</option>)}
+                <select className="h-10 w-full rounded-xl border border-neutral-200/90 dark:border-[#1a2e23] bg-white dark:bg-[#0f1a14] text-neutral-900 dark:text-neutral-100 px-3 text-sm transition-all duration-150 outline-none focus:ring-2 focus:ring-primary-500" value={level} onChange={e => setField('level', e.target.value)}>
+                  {['Beginner', 'Intermediate', 'Advanced', 'All levels'].map(l => <option key={l} value={l}>{l}</option>)}
                 </select>
               </div>
             </div>

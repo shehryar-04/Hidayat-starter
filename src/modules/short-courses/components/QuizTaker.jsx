@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { CheckCircle, XCircle, Award, RotateCcw } from 'lucide-react'
-import { Button, Spinner } from '../../../shared/ui'
+import { Button, Spinner, ConfirmDialog } from '../../../shared/ui'
 import { getQuizForStudent, submitQuizAttempt, getStudentAttempts } from '../services/quizService'
 
 /**
@@ -16,6 +16,8 @@ export function QuizTaker({ quizId, studentId, onComplete }) {
   const [result, setResult] = useState(null)
   const [previousAttempts, setPreviousAttempts] = useState([])
   const [error, setError] = useState(null)
+  const [unansweredCount, setUnansweredCount] = useState(0)
+  const [showUnansweredConfirm, setShowUnansweredConfirm] = useState(false)
 
   useEffect(() => {
     loadQuiz()
@@ -42,10 +44,16 @@ export function QuizTaker({ quizId, studentId, onComplete }) {
     if (!quiz) return
     const unanswered = quiz.questions.filter(q => !answers[q.id])
     if (unanswered.length > 0) {
-      if (!window.confirm(`You have ${unanswered.length} unanswered question(s). Submit anyway?`)) return
+      setUnansweredCount(unanswered.length)
+      setShowUnansweredConfirm(true)
+      return
     }
+    await processSubmission()
+  }
 
+  const processSubmission = async () => {
     setSubmitting(true); setError(null)
+    setShowUnansweredConfirm(false)
     try {
       const res = await submitQuizAttempt(quizId, studentId, answers)
       setResult(res)
@@ -196,6 +204,17 @@ export function QuizTaker({ quizId, studentId, onComplete }) {
           {submitting ? 'Submitting...' : `Submit Quiz (${answeredCount}/${totalQuestions} answered)`}
         </Button>
       </div>
+
+      <ConfirmDialog
+        open={showUnansweredConfirm}
+        onClose={() => setShowUnansweredConfirm(false)}
+        onConfirm={processSubmission}
+        loading={submitting}
+        title="Unanswered Questions"
+        message={`You have ${unansweredCount} unanswered question(s). Are you sure you want to submit anyway?`}
+        confirmText="Submit Anyway"
+        variant="warning"
+      />
     </div>
   )
 }

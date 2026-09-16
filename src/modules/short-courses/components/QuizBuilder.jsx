@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Trash2, Check, GripVertical, Eye, Save } from 'lucide-react'
-import { Button, Input, Label, Spinner } from '../../../shared/ui'
+import { Button, Input, Label, Spinner, ConfirmDialog } from '../../../shared/ui'
 import { supabase } from '../../../lib/supabase'
 import { createQuiz, addQuestion, deleteQuestion, getQuizWithQuestions, publishQuiz, updateQuiz, deleteQuiz } from '../services/quizService'
 
@@ -20,6 +20,8 @@ export function QuizBuilder({ courseId, quizId = null, createdBy, onComplete }) 
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(null)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deletingQuiz, setDeletingQuiz] = useState(false)
 
   // Load course sections for the dropdown
   useEffect(() => {
@@ -143,13 +145,15 @@ export function QuizBuilder({ courseId, quizId = null, createdBy, onComplete }) 
     finally { setSaving(false) }
   }
 
-  const handleDelete = async () => {
+  const confirmDeleteQuiz = async () => {
     if (!savedQuizId) return
-    if (!window.confirm('Delete this quiz permanently?')) return
+    setDeletingQuiz(true)
     try {
       await deleteQuiz(savedQuizId)
+      setShowDeleteConfirm(false)
       onComplete?.()
     } catch (err) { setError(err.message) }
+    finally { setDeletingQuiz(false) }
   }
 
   if (loading) return <div className="flex justify-center py-16"><Spinner size="lg" /></div>
@@ -160,7 +164,7 @@ export function QuizBuilder({ courseId, quizId = null, createdBy, onComplete }) 
         <h2 className="text-xl font-bold text-gray-800">{quizId ? 'Edit Quiz' : 'Create Quiz'}</h2>
         <div className="flex gap-2">
           {savedQuizId && (
-            <Button variant="destructive" size="sm" onClick={handleDelete}>Delete Quiz</Button>
+            <Button variant="destructive" size="sm" onClick={() => setShowDeleteConfirm(true)}>Delete Quiz</Button>
           )}
           <Button variant="outline" size="sm" onClick={onComplete}>Cancel</Button>
         </div>
@@ -273,6 +277,17 @@ export function QuizBuilder({ courseId, quizId = null, createdBy, onComplete }) 
           <Eye className="w-4 h-4 mr-2" /> Publish Quiz
         </Button>
       </div>
+
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={confirmDeleteQuiz}
+        loading={deletingQuiz}
+        title="Delete Quiz"
+        message="Are you sure you want to permanently delete this quiz and all its questions?"
+        confirmText="Delete Quiz"
+        variant="danger"
+      />
     </div>
   )
 }

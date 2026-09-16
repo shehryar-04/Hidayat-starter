@@ -21,16 +21,16 @@ export function PageHeader({ title, subtitle, actions, className, ...props }) {
       {...props}
     >
       <div>
-        <h1 className="text-2xl font-semibold text-neutral-800">
+        <h1 className="text-2xl sm:text-3xl font-display font-bold text-neutral-900 dark:text-neutral-50 tracking-tight">
           {title?.slice(0, 80)}
         </h1>
         {subtitle && (
-          <p className="text-base text-neutral-500 mt-1">
+          <p className="text-sm sm:text-base text-neutral-500 dark:text-neutral-400 mt-1">
             {subtitle?.slice(0, 200)}
           </p>
         )}
       </div>
-      {actions && <div className="flex items-center gap-3">{actions}</div>}
+      {actions && <div className="flex items-center gap-2.5 flex-wrap">{actions}</div>}
     </div>
   )
 }

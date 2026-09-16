@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     './index.html',
     './src/**/*.{js,jsx,ts,tsx}',
@@ -67,6 +68,28 @@ export default {
         'ease-in-out': 'cubic-bezier(0.4, 0, 0.2, 1)',
       },
       colors: {
+        // Semantic Token Mapping to CSS Variables
+        theme: {
+          bg: 'var(--color-background)',
+          'bg-subtle': 'var(--color-background-subtle)',
+          surface: 'var(--color-surface)',
+          'surface-elevated': 'var(--color-surface-elevated)',
+          'surface-hover': 'var(--color-surface-hover)',
+          'surface-subtle': 'var(--color-surface-subtle)',
+          border: 'var(--color-border)',
+          'border-subtle': 'var(--color-border-subtle)',
+          'border-strong': 'var(--color-border-strong)',
+          'border-focus': 'var(--color-border-focus)',
+          text: 'var(--color-text)',
+          'text-secondary': 'var(--color-text-secondary)',
+          'text-muted': 'var(--color-text-muted)',
+          'text-subtle': 'var(--color-text-subtle)',
+          'text-inverse': 'var(--color-text-inverse)',
+          'input-bg': 'var(--color-input-bg)',
+          'input-border': 'var(--color-input-border)',
+          'input-text': 'var(--color-input-text)',
+          'input-placeholder': 'var(--color-input-placeholder)',
+        },
         primary: {
           DEFAULT: '#2d8659',
           50:  '#f0faf5',

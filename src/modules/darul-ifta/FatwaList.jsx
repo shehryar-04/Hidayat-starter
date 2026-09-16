@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
-import { Button, Input, Card, CardContent, Badge, Spinner, EmptyState } from '../../shared/ui'
+import { Button, Input, Card, CardContent, Badge, Spinner, EmptyState, ConfirmDialog } from '../../shared/ui'
 import { Scale } from 'lucide-react'
 import { QuestionDetails } from './QuestionDetails'
 
@@ -20,6 +20,7 @@ export function FatwaList({ onEdit, canManage }) {
   const [statusFilter, setStatusFilter] = useState('all')
   const [search, setSearch] = useState('')
   const [deleting, setDeleting] = useState(null)
+  const [deleteTargetId, setDeleteTargetId] = useState(null)
 
   useEffect(() => { load() }, [statusFilter])
 
@@ -54,8 +55,9 @@ export function FatwaList({ onEdit, canManage }) {
     }
   }
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Remove this question from the active workflow?')) return
+  const handleConfirmDelete = async () => {
+    if (!deleteTargetId) return
+    const id = deleteTargetId
     setDeleting(id)
     try {
       const { data: { user } } = await supabase.auth.getUser()
@@ -71,6 +73,7 @@ export function FatwaList({ onEdit, canManage }) {
         .eq('id', id)
       if (err) throw err
       setFatwas(f => f.filter(x => x.id !== id))
+      setDeleteTargetId(null)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -145,7 +148,7 @@ export function FatwaList({ onEdit, canManage }) {
                     <Button
                       variant="destructive"
                       size="sm"
-                      onClick={() => handleDelete(fatwa.id)}
+                      onClick={() => setDeleteTargetId(fatwa.id)}
                       loading={deleting === fatwa.id}
                     >
                       Delete
@@ -189,6 +192,17 @@ export function FatwaList({ onEdit, canManage }) {
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!deleteTargetId}
+        onClose={() => setDeleteTargetId(null)}
+        onConfirm={handleConfirmDelete}
+        loading={!!deleting}
+        title="Remove Question"
+        message="Remove this question from the active workflow? It will be marked as deleted."
+        confirmText="Remove"
+        variant="danger"
+      />
     </div>
   )
 }

@@ -318,7 +318,7 @@ export default function FatwaDetailPage() {
     <>
       <ReadingProgress contentRef={contentRef} />
 
-      <main className="min-h-screen bg-gray-50">
+      <main className="space-y-6">
         <SEOHead
           title={seoTitle}
           description={seoDescription}
@@ -328,9 +328,9 @@ export default function FatwaDetailPage() {
           lang={detectDirection(fatwa?.question_text || fatwa?.title) === 'rtl' ? 'ur' : 'en'}
         />
 
-        <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="max-w-7xl mx-auto space-y-6">
           {/* Back to Results / Search link */}
-          <div className="mb-2">
+          <div>
             <button
               onClick={() => {
                 if (location.state?.fromSearch) {
@@ -339,7 +339,7 @@ export default function FatwaDetailPage() {
                   navigate('/fatwas/search')
                 }
               }}
-              className="inline-flex items-center gap-1.5 text-sm text-green-700 hover:text-green-800 font-medium transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:rounded-sm"
+              className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-primary-600 dark:text-emerald-400 hover:underline font-semibold transition-colors cursor-pointer"
             >
               <ArrowLeft size={16} aria-hidden="true" />
               {location.state?.fromSearch ? 'Back to Results' : 'Back to Search'}
@@ -349,7 +349,7 @@ export default function FatwaDetailPage() {
           {/* Breadcrumb */}
           <BreadcrumbNav items={breadcrumbItems} />
 
-          <div className="lg:flex lg:gap-8">
+          <div className="lg:flex lg:gap-8 items-start">
             {/* Main Content */}
             <article
               ref={contentRef}
@@ -357,11 +357,11 @@ export default function FatwaDetailPage() {
               aria-labelledby="fatwa-title"
             >
               {/* Header */}
-              <header className="mb-6">
+              <header className="mb-6 bg-white dark:bg-[#0f1a14] border border-neutral-200/80 dark:border-[#1a2e23] rounded-2xl p-6 shadow-xs">
                 <div className="flex items-start gap-3">
                   <h1
                     id="fatwa-title"
-                    className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight mb-3 flex-1"
+                    className="text-xl sm:text-2xl lg:text-3xl font-display font-bold text-neutral-900 dark:text-white leading-tight mb-3 flex-1"
                   >
                     {fatwa.title}
                   </h1>
@@ -372,18 +372,18 @@ export default function FatwaDetailPage() {
                     className="mt-1 flex-shrink-0"
                   />
                 </div>
-                <div className="flex flex-wrap items-center gap-3 text-sm">
+                <div className="flex flex-wrap items-center gap-2.5 text-xs">
                   {fatwa.category_1 && (
-                    <span className="inline-block text-xs font-medium px-2.5 py-1 rounded-full bg-green-50 text-green-700">
+                    <span className="inline-block font-semibold px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/50 dark:border-emerald-800/40">
                       {fatwa.category_1}
                     </span>
                   )}
                   {fatwa.dar_ul_ifta && (
-                    <span className="inline-block text-xs font-medium px-2.5 py-1 rounded-full bg-blue-50 text-blue-700">
+                    <span className="inline-block font-medium px-2.5 py-1 rounded-full bg-neutral-100 dark:bg-[#14221b] text-neutral-600 dark:text-neutral-300 border border-neutral-200/60 dark:border-[#1a2e23]">
                       {fatwa.dar_ul_ifta}
                     </span>
                   )}
-                  <span className="flex items-center gap-1 text-gray-600">
+                  <span className="flex items-center gap-1 text-neutral-400 dark:text-neutral-500 ml-auto">
                     <Clock size={14} aria-hidden="true" />
                     {readingTime} min read
                   </span>
@@ -394,18 +394,18 @@ export default function FatwaDetailPage() {
               <section aria-labelledby="question-heading" className="mb-8">
                 <h2
                   id="question-heading"
-                  className="text-lg font-semibold text-gray-800 mb-3"
+                  className="text-base sm:text-lg font-display font-bold text-neutral-800 dark:text-neutral-200 mb-3"
                 >
                   Question
                 </h2>
                 <div
-                  className="bg-white border border-gray-200 rounded-lg shadow-sm p-5"
+                  className="bg-white dark:bg-[#0f1a14] border border-neutral-200/80 dark:border-[#1a2e23] rounded-2xl shadow-xs p-6"
                   dir={questionDir}
                   lang={questionDir === 'rtl' ? 'ar' : undefined}
                 >
                   <p
-                    className="text-gray-700 leading-relaxed whitespace-pre-wrap"
-                    style={{ lineHeight: '1.7' }}
+                    className="text-neutral-800 dark:text-neutral-200 leading-relaxed whitespace-pre-wrap text-sm sm:text-base"
+                    style={{ lineHeight: '1.8' }}
                   >
                     {fatwa.question_text}
                   </p>
@@ -416,15 +416,17 @@ export default function FatwaDetailPage() {
               <section aria-labelledby="answer-heading" className="mb-8">
                 <h2
                   id="answer-heading"
-                  className="text-lg font-semibold text-gray-800 mb-3"
+                  className="text-base sm:text-lg font-display font-bold text-neutral-800 dark:text-neutral-200 mb-3"
                 >
                   Answer
                 </h2>
-                <FatwaAnswerContent
-                  id="fatwa-answer-content"
-                  prepared={answerContent}
-                  expanded={!showReadMore || expanded}
-                />
+                <div className="bg-white dark:bg-[#0f1a14] border border-neutral-200/80 dark:border-[#1a2e23] rounded-2xl shadow-xs p-6">
+                  <FatwaAnswerContent
+                    id="fatwa-answer-content"
+                    prepared={answerContent}
+                    expanded={!showReadMore || expanded}
+                  />
+                </div>
                 {showReadMore && (
                   <button
                     onClick={() => setExpanded(!expanded)}

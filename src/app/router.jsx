@@ -8,6 +8,7 @@ import FeatureFlagGuard from './FeatureFlagGuard'
 import HomePage from './HomePage'
 import Dashboard from './Dashboard'
 import PublicTopNav from './PublicTopNav'
+import AuthenticatedLayout from './AuthenticatedLayout'
 import { useRole } from './RoleProvider'
 
 // Module imports
@@ -18,6 +19,7 @@ import ShortCoursesModule from '../modules/short-courses'
 import DarulIftaModule from '../modules/darul-ifta'
 import ResearchCenterModule from '../modules/research-center'
 import WazifaModule from '../modules/wazifa'
+import ThemeShowcase from './ThemeShowcase'
 
 // Lazy-loaded public pages
 const CertificateVerifyPage = lazy(() => import('../modules/short-courses/CertificateVerifyPage'))
@@ -47,10 +49,9 @@ import AdminDashboard from '../modules/admin-dashboard'
 import AuditLogViewer from '../modules/admin-dashboard/AuditLogViewer'
 
 /**
- * Shell wrapper — single navbar for all pages (guest + authenticated).
- * Content is rendered below the fixed navbar with top padding.
+ * PublicShell — top navbar for public marketing and institutional pages.
  */
-function AppShell({ children }) {
+function PublicShell({ children }) {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <PublicTopNav />
@@ -59,6 +60,20 @@ function AppShell({ children }) {
       </main>
     </div>
   )
+}
+
+/**
+ * AdaptiveShell — uses AuthenticatedLayout with SideNav when user is logged in,
+ * or PublicShell with top navbar when user is a guest.
+ */
+function AdaptiveShell({ children }) {
+  const { role } = useRole()
+
+  if (role) {
+    return <AuthenticatedLayout>{children}</AuthenticatedLayout>
+  }
+
+  return <PublicShell>{children}</PublicShell>
 }
 
 /** Suspense fallback for lazily loaded pages. */
@@ -73,58 +88,164 @@ function PageFallback() {
 /** Public content page: shared navbar + lazy boundary. */
 function ContentRoute({ children }) {
   return (
-    <AppShell>
+    <PublicShell>
       <Suspense fallback={<PageFallback />}>{children}</Suspense>
-    </AppShell>
+    </PublicShell>
   )
-}
-
-/**
- * SmartHome — Shows the public landing page (HomePage) for guests,
- * and the module hub (Dashboard) for authenticated users.
- */
-function SmartHome() {
-  const { role } = useRole()
-
-  if (role) {
-    return <AppShell><Dashboard /></AppShell>
-  }
-  return <HomePage />
 }
 
 export default function AppRouter() {
   return (
     <Routes>
-      {/* Home page — public landing for guests, module hub for authenticated */}
-      <Route path="/" element={<SmartHome />} />
+      {/* Home page — public landing accessible to everyone (guests + authenticated) */}
+      <Route path="/" element={<HomePage />} />
+
+      {/* Authentication */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
-      <Route path="/reset-password" element={<ProtectedRoute><AppShell><ResetPasswordPage /></AppShell></ProtectedRoute>} />
+      <Route
+        path="/reset-password"
+        element={
+          <ProtectedRoute>
+            <AuthenticatedLayout>
+              <ResetPasswordPage />
+            </AuthenticatedLayout>
+          </ProtectedRoute>
+        }
+      />
 
-      {/* Under construction modules — no auth required, no flag guard */}
-      <Route path="/dars-e-nizami/*" element={<AppShell><FeatureFlagGuard flagKey="dars_e_nizami"><DarsENizamiModule /></FeatureFlagGuard></AppShell>} />
-      <Route path="/hifz/*" element={<AppShell><FeatureFlagGuard flagKey="hifz"><HifzModule /></FeatureFlagGuard></AppShell>} />
-      <Route path="/nazra/*" element={<AppShell><FeatureFlagGuard flagKey="nazra"><NazraModule /></FeatureFlagGuard></AppShell>} />
+      {/* Main Authenticated Hub / Dashboard with SideNav */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <AuthenticatedLayout>
+              <Dashboard />
+            </AuthenticatedLayout>
+          </ProtectedRoute>
+        }
+      />
 
-      {/* Protected module routes */}
-      <Route path="/admin-dashboard" element={<ProtectedRoute><AppShell><AdminDashboard /></AppShell></ProtectedRoute>} />
-      <Route path="/admin-dashboard/audit-log" element={<ProtectedRoute><AppShell><AuditLogViewer /></AppShell></ProtectedRoute>} />
-      <Route path="/short-courses/*" element={<ProtectedRoute><AppShell><FeatureFlagGuard flagKey="short_courses"><ShortCoursesModule /></FeatureFlagGuard></AppShell></ProtectedRoute>} />
-      <Route path="/wazifa/*" element={<ProtectedRoute><AppShell><FeatureFlagGuard flagKey="wazifa"><WazifaModule /></FeatureFlagGuard></AppShell></ProtectedRoute>} />
-      <Route path="/reports/*" element={<ProtectedRoute><AppShell><FeatureFlagGuard flagKey="student_reports"><StudentReportsModule /></FeatureFlagGuard></AppShell></ProtectedRoute>} />
-      <Route path="/student-admin/*" element={<ProtectedRoute><AppShell><StudentAdminModule /></AppShell></ProtectedRoute>} />
-      <Route path="/scholar-admin/*" element={<ProtectedRoute><AppShell><ScholarAdminModule /></AppShell></ProtectedRoute>} />
+      {/* Protected administrative modules */}
+      <Route
+        path="/admin-dashboard"
+        element={
+          <ProtectedRoute>
+            <AuthenticatedLayout>
+              <AdminDashboard />
+            </AuthenticatedLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin-dashboard/audit-log"
+        element={
+          <ProtectedRoute>
+            <AuthenticatedLayout>
+              <AuditLogViewer />
+            </AuthenticatedLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/student-admin/*"
+        element={
+          <ProtectedRoute>
+            <AuthenticatedLayout>
+              <StudentAdminModule />
+            </AuthenticatedLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/scholar-admin/*"
+        element={
+          <ProtectedRoute>
+            <AuthenticatedLayout>
+              <ScholarAdminModule />
+            </AuthenticatedLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/short-courses/*"
+        element={
+          <ProtectedRoute>
+            <AuthenticatedLayout>
+              <FeatureFlagGuard flagKey="short_courses">
+                <ShortCoursesModule />
+              </FeatureFlagGuard>
+            </AuthenticatedLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/wazifa/*"
+        element={
+          <ProtectedRoute>
+            <AuthenticatedLayout>
+              <FeatureFlagGuard flagKey="wazifa">
+                <WazifaModule />
+              </FeatureFlagGuard>
+            </AuthenticatedLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/reports/*"
+        element={
+          <ProtectedRoute>
+            <AuthenticatedLayout>
+              <FeatureFlagGuard flagKey="student_reports">
+                <StudentReportsModule />
+              </FeatureFlagGuard>
+            </AuthenticatedLayout>
+          </ProtectedRoute>
+        }
+      />
 
-      {/* Public routes — accessible without login, same navbar */}
-      <Route path="/darul-ifta/*" element={<AppShell><DarulIftaModule /></AppShell>} />
-      <Route path="/research-center/*" element={<AppShell><ResearchCenterModule /></AppShell>} />
-      <Route path="/articles/*" element={<AppShell><ArticlesPage /></AppShell>} />
-      <Route path="/downloads/*" element={<AppShell><DownloadsPage /></AppShell>} />
-      <Route path="/fatwas/*" element={<AppShell><FatwaPlatformModule /></AppShell>} />
-      <Route path="/darul-iftaa/*" element={<AppShell><FatwaPlatformModule /></AppShell>} />
-      <Route path="/knowledge-test" element={<ContentRoute><KnowledgeTestPage /></ContentRoute>} />
+      {/* Academic modules */}
+      <Route
+        path="/dars-e-nizami/*"
+        element={
+          <AdaptiveShell>
+            <FeatureFlagGuard flagKey="dars_e_nizami">
+              <DarsENizamiModule />
+            </FeatureFlagGuard>
+          </AdaptiveShell>
+        }
+      />
+      <Route
+        path="/hifz/*"
+        element={
+          <AdaptiveShell>
+            <FeatureFlagGuard flagKey="hifz">
+              <HifzModule />
+            </FeatureFlagGuard>
+          </AdaptiveShell>
+        }
+      />
+      <Route
+        path="/nazra/*"
+        element={
+          <AdaptiveShell>
+            <FeatureFlagGuard flagKey="nazra">
+              <NazraModule />
+            </FeatureFlagGuard>
+          </AdaptiveShell>
+        }
+      />
 
-      {/* Institutional content pages — public, sourced from the company profile */}
+      {/* Public / Hybrid Knowledge routes */}
+      <Route path="/darul-ifta/*" element={<AdaptiveShell><DarulIftaModule /></AdaptiveShell>} />
+      <Route path="/research-center/*" element={<AdaptiveShell><ResearchCenterModule /></AdaptiveShell>} />
+      <Route path="/articles/*" element={<AdaptiveShell><ArticlesPage /></AdaptiveShell>} />
+      <Route path="/downloads/*" element={<AdaptiveShell><DownloadsPage /></AdaptiveShell>} />
+      <Route path="/fatwas/*" element={<AdaptiveShell><FatwaPlatformModule /></AdaptiveShell>} />
+      <Route path="/darul-iftaa/*" element={<AdaptiveShell><FatwaPlatformModule /></AdaptiveShell>} />
+      <Route path="/knowledge-test" element={<AdaptiveShell><Suspense fallback={<PageFallback />}><KnowledgeTestPage /></Suspense></AdaptiveShell>} />
+
+      {/* Institutional content pages — public, sourced from company profile */}
       <Route path="/about" element={<ContentRoute><AboutPage /></ContentRoute>} />
       <Route path="/about/directors-message" element={<ContentRoute><DirectorMessagePage /></ContentRoute>} />
       <Route path="/about/mission-values" element={<ContentRoute><MissionValuesPage /></ContentRoute>} />
@@ -139,20 +260,38 @@ export default function AppRouter() {
       <Route path="/terms-of-service" element={<ContentRoute><TermsOfServicePage /></ContentRoute>} />
 
       {/* Certificate Verification — public, no login required */}
-      <Route path="/certificate/verify/:code" element={
-        <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading...</p></div>}>
-          <CertificateVerifyPage />
-        </Suspense>
-      } />
+      <Route
+        path="/certificate/verify/:code"
+        element={
+          <Suspense fallback={<PageFallback />}>
+            <CertificateVerifyPage />
+          </Suspense>
+        }
+      />
 
       {/* Certificate View & Download — protected (owner/admin) */}
-      <Route path="/certificate/:id" element={
-        <ProtectedRoute>
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading...</p></div>}>
-            <CertificatePage />
-          </Suspense>
-        </ProtectedRoute>
-      } />
+      <Route
+        path="/certificate/:id"
+        element={
+          <ProtectedRoute>
+            <AuthenticatedLayout>
+              <Suspense fallback={<PageFallback />}>
+                <CertificatePage />
+              </Suspense>
+            </AuthenticatedLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Developer Theme Workbench & Component Showcase */}
+      <Route
+        path="/theme-showcase"
+        element={
+          <AdaptiveShell>
+            <ThemeShowcase />
+          </AdaptiveShell>
+        }
+      />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

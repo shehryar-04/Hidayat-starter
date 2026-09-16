@@ -14,9 +14,10 @@ export const Input = forwardRef(({ className, error, ...props }, ref) => (
   <input
     ref={ref}
     className={cn(
-      'h-10 w-full rounded-lg border px-3 text-sm shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] transition-all duration-150 outline-none',
-      'border-neutral-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500',
-      error && 'border-red-500 focus:ring-red-500 focus:border-red-500',
+      'h-10 w-full rounded-xl border px-3.5 text-sm transition-all duration-150 outline-none',
+      'bg-white dark:bg-[#0f1a14] text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500',
+      'border-neutral-200/90 dark:border-[#1a2e23] focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:focus:border-emerald-500/80',
+      error && 'border-red-500 dark:border-red-500 focus:ring-red-500 focus:border-red-500',
       'disabled:opacity-50 disabled:pointer-events-none',
       className
     )}

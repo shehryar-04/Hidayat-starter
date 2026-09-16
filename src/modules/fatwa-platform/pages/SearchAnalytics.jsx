@@ -54,7 +54,7 @@ export default function SearchAnalytics() {
 
       {/* Time range selector */}
       <div className="flex items-center gap-2 mb-6">
-        <span className="text-sm text-gray-500">
+        <span className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
           {tab === 'most' ? 'Most viewed is all-time:' : 'Time range:'}
         </span>
         {[7, 14, 30, 90].map((d) => (
@@ -62,8 +62,8 @@ export default function SearchAnalytics() {
             key={d}
             onClick={() => setDays(d)}
             disabled={tab === 'most'}
-            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-              days === d ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            className={`px-3 py-1 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
+              days === d ? 'bg-primary-500 text-white shadow-xs' : 'bg-neutral-100 dark:bg-[#14221b] text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white border border-neutral-200/60 dark:border-[#1a2e23]'
             } disabled:opacity-40 disabled:cursor-not-allowed`}
           >
             {d}d
@@ -72,7 +72,7 @@ export default function SearchAnalytics() {
       </div>
 
       {/* Tab navigation */}
-      <div className="flex gap-1 border-b border-gray-200 mb-6">
+      <div className="flex gap-1 border-b border-neutral-200/80 dark:border-[#1a2e23] mb-6 overflow-x-auto custom-scrollbar">
         {[
           { key: 'top', label: 'Top Queries', icon: TrendingUp },
           { key: 'history', label: 'Search Log', icon: History },
@@ -84,10 +84,10 @@ export default function SearchAnalytics() {
           <button
             key={key}
             onClick={() => setTab(key)}
-            className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+            className={`flex items-center gap-1.5 px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 whitespace-nowrap transition-colors cursor-pointer ${
               tab === key
-                ? 'border-primary text-primary'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                ? 'border-primary-500 dark:border-emerald-400 text-primary-600 dark:text-emerald-400 font-semibold'
+                : 'border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
             }`}
           >
             <Icon size={14} /> {label}
@@ -96,50 +96,50 @@ export default function SearchAnalytics() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-12"><Spinner size="lg" /></div>
+        <div className="flex justify-center py-16"><Spinner size="lg" /></div>
       ) : tab === 'volume' ? (
-        <div>
+        <div className="space-y-6">
           {/* Summary cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Card>
-              <CardContent className="p-4 text-center">
-                <p className="text-2xl font-bold text-primary">{totalSearches.toLocaleString()}</p>
-                <p className="text-xs text-gray-500">Total Searches</p>
+              <CardContent className="p-5 text-center">
+                <p className="text-2xl sm:text-3xl font-display font-bold text-primary-600 dark:text-emerald-400">{totalSearches.toLocaleString()}</p>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Total Searches</p>
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="p-4 text-center">
-                <p className="text-2xl font-bold text-primary">{avgDaily.toLocaleString()}</p>
-                <p className="text-xs text-gray-500">Avg Daily</p>
+              <CardContent className="p-5 text-center">
+                <p className="text-2xl sm:text-3xl font-display font-bold text-primary-600 dark:text-emerald-400">{avgDaily.toLocaleString()}</p>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Avg Daily Searches</p>
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="p-4 text-center">
-                <p className="text-2xl font-bold text-primary">{volume.length}</p>
-                <p className="text-xs text-gray-500">Active Days</p>
+              <CardContent className="p-5 text-center">
+                <p className="text-2xl sm:text-3xl font-display font-bold text-primary-600 dark:text-emerald-400">{volume.length}</p>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Active Days</p>
               </CardContent>
             </Card>
           </div>
 
           {/* Simple bar visualization */}
-          <div className="bg-white rounded-lg border border-gray-100 p-4">
-            <h4 className="text-sm font-medium text-gray-700 mb-3">Daily Search Volume</h4>
-            <div className="space-y-1 max-h-80 overflow-y-auto">
+          <div className="bg-white dark:bg-[#0f1a14] rounded-2xl border border-neutral-200/80 dark:border-[#1a2e23] p-5 shadow-xs">
+            <h4 className="text-sm font-display font-bold text-neutral-800 dark:text-neutral-200 mb-4">Daily Search Volume</h4>
+            <div className="space-y-2 max-h-80 overflow-y-auto custom-scrollbar">
               {volume.slice(0, 30).map((d) => {
                 const max = Math.max(...volume.map(v => v.total_searches || 1))
                 const pct = ((d.total_searches || 0) / max) * 100
                 return (
-                  <div key={d.day} className="flex items-center gap-2">
-                    <span className="text-xs text-gray-400 w-20 flex-shrink-0">
+                  <div key={d.day} className="flex items-center gap-3">
+                    <span className="text-xs text-neutral-400 w-20 flex-shrink-0 font-mono">
                       {new Date(d.day).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </span>
-                    <div className="flex-1 h-5 bg-gray-50 rounded overflow-hidden">
+                    <div className="flex-1 h-5 bg-neutral-100 dark:bg-[#14221b] rounded-lg overflow-hidden">
                       <div
-                        className="h-full bg-primary/20 rounded"
+                        className="h-full bg-primary-500/40 dark:bg-emerald-500/40 rounded-lg"
                         style={{ width: `${pct}%` }}
                       />
                     </div>
-                    <span className="text-xs text-gray-600 w-12 text-right">{d.total_searches}</span>
+                    <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-300 w-12 text-right font-mono">{d.total_searches}</span>
                   </div>
                 )
               })}
@@ -147,17 +147,17 @@ export default function SearchAnalytics() {
           </div>
         </div>
       ) : (
-        <div className="bg-white rounded-lg border border-gray-100 overflow-hidden">
+        <div className="bg-white dark:bg-[#0f1a14] rounded-2xl border border-neutral-200/80 dark:border-[#1a2e23] overflow-hidden shadow-xs">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50">
+            <thead className="bg-neutral-50/80 dark:bg-[#14221b]/80 border-b border-neutral-200/80 dark:border-[#1a2e23]">
               <tr>
-                <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase">#</th>
-                <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase">Query</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">#</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Query</th>
                 {tab === 'top' && (
                   <>
-                    <th className="px-4 py-2.5 text-right text-xs font-medium text-gray-500 uppercase">Searches</th>
-                    <th className="px-4 py-2.5 text-right text-xs font-medium text-gray-500 uppercase">Avg Results</th>
-                    <th className="px-4 py-2.5 text-right text-xs font-medium text-gray-500 uppercase">Avg Latency</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Searches</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Avg Results</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Avg Latency</th>
                   </>
                 )}
                 {tab === 'history' && (
@@ -190,44 +190,44 @@ export default function SearchAnalytics() {
                 )}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-neutral-100 dark:divide-[#1a2e23]">
               {data.map((row, i) => (
-                <tr key={i} className="hover:bg-gray-50/50">
-                  <td className="px-4 py-2 text-gray-400 text-xs">{i + 1}</td>
-                  <td className="px-4 py-2 font-medium text-gray-800 max-w-xs truncate" dir="auto">
+                <tr key={i} className="hover:bg-neutral-50/80 dark:hover:bg-[#14221b]/60 transition-colors">
+                  <td className="px-4 py-3 text-neutral-400 dark:text-neutral-500 text-xs font-mono">{i + 1}</td>
+                  <td className="px-4 py-3 font-medium text-neutral-900 dark:text-neutral-100 max-w-xs truncate" dir="auto">
                     {tab === 'most' ? row.title : row.query}
                   </td>
                   {tab === 'top' && (
                     <>
-                      <td className="px-4 py-2 text-right text-gray-600">{row.search_count}</td>
-                      <td className="px-4 py-2 text-right text-gray-600">{row.avg_results}</td>
-                      <td className="px-4 py-2 text-right text-gray-500">{row.avg_latency}ms</td>
+                      <td className="px-4 py-3 text-right text-neutral-700 dark:text-neutral-300 font-mono">{row.search_count}</td>
+                      <td className="px-4 py-3 text-right text-neutral-700 dark:text-neutral-300 font-mono">{row.avg_results}</td>
+                      <td className="px-4 py-3 text-right text-neutral-500 dark:text-neutral-400 font-mono">{row.avg_latency}ms</td>
                     </>
                   )}
                   {tab === 'history' && (
                     <>
-                      <td className="px-4 py-2 text-left">
-                        <span className={`px-2 py-0.5 rounded text-xs font-semibold ${
-                          row.username === 'Guest' ? 'bg-gray-100 text-gray-600' : 'bg-primary/10 text-primary'
+                      <td className="px-4 py-3 text-left">
+                        <span className={`px-2 py-0.5 rounded-lg text-xs font-semibold ${
+                          row.username === 'Guest' ? 'bg-neutral-100 dark:bg-[#14221b] text-neutral-600 dark:text-neutral-400' : 'bg-primary-50 dark:bg-primary-950/60 text-primary-700 dark:text-emerald-300'
                         }`}>
                           {row.username}
                         </span>
                       </td>
-                      <td className="px-4 py-2 text-right text-gray-600">
+                      <td className="px-4 py-3 text-right text-neutral-700 dark:text-neutral-300 font-mono">
                         {row.results_count === 0 ? (
-                          <Badge variant="destructive" className="text-xs">0</Badge>
+                          <Badge variant="error" className="text-xs">0</Badge>
                         ) : (
                           row.results_count
                         )}
                       </td>
-                      <td className="px-4 py-2 text-right text-gray-500">
+                      <td className="px-4 py-3 text-right text-neutral-500 dark:text-neutral-400 font-mono">
                         {row.latency_ms ? `${row.latency_ms}ms` : '—'}
                       </td>
-                      <td className="px-4 py-2 text-center">
+                      <td className="px-4 py-3 text-center">
                         {row.cache_hit ? (
-                          <span className="text-green-600 text-xs font-medium bg-green-50 px-1.5 py-0.5 rounded border border-green-200">Hit</span>
+                          <span className="text-emerald-600 dark:text-emerald-400 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-200/50 dark:border-emerald-800/40">Hit</span>
                         ) : (
-                          <span className="text-gray-400 text-xs font-medium bg-gray-50 px-1.5 py-0.5 rounded border border-gray-200">Miss</span>
+                          <span className="text-neutral-400 text-xs font-medium bg-neutral-100 dark:bg-[#14221b] px-2 py-0.5 rounded-full border border-neutral-200/60 dark:border-[#1a2e23]">Miss</span>
                         )}
                       </td>
                       <td className="px-4 py-2 text-right text-gray-500 text-xs">

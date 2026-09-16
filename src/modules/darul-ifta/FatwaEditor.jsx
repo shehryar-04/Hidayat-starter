@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useRole } from '../../app/RoleProvider'
-import { Button, Input, Textarea, Label, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../../shared/ui'
+import { Button, Input, Textarea, Label, Select, SelectTrigger, SelectContent, SelectItem, SelectValue, ConfirmDialog } from '../../shared/ui'
 
 const STATUSES = ['pending', 'assigned', 'under_review', 'approved', 'published', 'closed']
 
@@ -22,6 +22,8 @@ export function FatwaEditor({ fatwa, onComplete, onCancel }) {
   const [editingResponseId, setEditingResponseId] = useState(null)
   const [editingResponseText, setEditingResponseText] = useState('')
   const [editingResponseRefs, setEditingResponseRefs] = useState('')
+  const [deleteAnswerId, setDeleteAnswerId] = useState(null)
+  const [deletingAnswer, setDeletingAnswer] = useState(false)
 
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
@@ -144,10 +146,13 @@ export function FatwaEditor({ fatwa, onComplete, onCancel }) {
   }
 
   // ── Delete answer ─────────────────────────────────────────
-  const handleDeleteAnswer = async (id) => {
-    if (!window.confirm('Delete this answer?')) return
-    const { error: err } = await supabase.from('fatwa_responses').delete().eq('id', id)
+  const confirmDeleteAnswer = async () => {
+    if (!deleteAnswerId) return
+    setDeletingAnswer(true)
+    const { error: err } = await supabase.from('fatwa_responses').delete().eq('id', deleteAnswerId)
+    setDeletingAnswer(false)
     if (err) { setError(err.message); return }
+    setDeleteAnswerId(null)
     await loadResponses()
   }
 
@@ -261,7 +266,7 @@ export function FatwaEditor({ fatwa, onComplete, onCancel }) {
                       <Button
                         variant="destructive"
                         size="sm"
-                        onClick={() => handleDeleteAnswer(resp.id)}
+                        onClick={() => setDeleteAnswerId(resp.id)}
                       >Delete</Button>
                     </div>
                   </div>
@@ -334,6 +339,17 @@ export function FatwaEditor({ fatwa, onComplete, onCancel }) {
           )}
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!deleteAnswerId}
+        onClose={() => setDeleteAnswerId(null)}
+        onConfirm={confirmDeleteAnswer}
+        loading={deletingAnswer}
+        title="Delete Answer"
+        message="Are you sure you want to delete this fatwa answer? This action cannot be undone."
+        confirmText="Delete"
+        variant="danger"
+      />
     </div>
   )
 }

@@ -8,7 +8,9 @@ import { supabase } from '../lib/supabase'
 vi.mock('../lib/supabase', () => ({
   supabase: {
     auth: {
-      updateUser: vi.fn(),
+      getUser: vi.fn().mockResolvedValue({ data: { user: { email: 'test@example.com' } } }),
+      signInWithPassword: vi.fn().mockResolvedValue({ error: null }),
+      updateUser: vi.fn().mockResolvedValue({ error: null }),
     },
   },
 }))
@@ -26,6 +28,15 @@ vi.mock('react-router-dom', async () => {
 describe('ResetPasswordPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(supabase.auth.getUser).mockResolvedValue({
+      data: { user: { email: 'test@example.com' } },
+    })
+    vi.mocked(supabase.auth.signInWithPassword).mockResolvedValue({
+      error: null,
+    })
+    vi.mocked(supabase.auth.updateUser).mockResolvedValue({
+      error: null,
+    })
   })
 
   it('should render password reset form', () => {
@@ -35,55 +46,54 @@ describe('ResetPasswordPage', () => {
       </BrowserRouter>
     )
 
-    expect(screen.getByRole('heading', { name: 'Reset Your Password' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Change Password' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Current Password')).toBeInTheDocument()
     expect(screen.getByLabelText('New Password')).toBeInTheDocument()
-    expect(screen.getByLabelText('Confirm Password')).toBeInTheDocument()
+    expect(screen.getByLabelText('Confirm New Password')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Update Password/i })).toBeInTheDocument()
   })
 
-  it('should show error when passwords do not match', async () => {
+  it('should disable submit button when passwords do not match', () => {
     render(
       <BrowserRouter>
         <ResetPasswordPage />
       </BrowserRouter>
     )
 
+    const currentInput = screen.getByLabelText('Current Password')
     const passwordInput = screen.getByLabelText('New Password')
-    const confirmInput = screen.getByLabelText('Confirm Password')
+    const confirmInput = screen.getByLabelText('Confirm New Password')
     const submitButton = screen.getByRole('button', { name: /Update Password/i })
 
+    fireEvent.change(currentInput, { target: { value: 'oldpass123' } })
     fireEvent.change(passwordInput, { target: { value: 'password123' } })
     fireEvent.change(confirmInput, { target: { value: 'password321' } })
-    fireEvent.click(submitButton)
 
-    await waitFor(() => {
-      expect(screen.getByText('Passwords do not match')).toBeInTheDocument()
-    })
+    expect(submitButton).toBeDisabled()
     expect(supabase.auth.updateUser).not.toHaveBeenCalled()
   })
 
-  it('should show error when password is less than 6 characters', async () => {
+  it('should disable submit button when password is less than 8 characters', () => {
     render(
       <BrowserRouter>
         <ResetPasswordPage />
       </BrowserRouter>
     )
 
+    const currentInput = screen.getByLabelText('Current Password')
     const passwordInput = screen.getByLabelText('New Password')
-    const confirmInput = screen.getByLabelText('Confirm Password')
+    const confirmInput = screen.getByLabelText('Confirm New Password')
     const submitButton = screen.getByRole('button', { name: /Update Password/i })
 
+    fireEvent.change(currentInput, { target: { value: 'oldpass123' } })
     fireEvent.change(passwordInput, { target: { value: '12345' } })
     fireEvent.change(confirmInput, { target: { value: '12345' } })
-    fireEvent.click(submitButton)
 
-    await waitFor(() => {
-      expect(screen.getByText('Password must be at least 6 characters')).toBeInTheDocument()
-    })
+    expect(submitButton).toBeDisabled()
     expect(supabase.auth.updateUser).not.toHaveBeenCalled()
   })
 
-  it('should update password and redirect to login on success', async () => {
+  it('should update password and show success on valid submit', async () => {
     vi.mocked(supabase.auth.updateUser).mockResolvedValue({
       error: null,
     })
@@ -94,10 +104,12 @@ describe('ResetPasswordPage', () => {
       </BrowserRouter>
     )
 
+    const currentInput = screen.getByLabelText('Current Password')
     const passwordInput = screen.getByLabelText('New Password')
-    const confirmInput = screen.getByLabelText('Confirm Password')
+    const confirmInput = screen.getByLabelText('Confirm New Password')
     const submitButton = screen.getByRole('button', { name: /Update Password/i })
 
+    fireEvent.change(currentInput, { target: { value: 'oldpass123' } })
     fireEvent.change(passwordInput, { target: { value: 'newpassword123' } })
     fireEvent.change(confirmInput, { target: { value: 'newpassword123' } })
     fireEvent.click(submitButton)
@@ -109,11 +121,7 @@ describe('ResetPasswordPage', () => {
     })
 
     await waitFor(() => {
-      expect(screen.getByText(/Password updated successfully! Redirecting you to login.../i)).toBeInTheDocument()
+      expect(screen.getByText(/Password Updated!/i)).toBeInTheDocument()
     })
-
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/login', { replace: true })
-    }, { timeout: 3000 })
   })
 })

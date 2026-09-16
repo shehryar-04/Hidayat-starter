@@ -30,7 +30,7 @@ export function Tabs({ items, defaultIndex = 0, fullWidth, className }) {
 
   return (
     <div className={className}>
-      <div className="flex border-b border-neutral-200 overflow-x-auto" role="tablist">
+      <div className="flex border-b border-neutral-200/80 dark:border-[#1a2e23] overflow-x-auto custom-scrollbar" role="tablist">
         {items.map((item, i) => (
           <button
             key={item.label}
@@ -43,14 +43,16 @@ export function Tabs({ items, defaultIndex = 0, fullWidth, className }) {
             className={cn(
               'relative px-4 py-2.5 text-sm font-medium transition-colors duration-150 whitespace-nowrap outline-none',
               fullWidth && 'flex-1',
-              i === active ? 'text-primary-500 font-semibold' : 'text-neutral-500 hover:text-neutral-800'
+              i === active
+                ? 'text-primary-600 dark:text-emerald-400 font-semibold'
+                : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
             )}
           >
             {item.label}
             {i === active && (
               <motion.div
                 layoutId="tab-indicator"
-                className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500 dark:bg-emerald-400 shadow-xs"
                 transition={{ duration: 0.2, ease: [0, 0, 0.2, 1] }}
               />
             )}

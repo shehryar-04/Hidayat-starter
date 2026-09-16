@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { StudentCourseView } from './StudentCourseView'
-import { Button, Spinner, EmptyState } from '../../shared/ui'
-import { CheckCircle } from 'lucide-react'
+import { Button, Badge, Spinner, EmptyState, ConfirmDialog } from '../../shared/ui'
+import { CheckCircle, Clock, Eye, Check, X } from 'lucide-react'
 
-const LEVEL_COLORS = {
-  Beginner: 'bg-green-100 text-green-700',
-  Intermediate: 'bg-yellow-100 text-yellow-700',
-  Advanced: 'bg-red-100 text-red-700',
-  'All levels': 'bg-blue-100 text-blue-700',
+const LEVEL_VARIANT = {
+  Beginner: 'success',
+  Intermediate: 'warning',
+  Advanced: 'error',
+  'All levels': 'info',
 }
 
 export function AdminCourseReview() {
@@ -17,6 +17,7 @@ export function AdminCourseReview() {
   const [error, setError] = useState(null)
   const [msg, setMsg] = useState(null)
   const [previewing, setPreviewing] = useState(null)
+  const [rejectingCourseId, setRejectingCourseId] = useState(null)
 
   useEffect(() => { load() }, [])
 
@@ -51,8 +52,9 @@ export function AdminCourseReview() {
     } catch (err) { setError(err.message) }
   }
 
-  const handleReject = async (courseId) => {
-    if (!window.confirm('Reject this course? It will be moved back to draft.')) return
+  const confirmReject = async () => {
+    if (!rejectingCourseId) return
+    const courseId = rejectingCourseId
     try {
       const { error: err } = await supabase
         .from('short_courses')
@@ -61,102 +63,121 @@ export function AdminCourseReview() {
       if (err) throw err
       setCourses(c => c.filter(x => x.id !== courseId))
       setPreviewing(null)
+      setRejectingCourseId(null)
       setMsg('Course rejected and moved to draft.')
       setTimeout(() => setMsg(null), 3000)
     } catch (err) { setError(err.message) }
   }
 
-  // Preview mode — show the course like a student would see it, with approve/reject buttons
+  // Preview mode
   if (previewing) {
     return (
-      <div>
+      <div className="space-y-4">
         {/* Approval bar */}
-        <div className="bg-yellow-50 border-b border-yellow-200 px-6 py-3 flex items-center justify-between">
+        <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 rounded-2xl px-6 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
           <div className="flex items-center gap-3">
-            <span className="text-yellow-600 text-sm font-bold">⏳ Pending Approval</span>
-            <span className="text-sm text-gray-600">by {previewing.profiles?.full_name || 'Unknown'}</span>
+            <Badge variant="warning" dot>Pending Approval</Badge>
+            <span className="text-sm text-neutral-700 dark:text-neutral-300">Submitted by <strong className="text-neutral-900 dark:text-white">{previewing.profiles?.full_name || 'Unknown'}</strong></span>
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <Button variant="primary" size="sm" onClick={() => handleApprove(previewing.id)}>
-              ✓ Approve & Publish
+              <Check className="w-3.5 h-3.5 mr-1" />
+              Approve & Publish
             </Button>
-            <Button variant="destructive" size="sm" onClick={() => handleReject(previewing.id)}>
-              ✕ Reject
+            <Button variant="destructive" size="sm" onClick={() => setRejectingCourseId(previewing.id)}>
+              <X className="w-3.5 h-3.5 mr-1" />
+              Reject
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => setPreviewing(null)}>
+            <Button variant="outline" size="sm" onClick={() => setPreviewing(null)}>
               ← Back to Queue
             </Button>
           </div>
         </div>
-        {/* Render the student course view for preview */}
+
+        {/* Render student course view for preview */}
         <StudentCourseView course={previewing} onBack={() => setPreviewing(null)} />
+
+        <ConfirmDialog
+          open={!!rejectingCourseId}
+          onClose={() => setRejectingCourseId(null)}
+          onConfirm={confirmReject}
+          title="Reject Course"
+          message="Reject this course? It will be moved back to draft status and the instructor can revise it."
+          confirmText="Reject Course"
+          variant="warning"
+        />
       </div>
     )
   }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-16">
+      <div className="flex flex-col items-center justify-center py-20">
         <Spinner size="lg" />
+        <span className="text-sm text-neutral-400 mt-3 font-medium">Loading approval queue...</span>
       </div>
     )
   }
 
   return (
-    <div className="max-w-[1280px] mx-auto px-4 py-6 md:px-6 md:py-8">
-      {error && <div className="bg-error-light text-error-dark rounded-lg p-4 text-sm mb-4">{error}</div>}
-      {msg && <div className="bg-success-light text-success-dark rounded-lg p-4 text-sm mb-4">{msg}</div>}
+    <div className="space-y-6">
+      {error && (
+        <div className="p-4 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-300 text-sm">
+          {error}
+        </div>
+      )}
+      {msg && (
+        <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-sm">
+          {msg}
+        </div>
+      )}
 
       {courses.length === 0 ? (
-        <EmptyState
-          icon={CheckCircle}
-          title="All clear!"
-          description="No courses pending approval."
-        />
+        <div className="bg-white dark:bg-[#0f1a14] rounded-2xl border border-neutral-200/80 dark:border-[#1a2e23] p-12">
+          <EmptyState
+            icon={CheckCircle}
+            title="Review queue is clear"
+            description="All submitted short courses have been reviewed. New submissions will appear here."
+          />
+        </div>
       ) : (
-        <div className="space-y-4">
-          <p className="text-sm text-gray-500 mb-2">{courses.length} course{courses.length !== 1 ? 's' : ''} awaiting your review.</p>
-
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {courses.map(course => (
-            <div key={course.id} className="bg-white rounded-xl border border-yellow-200 shadow-sm overflow-hidden flex flex-col sm:flex-row">
+            <div key={course.id} className="bg-white dark:bg-[#0f1a14] rounded-2xl border border-neutral-200/80 dark:border-[#1a2e23] shadow-xs overflow-hidden flex flex-col hover:shadow-xl hover:border-amber-500/50 dark:hover:border-amber-500/50 transition-all duration-300">
               {/* Thumbnail */}
-              <div className="sm:w-48 h-36 sm:h-auto bg-neutral-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+              <div className="h-40 bg-gradient-to-br from-neutral-100 to-neutral-200 dark:from-[#112018] dark:to-[#09140e] flex items-center justify-center overflow-hidden border-b border-neutral-100 dark:border-[#1a2e23]">
                 {course.thumbnail_url
                   ? <img src={course.thumbnail_url} alt={course.title} className="w-full h-full object-cover" />
-                  : <div className="w-full h-full bg-gradient-to-br from-primary-800 to-primary-600 flex items-center justify-center"><span className="text-4xl">🎓</span></div>}
+                  : <span className="text-4xl">🎓</span>}
               </div>
 
-              {/* Details */}
-              <div className="p-5 flex-1 flex flex-col">
-                <div className="flex flex-wrap gap-1.5 mb-2">
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">Pending Approval</span>
-                  {course.level && <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${LEVEL_COLORS[course.level] || 'bg-gray-100 text-gray-600'}`}>{course.level}</span>}
-                  {course.category && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-neutral-100 text-primary-700">{course.category}</span>}
+              <div className="p-5 flex flex-col flex-1">
+                {/* Badges */}
+                <div className="flex flex-wrap items-center gap-1.5 mb-2.5">
+                  <Badge variant="warning" dot>Pending Review</Badge>
+                  {course.level && <Badge variant={LEVEL_VARIANT[course.level] || 'default'}>{course.level}</Badge>}
+                  {course.language && (
+                    <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-[#14221b] text-neutral-600 dark:text-neutral-400 border border-neutral-200/60 dark:border-[#1a2e23]">
+                      {course.language}
+                    </span>
+                  )}
                 </div>
 
-                <h3 className="font-semibold text-gray-800 text-sm mb-1">{course.title}</h3>
-                {course.subtitle && <p className="text-xs text-gray-500 mb-1">{course.subtitle}</p>}
-                <p className="text-xs text-gray-400 line-clamp-2 flex-1">{course.description}</p>
-
-                <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
-                  <span className="text-xs text-gray-400">
-                    Submitted by: <span className="font-medium text-gray-600">{course.profiles?.full_name || 'Unknown'}</span>
-                  </span>
-                  <span className={`text-sm font-bold ${course.is_free ? 'text-secondary' : 'text-primary'}`}>
-                    {course.is_free ? 'Free' : `$${course.fee}`}
-                  </span>
-                </div>
+                <h3 className="font-display font-bold text-neutral-900 dark:text-neutral-100 text-base mb-1">{course.title}</h3>
+                {course.subtitle && <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-1">{course.subtitle}</p>}
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 line-clamp-2 flex-1 leading-relaxed">{course.description}</p>
 
                 {/* Actions */}
-                <div className="mt-3 flex gap-2">
+                <div className="mt-4 pt-3 border-t border-neutral-100 dark:border-[#1a2e23] flex items-center gap-2">
                   <Button variant="outline" size="sm" className="flex-1" onClick={() => setPreviewing(course)}>
-                    👁 Preview Course
+                    <Eye className="w-3.5 h-3.5 mr-1" />
+                    Preview
                   </Button>
                   <Button variant="primary" size="sm" onClick={() => handleApprove(course.id)}>
-                    ✓ Approve
+                    <Check className="w-3.5 h-3.5" />
                   </Button>
-                  <Button variant="destructive" size="sm" onClick={() => handleReject(course.id)}>
-                    ✕ Reject
+                  <Button variant="destructive" size="sm" onClick={() => setRejectingCourseId(course.id)}>
+                    <X className="w-3.5 h-3.5" />
                   </Button>
                 </div>
               </div>
@@ -164,6 +185,16 @@ export function AdminCourseReview() {
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!rejectingCourseId}
+        onClose={() => setRejectingCourseId(null)}
+        onConfirm={confirmReject}
+        title="Reject Course"
+        message="Reject this course? It will be moved back to draft status and the instructor can revise it."
+        confirmText="Reject Course"
+        variant="warning"
+      />
     </div>
   )
 }

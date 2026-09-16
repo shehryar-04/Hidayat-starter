@@ -28,7 +28,7 @@ export default function LoginPage() {
   const [searchParams] = useSearchParams()
 
   // Where to redirect after login (from session guard or deep link)
-  const returnTo = searchParams.get('returnTo') || '/short-courses'
+  const returnTo = searchParams.get('returnTo') || '/dashboard'
 
   async function handleSignIn(e) {
     e.preventDefault()
@@ -101,65 +101,73 @@ export default function LoginPage() {
         return
       }
 
-      setSuccess(data.message || 'Account created! Please check your email to confirm your account.')
-      setResendEmail(email)
-      setEmail(''); setPassword(''); setConfirmPassword(''); setFullName('')
-      setShowResendVerification(true)
+      setSuccess('Account created successfully! Please check your email to verify your account.')
+      setEmail('')
+      setPassword('')
+      setConfirmPassword('')
+      setFullName('')
     } catch (err) {
-      setError('Network error. Please check your connection and try again.')
+      setError(err.message || 'An unexpected error occurred.')
     } finally {
       setLoading(false)
     }
   }
 
-  const switchMode = () => {
-    setIsSignUp(!isSignUp)
-    setError(null); setSuccess(null)
-    setShowResendVerification(false)
-    setEmail(''); setPassword(''); setConfirmPassword(''); setFullName('')
-  }
-
   async function handleGoogleSignIn() {
     setError(null)
+    setSuccess(null)
     setGoogleLoading(true)
     try {
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}${returnTo}`,
+          redirectTo: `${window.location.origin}/auth/callback`,
         },
       })
       if (oauthError) setError(oauthError.message)
-      // If no error, Supabase redirects the browser to Google
     } catch (err) {
-      setError('Failed to initiate Google sign-in. Please try again.')
+      setError(err.message)
     } finally {
       setGoogleLoading(false)
     }
   }
 
-  async function handleResendVerification() {
+  function switchMode() {
+    setIsSignUp(s => !s)
     setError(null)
     setSuccess(null)
-    const targetEmail = resendEmail || email
-    if (!targetEmail) { setError('Please enter your email address.'); return }
+    setShowForgotPassword(false)
+    setShowResendVerification(false)
+    setPassword('')
+    setConfirmPassword('')
+  }
+
+  async function handleResendVerification(e) {
+    e.preventDefault()
+    const targetEmail = isSignUp ? email : resendEmail
+    if (!targetEmail) {
+      setError('Please enter your email address to resend verification.')
+      return
+    }
+
+    setError(null)
+    setSuccess(null)
     setResending(true)
+
     try {
-      const res = await fetch(`${FUNCTIONS_BASE_URL}/resend-verification`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      const { error: resendError } = await supabase.auth.resend({
+        type: 'signup',
+        email: targetEmail,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
-        body: JSON.stringify({ email: targetEmail }),
       })
 
-      const data = await res.json()
-
-      if (!res.ok) {
-        setError(data.error || 'Failed to resend verification email.')
+      if (resendError) {
+        setError(resendError.message)
       } else {
-        setSuccess(data.message || 'Verification email sent! Check your inbox and spam folder.')
+        setSuccess(`Verification email resent to ${targetEmail}. Please check your inbox and spam folder.`)
+        setShowResendVerification(false)
       }
     } catch (err) {
       setError('Failed to resend verification email. Please try again.')
@@ -169,7 +177,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-neutral-50 to-neutral-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-neutral-50 dark:bg-[#070d0a] flex items-center justify-center p-4 transition-colors duration-200">
       <div className="w-full max-w-md">
         {/* Logo & Institution Name */}
         <div className="text-center mb-8">
@@ -178,10 +186,10 @@ export default function LoginPage() {
             alt="Hidayat"
             className="w-16 h-16 mx-auto mb-3 object-contain"
           />
-          <h1 className="font-display text-[28px] font-semibold text-neutral-900">
+          <h1 className="font-display text-[28px] font-bold text-neutral-900 dark:text-white">
             Hidayat
           </h1>
-          <p className="text-neutral-500 text-sm mt-1">Learning Today, Leading Tomorrow</p>
+          <p className="text-neutral-500 dark:text-neutral-400 text-sm mt-1">Learning Today, Leading Tomorrow</p>
         </div>
 
         {/* Card with fade-up entrance */}
@@ -189,9 +197,9 @@ export default function LoginPage() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease: [0, 0, 0.2, 1] }}
-          className="bg-white border border-neutral-200 rounded-xl p-8 shadow-sm"
+          className="bg-white dark:bg-[#0f1a14] border border-neutral-200/90 dark:border-[#1a2e23] rounded-2xl p-6 sm:p-8 shadow-xl transition-colors"
         >
-          <h2 className="text-xl font-semibold text-neutral-900 mb-6">
+          <h2 className="text-xl font-display font-bold text-neutral-900 dark:text-white mb-6">
             {showForgotPassword
               ? 'Reset Password'
               : isSignUp
@@ -201,13 +209,13 @@ export default function LoginPage() {
 
           {showForgotPassword ? (
             <form onSubmit={handleForgotPassword} className="space-y-4">
-              <p className="text-sm text-neutral-500 mb-4 leading-relaxed">
+              <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4 leading-relaxed">
                 Enter your email address and we'll send you a link to reset your password.
               </p>
               <div className="space-y-1.5">
                 <Label htmlFor="email">Email</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 dark:text-neutral-500" />
                   <Input
                     id="email"
                     type="email"
@@ -222,14 +230,14 @@ export default function LoginPage() {
 
               {/* Error Alert */}
               {error && (
-                <div className="bg-error-light text-error-dark rounded-lg p-4 text-sm" role="alert">
+                <div className="p-4 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-300 text-sm" role="alert">
                   {error}
                 </div>
               )}
 
               {/* Success Alert */}
               {success && (
-                <div className="bg-success-light text-success-dark rounded-lg p-4 text-sm" role="alert">
+                <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 text-emerald-800 dark:text-emerald-300 text-sm" role="alert">
                   {success}
                 </div>
               )}
@@ -252,7 +260,7 @@ export default function LoginPage() {
                   setSuccess(null)
                   setEmail('')
                 }}
-                className="w-full text-center text-sm text-neutral-500 hover:text-neutral-700 font-medium py-2 mt-2"
+                className="w-full text-center text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 font-medium py-2 mt-2 cursor-pointer"
               >
                 Back to Sign In
               </button>
@@ -264,7 +272,7 @@ export default function LoginPage() {
                   <div className="space-y-1.5">
                     <Label htmlFor="fullName">Full Name</Label>
                     <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 dark:text-neutral-500" />
                       <Input
                         id="fullName"
                         type="text"
@@ -281,7 +289,7 @@ export default function LoginPage() {
                 <div className="space-y-1.5">
                   <Label htmlFor="email">Email</Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 dark:text-neutral-500" />
                     <Input
                       id="email"
                       type="email"
@@ -307,14 +315,14 @@ export default function LoginPage() {
                           setEmail('')
                           setPassword('')
                         }}
-                        className="text-xs text-primary-500 hover:text-primary-700 hover:underline font-medium"
+                        className="text-xs text-primary-600 dark:text-emerald-400 hover:underline font-semibold cursor-pointer"
                       >
                         Forgot password?
                       </button>
                     )}
                   </div>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 dark:text-neutral-500 pointer-events-none" />
                     <Input
                       id="password"
                       type={isSignUp ? (showSignUpPassword ? 'text' : 'password') : (showPassword ? 'text' : 'password')}
@@ -328,7 +336,7 @@ export default function LoginPage() {
                       type="button"
                       tabIndex={-1}
                       onClick={() => isSignUp ? setShowSignUpPassword(s => !s) : setShowPassword(s => !s)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors cursor-pointer"
                       aria-label={(isSignUp ? showSignUpPassword : showPassword) ? 'Hide password' : 'Show password'}
                     >
                       {(isSignUp ? showSignUpPassword : showPassword)
@@ -342,26 +350,24 @@ export default function LoginPage() {
                   <div className="space-y-1.5">
                     <Label htmlFor="confirmPassword">Confirm Password</Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" />
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 dark:text-neutral-500 pointer-events-none" />
                       <Input
                         id="confirmPassword"
                         type={showConfirmPassword ? 'text' : 'password'}
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         required
-                        placeholder="Confirm your password"
+                        placeholder="Re-enter your password"
                         className="pl-9 pr-10 min-h-[44px]"
                       />
                       <button
                         type="button"
                         tabIndex={-1}
                         onClick={() => setShowConfirmPassword(s => !s)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors cursor-pointer"
                         aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
                       >
-                        {showConfirmPassword
-                          ? <EyeOff className="w-4 h-4" />
-                          : <Eye className="w-4 h-4" />}
+                        {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
                   </div>
@@ -369,22 +375,22 @@ export default function LoginPage() {
 
                 {/* Error Alert */}
                 {error && (
-                  <div className="bg-error-light text-error-dark rounded-lg p-4 text-sm" role="alert">
+                  <div className="p-4 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-300 text-sm" role="alert">
                     {error}
                   </div>
                 )}
 
                 {/* Success Alert */}
                 {success && (
-                  <div className="bg-success-light text-success-dark rounded-lg p-4 text-sm" role="alert">
+                  <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 text-emerald-800 dark:text-emerald-300 text-sm" role="alert">
                     {success}
                   </div>
                 )}
 
                 {/* Resend verification email section */}
                 {showResendVerification && (
-                  <div className="bg-info-light border border-info/20 rounded-lg p-4 space-y-3">
-                    <p className="text-sm text-info-dark">
+                  <div className="bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/50 rounded-xl p-4 space-y-3">
+                    <p className="text-sm text-blue-800 dark:text-blue-200">
                       Didn't receive the verification email? Check your spam folder or resend it.
                     </p>
                     <Button
@@ -414,10 +420,10 @@ export default function LoginPage() {
               {/* Divider */}
               <div className="relative my-5">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-neutral-200" />
+                  <div className="w-full border-t border-neutral-200/80 dark:border-[#1a2e23]" />
                 </div>
                 <div className="relative flex justify-center">
-                  <span className="bg-white px-3 text-xs text-neutral-400">or</span>
+                  <span className="bg-white dark:bg-[#0f1a14] px-3 text-xs text-neutral-400">or</span>
                 </div>
               </div>
 
@@ -426,10 +432,10 @@ export default function LoginPage() {
                 type="button"
                 onClick={handleGoogleSignIn}
                 disabled={googleLoading}
-                className="w-full flex items-center justify-center gap-3 min-h-[44px] px-4 py-2.5 bg-white border border-neutral-200 rounded-lg text-sm font-medium text-neutral-700 hover:bg-neutral-50 hover:border-neutral-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-3 min-h-[44px] px-4 py-2.5 bg-white dark:bg-[#14221b] border border-neutral-200/90 dark:border-[#1a2e23] rounded-xl text-sm font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-[#182b20] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xs cursor-pointer"
               >
                 {googleLoading ? (
-                  <div className="w-5 h-5 border-2 border-neutral-300 border-t-primary-500 rounded-full animate-spin" />
+                  <div className="w-5 h-5 border-2 border-neutral-300 dark:border-neutral-700 border-t-primary-500 rounded-full animate-spin" />
                 ) : (
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -441,8 +447,8 @@ export default function LoginPage() {
                 <span>{googleLoading ? 'Connecting...' : 'Continue with Google'}</span>
               </button>
 
-              <div className="mt-6 pt-5 border-t border-neutral-100 text-center">
-                <p className="text-sm text-neutral-500 mb-3">
+              <div className="mt-6 pt-5 border-t border-neutral-100 dark:border-[#1a2e23] text-center">
+                <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-3">
                   {isSignUp ? 'Already have an account?' : "Don't have an account?"}
                 </p>
                 <Button
@@ -462,7 +468,7 @@ export default function LoginPage() {
                       setShowResendVerification(true)
                       setResendEmail(email)
                     }}
-                    className="mt-3 text-sm text-primary-500 hover:text-primary-700 underline underline-offset-2 min-h-[44px] inline-flex items-center"
+                    className="mt-3 text-sm text-primary-600 dark:text-emerald-400 hover:underline min-h-[44px] inline-flex items-center cursor-pointer font-medium"
                   >
                     Didn't get verification email?
                   </button>
@@ -470,8 +476,8 @@ export default function LoginPage() {
 
                 {/* Resend verification panel (shown on sign-in side) */}
                 {!isSignUp && showResendVerification && !success && (
-                  <div className="mt-4 bg-info-light border border-info/20 rounded-lg p-4 space-y-3 text-left">
-                    <Label className="text-sm text-info-dark">Enter your email to resend verification</Label>
+                  <div className="mt-4 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/50 rounded-xl p-4 space-y-3 text-left">
+                    <Label className="text-sm text-blue-800 dark:text-blue-200">Enter your email to resend verification</Label>
                     <Input
                       type="email"
                       value={resendEmail}

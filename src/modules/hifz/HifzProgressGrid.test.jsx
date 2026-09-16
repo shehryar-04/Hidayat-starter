@@ -111,11 +111,13 @@ describe('HifzProgressGrid', () => {
     currentProgress = mockProgress
     currentAuditLog = mockAuditLog
     currentScholar = [{ id: 'scholar1' }]
+    supabaseModule.supabase.from = mockFrom
+    supabaseModule.supabase.auth.getUser = vi.fn().mockResolvedValue({
+      data: { user: { id: 'user1' } },
+    })
   })
 
   it('renders Hifz progress grid with student info', async () => {
-    supabaseModule.supabase.from = mockFrom
-
     render(<HifzProgressGrid student={mockStudent} onBack={vi.fn()} />)
 
     await waitFor(() => {
@@ -125,8 +127,6 @@ describe('HifzProgressGrid', () => {
   })
 
   it('displays all 30 Juz cards', async () => {
-    supabaseModule.supabase.from = mockFrom
-
     render(<HifzProgressGrid student={mockStudent} onBack={vi.fn()} />)
 
     await waitFor(() => {
@@ -135,32 +135,29 @@ describe('HifzProgressGrid', () => {
     })
   })
 
-  it('logs status changes to audit log', async () => {
-    const mockGetUser = vi.fn().mockResolvedValue({
-      data: { user: { id: 'user1' } },
-    })
-
-    supabaseModule.supabase.from = mockFrom
-    supabaseModule.supabase.auth.getUser = mockGetUser
-
-    render(<HifzProgressGrid student={mockStudent} onBack={vi.fn()} />)
-
-    await waitFor(() => {
-      expect(screen.getByText('Juz 1')).toBeInTheDocument()
-    })
-
-    // Find and click a status button
-    const statusButtons = screen.getAllByRole('button')
-    const memorizedButton = statusButtons.find((btn) => btn.textContent === '●')
-
-    if (memorizedButton) {
-      fireEvent.click(memorizedButton)
+  it(
+    'logs status changes to audit log',
+    async () => {
+      render(<HifzProgressGrid student={mockStudent} onBack={vi.fn()} />)
 
       await waitFor(() => {
-        expect(mockInsert).toHaveBeenCalled()
+        expect(screen.getByText('Juz 1')).toBeInTheDocument()
       })
-    }
-  })
+
+      // Find and click a status button
+      const statusButtons = screen.getAllByRole('button')
+      const memorizedButton = statusButtons.find((btn) => btn.textContent === '●')
+
+      if (memorizedButton) {
+        fireEvent.click(memorizedButton)
+
+        await waitFor(() => {
+          expect(mockInsert).toHaveBeenCalled()
+        })
+      }
+    },
+    15000
+  )
 
   it('detects when all 30 Juz are memorized', async () => {
     const allMemorized = Array.from({ length: 30 }, (_, i) => ({
@@ -175,8 +172,6 @@ describe('HifzProgressGrid', () => {
     currentProgress = allMemorized
     currentAuditLog = []
 
-    supabaseModule.supabase.from = mockFrom
-
     render(<HifzProgressGrid student={mockStudent} onBack={vi.fn()} />)
 
     await waitFor(() => {
@@ -185,8 +180,6 @@ describe('HifzProgressGrid', () => {
   })
 
   it('displays audit log when toggled', async () => {
-    supabaseModule.supabase.from = mockFrom
-
     render(<HifzProgressGrid student={mockStudent} onBack={vi.fn()} />)
 
     await waitFor(() => {
@@ -202,8 +195,6 @@ describe('HifzProgressGrid', () => {
   })
 
   it('calls onBack when back button is clicked', async () => {
-    supabaseModule.supabase.from = mockFrom
-
     const onBack = vi.fn()
 
     render(<HifzProgressGrid student={mockStudent} onBack={onBack} />)

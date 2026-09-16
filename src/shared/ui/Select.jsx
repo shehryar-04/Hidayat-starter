@@ -22,8 +22,8 @@ export const SelectTrigger = forwardRef(({ className, children, ...props }, ref)
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      'flex h-10 w-full items-center justify-between rounded-lg border border-neutral-200 bg-white px-3 text-sm shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] transition-all duration-150 outline-none',
-      'focus:ring-2 focus:ring-primary-500 focus:border-primary-500',
+      'flex h-10 w-full items-center justify-between rounded-xl border border-neutral-200/90 dark:border-[#1a2e23] bg-white dark:bg-[#0f1a14] text-neutral-900 dark:text-neutral-100 px-3.5 text-sm transition-all duration-150 outline-none',
+      'focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:focus:border-emerald-500/80',
       'disabled:opacity-50 disabled:pointer-events-none',
       className
     )}
@@ -31,7 +31,7 @@ export const SelectTrigger = forwardRef(({ className, children, ...props }, ref)
   >
     {children}
     <SelectPrimitive.Icon asChild>
-      <ChevronDown className="h-4 w-4 text-neutral-400" />
+      <ChevronDown className="h-4 w-4 text-neutral-400 dark:text-neutral-500" />
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>
 ))
@@ -42,7 +42,7 @@ export const SelectContent = forwardRef(({ className, children, ...props }, ref)
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        'relative z-50 min-w-[8rem] overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-lg',
+        'relative z-50 min-w-[8rem] overflow-hidden rounded-xl border border-neutral-200/90 dark:border-[#1a2e23] bg-white dark:bg-[#0f1a14] text-neutral-900 dark:text-neutral-100 shadow-xl',
         'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
         'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
         className
@@ -63,8 +63,9 @@ export const SelectItem = forwardRef(({ className, children, ...props }, ref) =>
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      'relative flex w-full cursor-pointer select-none items-center rounded-md px-3 py-2 text-sm outline-none',
-      'focus:bg-neutral-100 data-[highlighted]:bg-neutral-100',
+      'relative flex w-full cursor-pointer select-none items-center rounded-lg px-3 py-2 text-sm outline-none transition-colors',
+      'focus:bg-neutral-100 dark:focus:bg-[#14221b] data-[highlighted]:bg-neutral-100 dark:data-[highlighted]:bg-[#14221b]',
+      'text-neutral-800 dark:text-neutral-200',
       'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       className
     )}
@@ -72,7 +73,7 @@ export const SelectItem = forwardRef(({ className, children, ...props }, ref) =>
   >
     <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
       <SelectPrimitive.ItemIndicator>
-        <Check className="h-4 w-4 text-primary-500" />
+        <Check className="h-4 w-4 text-primary-500 dark:text-emerald-400" />
       </SelectPrimitive.ItemIndicator>
     </span>
     <SelectPrimitive.ItemText className="pl-6">{children}</SelectPrimitive.ItemText>

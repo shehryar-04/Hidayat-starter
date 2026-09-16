@@ -5,7 +5,7 @@ import { Download, ArrowLeft, ShieldCheck, Loader2 } from 'lucide-react'
 import { getCertificateById } from './services/certificateService'
 import { downloadCertificatePdf } from './services/certificatePdf'
 import CertificateTemplate from './components/CertificateTemplate'
-import { Spinner } from '../../shared/ui'
+import { Spinner, useToast } from '../../shared/ui'
 
 /**
  * CertificatePage — full-screen view of a single certificate with
@@ -16,6 +16,7 @@ import { Spinner } from '../../shared/ui'
  */
 export default function CertificatePage() {
   const { id } = useParams()
+  const { toast } = useToast()
   const certRef = useRef(null)
   const [cert, setCert] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -74,7 +75,7 @@ export default function CertificatePage() {
       })
     } catch (err) {
       console.error('PDF export failed:', err)
-      alert('Sorry, the certificate could not be downloaded. Please try again.')
+      toast.error('Download Failed', 'Sorry, the certificate could not be downloaded. Please try again.')
     } finally {
       setDownloading(false)
     }

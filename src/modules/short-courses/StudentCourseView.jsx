@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useRole } from '../../app/RoleProvider'
-import { Button, Input, Label, Spinner } from '../../shared/ui'
+import { Button, Input, Label, Spinner, Modal } from '../../shared/ui'
 import { Helmet } from 'react-helmet-async'
 import { WhatsAppButton } from '../../shared/WhatsAppButton'
 import { generateCourseSchema } from '../fatwa-platform/utils/structuredData'
@@ -250,112 +250,112 @@ function PaymentPaywall({ course, onSubmit, submitting, error, onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="bg-primary rounded-t-2xl p-6 text-white">
-          <div className="flex items-center justify-between">
-            <h2 className="font-serif text-xl font-bold">Payment Required</h2>
-            <button onClick={onClose} className="text-white/70 hover:text-white text-2xl leading-none">&times;</button>
+    <Modal
+      open={true}
+      onClose={onClose}
+      size="md"
+      title="Payment Required"
+      description="Complete payment to enroll in this course"
+    >
+      <div className="space-y-5">
+        {/* Course & Amount */}
+        <div className="bg-neutral-50 dark:bg-neutral-800/60 rounded-xl p-4 border border-neutral-200 dark:border-neutral-700">
+          <p className="text-xs text-neutral-500 dark:text-neutral-400">Course</p>
+          <p className="font-semibold text-neutral-800 dark:text-neutral-200 text-sm mt-0.5">{course.title}</p>
+          <div className="mt-2.5 flex items-baseline gap-2">
+            <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">Rs. {course.fee}</span>
+            <span className="text-xs text-neutral-400">one-time payment</span>
           </div>
-          <p className="text-white/70 text-sm mt-1">Complete payment to enroll in this course</p>
         </div>
 
-        <div className="p-6 space-y-5">
-          {/* Course & Amount */}
-          <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-            <p className="text-sm text-gray-500">Course</p>
-            <p className="font-semibold text-gray-800">{course.title}</p>
-            <div className="mt-3 flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-primary">Rs. {course.fee}</span>
-              <span className="text-xs text-gray-400">one-time payment</span>
-            </div>
-          </div>
-
-          {/* Payment Details */}
-          <div className="bg-green-50 rounded-xl p-4 border border-green-200">
-            <h3 className="font-semibold text-green-800 text-sm mb-3 flex items-center gap-2">
-              <span>📱</span> Send Payment To
-            </h3>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between bg-white rounded-lg p-3 border border-green-100">
-                <div>
-                  <p className="text-xs text-gray-500">NayaPay / EasyPaisa</p>
-                  <p className="font-mono font-bold text-gray-800 text-lg">0334 3121986</p>
-                </div>
-                <button
-                  onClick={() => navigator.clipboard?.writeText('03343121986')}
-                  className="text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded-lg hover:bg-green-200 transition-colors"
-                >
-                  Copy
-                </button>
+        {/* Payment Details */}
+        <div className="bg-emerald-50 dark:bg-emerald-950/40 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
+          <h3 className="font-semibold text-emerald-800 dark:text-emerald-300 text-sm mb-3 flex items-center gap-2">
+            <span>📱</span> Send Payment To
+          </h3>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between bg-white dark:bg-neutral-900 rounded-lg p-3 border border-emerald-100 dark:border-emerald-900/60">
+              <div>
+                <p className="text-xs text-neutral-500">NayaPay / EasyPaisa</p>
+                <p className="font-mono font-bold text-neutral-800 dark:text-neutral-100 text-lg">0334 3121986</p>
               </div>
-              <p className="text-xs text-green-700">
-                Send exactly <strong>Rs. {course.fee}</strong> to the above number via NayaPay or EasyPaisa, then enter your transaction ID below.
-              </p>
+              <button
+                type="button"
+                onClick={() => navigator.clipboard?.writeText('03343121986')}
+                className="text-xs bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 px-3 py-1.5 rounded-lg hover:bg-emerald-200 transition-colors font-medium"
+              >
+                Copy
+              </button>
             </div>
-          </div>
-
-          {/* Payment Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label className="mb-1.5">Payment Method</Label>
-              <div className="grid grid-cols-2 gap-2">
-                <button type="button"
-                  onClick={() => setPaymentMethod('easypaisa')}
-                  className={`py-2.5 px-4 rounded-lg text-sm font-medium border-2 transition-all ${
-                    paymentMethod === 'easypaisa'
-                      ? 'border-green-500 bg-green-50 text-green-700'
-                      : 'border-gray-200 text-gray-600 hover:border-gray-300'
-                  }`}>
-                  EasyPaisa
-                </button>
-                <button type="button"
-                  onClick={() => setPaymentMethod('nayapay')}
-                  className={`py-2.5 px-4 rounded-lg text-sm font-medium border-2 transition-all ${
-                    paymentMethod === 'nayapay'
-                      ? 'border-purple-500 bg-purple-50 text-purple-700'
-                      : 'border-gray-200 text-gray-600 hover:border-gray-300'
-                  }`}>
-                  NayaPay
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="txnId" className="mb-1.5">
-                Transaction ID / Reference Number
-              </Label>
-              <Input
-                id="txnId"
-                type="text"
-                value={transactionId}
-                onChange={(e) => setTransactionId(e.target.value)}
-                placeholder="e.g. 1234567890"
-                required
-              />
-              <p className="text-xs text-gray-400 mt-1">You'll find this in your payment confirmation SMS or app notification.</p>
-            </div>
-
-            {error && <div className="bg-error-light text-error-dark rounded-lg p-4 text-sm">{error}</div>}
-
-            <Button
-              type="submit"
-              variant="primary"
-              disabled={submitting || !transactionId.trim()}
-              loading={submitting}
-              className="w-full py-3 font-bold"
-            >
-              {submitting ? 'Submitting Payment…' : 'Submit Payment Proof'}
-            </Button>
-
-            <p className="text-[10px] text-gray-400 text-center">
-              Your enrollment will be activated once an admin verifies your payment.
+            <p className="text-xs text-emerald-700 dark:text-emerald-300">
+              Send exactly <strong>Rs. {course.fee}</strong> to the above number via NayaPay or EasyPaisa, then enter your transaction ID below.
             </p>
-          </form>
+          </div>
         </div>
+
+        {/* Payment Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label className="mb-1.5">Payment Method</Label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setPaymentMethod('easypaisa')}
+                className={`py-2 px-4 rounded-lg text-sm font-medium border-2 transition-all ${
+                  paymentMethod === 'easypaisa'
+                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300'
+                    : 'border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:border-neutral-300'
+                }`}
+              >
+                EasyPaisa
+              </button>
+              <button
+                type="button"
+                onClick={() => setPaymentMethod('nayapay')}
+                className={`py-2 px-4 rounded-lg text-sm font-medium border-2 transition-all ${
+                  paymentMethod === 'nayapay'
+                    ? 'border-purple-500 bg-purple-50 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300'
+                    : 'border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:border-neutral-300'
+                }`}
+              >
+                NayaPay
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="txnId" className="mb-1.5">
+              Transaction ID / Reference Number
+            </Label>
+            <Input
+              id="txnId"
+              type="text"
+              value={transactionId}
+              onChange={(e) => setTransactionId(e.target.value)}
+              placeholder="e.g. 1234567890"
+              required
+            />
+            <p className="text-xs text-neutral-400 mt-1">You'll find this in your payment confirmation SMS or app notification.</p>
+          </div>
+
+          {error && <div className="bg-red-50 text-red-700 dark:bg-red-950/50 dark:text-red-300 rounded-lg p-3 text-xs">{error}</div>}
+
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={submitting || !transactionId.trim()}
+            loading={submitting}
+            className="w-full py-2.5 font-bold"
+          >
+            {submitting ? 'Submitting Payment…' : 'Submit Payment Proof'}
+          </Button>
+
+          <p className="text-[11px] text-neutral-400 text-center">
+            Your enrollment will be activated once an admin verifies your payment.
+          </p>
+        </form>
       </div>
-    </div>
+    </Modal>
   )
 }
 

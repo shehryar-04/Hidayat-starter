@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Search } from 'lucide-react'
 import SEOHead from '../components/SEOHead'
 import EnterpriseSearchBar from '../components/EnterpriseSearchBar'
 import EnterpriseSearchResults from '../components/EnterpriseSearchResults'
@@ -8,20 +8,6 @@ import SearchFilters from '../components/SearchFilters'
 import { useEnterpriseSearch } from '../hooks/useEnterpriseSearch'
 import { useBasePath } from '../hooks/useBasePath'
 
-/**
- * EnterpriseSearchPage — Full-featured search page with server-side
- * PostgreSQL full-text search across 70,000+ fatwas.
- *
- * Features:
- * - Server-side full-text search (replaces client-side Fuse.js)
- * - Autocomplete suggestions via trigram similarity
- * - Faceted filters (category, institution) with counts
- * - Pagination
- * - Search analytics (query logging, click tracking)
- * - Highlighted snippets in results
- * - RTL support for Urdu/Arabic
- * - Responsive layout with sidebar filters on desktop
- */
 export default function EnterpriseSearchPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()
@@ -71,7 +57,6 @@ export default function EnterpriseSearchPage() {
     if (suggestion.slug) {
       navigate(`${basePath}/${suggestion.slug}`)
     } else {
-      // Precomputed suggestion — use term as search query
       const term = suggestion.term || suggestion.title || ''
       handleQueryChange(term)
     }
@@ -98,7 +83,7 @@ export default function EnterpriseSearchPage() {
   const totalPages = Math.ceil(total / LIMIT)
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <div className="space-y-6">
       <SEOHead
         title="Search Fatwas | Hidayat Islamic Knowledge Platform"
         description="Search across 70,000+ authentic Islamic fatwas in Urdu, Arabic, and English. Find rulings on worship, transactions, family law, and more."
@@ -106,28 +91,26 @@ export default function EnterpriseSearchPage() {
         ogType="website"
       />
 
-      {/* Search Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-[57px] sm:top-[65px] z-30">
-        <div className="max-w-6xl mx-auto px-4 py-4">
-          <EnterpriseSearchBar
-            value={query}
-            onChange={handleQueryChange}
-            onSubmit={handleSubmit}
-            suggestions={suggestions}
-            onSuggestionSelect={handleSuggestionSelect}
-            isSuggesting={isSuggesting}
-            placeholder="Search 70,000+ fatwas in Urdu, Arabic, English..."
-          />
-        </div>
+      {/* Search Header Bar */}
+      <div className="bg-white dark:bg-[#0f1a14] border border-neutral-200/80 dark:border-[#1a2e23] rounded-2xl p-4 sm:p-5 shadow-xs transition-colors">
+        <EnterpriseSearchBar
+          value={query}
+          onChange={handleQueryChange}
+          onSubmit={handleSubmit}
+          suggestions={suggestions}
+          onSuggestionSelect={handleSuggestionSelect}
+          isSuggesting={isSuggesting}
+          placeholder="Search 70,000+ fatwas in Urdu, Arabic, English..."
+        />
       </div>
 
       {/* Content area */}
-      <div className="max-w-6xl mx-auto px-4 py-6">
+      <div>
         {query.trim() ? (
-          <div className="lg:flex lg:gap-8">
+          <div className="lg:flex lg:gap-8 items-start">
             {/* Sidebar filters — desktop only */}
             <div className="hidden lg:block w-64 flex-shrink-0">
-              <div className="sticky top-[160px]">
+              <div className="sticky top-24 bg-white dark:bg-[#0f1a14] border border-neutral-200/80 dark:border-[#1a2e23] rounded-2xl p-4 shadow-xs">
                 <SearchFilters
                   facets={facets}
                   activeFilters={filters}
@@ -141,11 +124,11 @@ export default function EnterpriseSearchPage() {
             <div className="flex-1 min-w-0">
               {/* Mobile filters */}
               <div className="lg:hidden mb-4">
-                <details className="bg-white rounded-lg border border-gray-200 p-3">
-                  <summary className="text-sm font-medium text-gray-700 cursor-pointer">
-                    Filters {(filters.category_1 || filters.dar_ul_ifta) && '(active)'}
+                <details className="bg-white dark:bg-[#0f1a14] rounded-2xl border border-neutral-200/80 dark:border-[#1a2e23] p-4 shadow-xs">
+                  <summary className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 cursor-pointer">
+                    Filter Results {(filters.category_1 || filters.dar_ul_ifta) && '(active)'}
                   </summary>
-                  <div className="mt-3 pt-3 border-t border-gray-100">
+                  <div className="mt-3 pt-3 border-t border-neutral-100 dark:border-[#1a2e23]">
                     <SearchFilters
                       facets={facets}
                       activeFilters={filters}
@@ -170,25 +153,25 @@ export default function EnterpriseSearchPage() {
 
               {/* Pagination */}
               {totalPages > 1 && !isSearching && results.length > 0 && (
-                <nav className="flex items-center justify-center gap-2 mt-8" aria-label="Search results pagination">
+                <nav className="flex items-center justify-center gap-3 mt-8" aria-label="Search results pagination">
                   <button
                     onClick={() => handlePageChange(page - 1)}
                     disabled={page <= 1}
-                    className="flex items-center gap-1 px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed min-h-[44px] transition-colors"
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-neutral-200/80 dark:border-[#1a2e23] bg-white dark:bg-[#0f1a14] text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-[#14221b] disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-xs"
                     aria-label="Previous page"
                   >
                     <ChevronLeft className="w-4 h-4" />
                     Previous
                   </button>
 
-                  <span className="text-sm text-gray-600 px-3">
-                    Page {page} of {totalPages}
+                  <span className="text-xs sm:text-sm font-medium text-neutral-500 dark:text-neutral-400 px-3">
+                    Page <strong className="text-neutral-900 dark:text-white">{page}</strong> of {totalPages}
                   </span>
 
                   <button
                     onClick={() => handlePageChange(page + 1)}
                     disabled={!hasMore}
-                    className="flex items-center gap-1 px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed min-h-[44px] transition-colors"
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-neutral-200/80 dark:border-[#1a2e23] bg-white dark:bg-[#0f1a14] text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-[#14221b] disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-xs"
                     aria-label="Next page"
                   >
                     Next
@@ -200,21 +183,20 @@ export default function EnterpriseSearchPage() {
           </div>
         ) : (
           /* Empty state — no query */
-          <div className="text-center py-20">
+          <div className="bg-white dark:bg-[#0f1a14] border border-neutral-200/80 dark:border-[#1a2e23] rounded-3xl p-8 sm:p-16 text-center shadow-xs">
             <div className="text-5xl mb-4">⚖️</div>
-            <h1 className="text-2xl font-bold text-gray-800 mb-3">
-              Search Islamic Fatwas
-            </h1>
-            <p className="text-gray-600 max-w-lg mx-auto mb-8">
-              Search across 70,000+ authentic Islamic fatwas from trusted scholars and institutions.
-              Supports Urdu, Arabic, and English.
+            <h2 className="text-xl sm:text-2xl font-display font-bold text-neutral-900 dark:text-white mb-2">
+              Search Islamic Fatwas & Rulings
+            </h2>
+            <p className="text-sm text-neutral-500 dark:text-neutral-400 max-w-md mx-auto mb-8">
+              Search across 70,000+ authentic Islamic fatwas from verified seminaries and muftis.
             </p>
             <div className="flex flex-wrap justify-center gap-2 text-sm">
               {['نماز', 'طلاق', 'زکوٰۃ', 'روزہ', 'نکاح', 'وراثت', 'تجارت'].map(term => (
                 <button
                   key={term}
                   onClick={() => handleQueryChange(term)}
-                  className="px-4 py-2 rounded-full bg-green-50 text-green-700 font-urdu hover:bg-green-100 transition-colors min-h-[44px]"
+                  className="px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40 font-urdu hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-colors cursor-pointer"
                 >
                   {term}
                 </button>
@@ -223,6 +205,6 @@ export default function EnterpriseSearchPage() {
           </div>
         )}
       </div>
-    </main>
+    </div>
   )
 }

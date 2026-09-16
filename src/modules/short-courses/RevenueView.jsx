@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { Card, CardContent, Spinner, EmptyState, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../shared/ui'
-import { DollarSign, Users, BookOpen } from 'lucide-react'
+import { DollarSign, Users, BookOpen, TrendingUp } from 'lucide-react'
 
 /**
  * Revenue View Component
  * Displays enrollment counts and revenue totals for short courses
- * Requirements: 7.4
  */
 export function RevenueView() {
   const [courses, setCourses] = useState([])
@@ -22,7 +21,6 @@ export function RevenueView() {
   const loadRevenueData = async () => {
     setLoading(true)
     try {
-      // Get all courses with enrollment counts
       const { data: coursesData, error: err1 } = await supabase
         .from('short_courses')
         .select('*')
@@ -30,7 +28,6 @@ export function RevenueView() {
 
       if (err1) throw err1
 
-      // Get enrollment data for each course
       const coursesWithStats = await Promise.all(
         (coursesData || []).map(async (course) => {
           const { data: enrollments, error: err2 } = await supabase
@@ -57,7 +54,6 @@ export function RevenueView() {
 
       setCourses(coursesWithStats)
 
-      // Calculate totals
       const revenue = coursesWithStats.reduce(
         (sum, course) => sum + course.courseRevenue,
         0
@@ -79,8 +75,9 @@ export function RevenueView() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-16">
+      <div className="flex flex-col items-center justify-center py-20">
         <Spinner size="lg" />
+        <span className="text-sm text-neutral-400 mt-3">Loading analytics...</span>
       </div>
     )
   }
@@ -93,55 +90,60 @@ export function RevenueView() {
   })
 
   return (
-    <div className="max-w-[1280px] mx-auto px-4 py-6 md:px-6 md:py-8">
-      <h2 className="text-xl font-bold text-neutral-800 mb-6">Revenue & Analytics</h2>
-
-      {error && <div className="bg-error-light text-error-dark rounded-lg p-4 text-sm mb-4">{error}</div>}
+    <div className="space-y-6">
+      {error && (
+        <div className="p-4 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-300 text-sm">
+          {error}
+        </div>
+      )}
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-              <DollarSign className="w-5 h-5 text-green-600" />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div className="bg-white dark:bg-[#0f1a14] border border-neutral-200/80 dark:border-[#1a2e23] rounded-2xl shadow-xs p-5 transition-colors">
+          <div className="flex items-center gap-3.5 mb-2">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-100 dark:border-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+              <DollarSign className="w-5 h-5" />
             </div>
-            <h3 className="text-sm font-medium text-neutral-500">Total Revenue</h3>
+            <h3 className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Total Revenue</h3>
           </div>
-          <p className="text-2xl font-bold text-neutral-800">${totalRevenue.toFixed(2)}</p>
+          <p className="text-2xl sm:text-3xl font-display font-bold text-neutral-900 dark:text-white">${totalRevenue.toFixed(2)}</p>
         </div>
 
-        <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-              <Users className="w-5 h-5 text-blue-600" />
+        <div className="bg-white dark:bg-[#0f1a14] border border-neutral-200/80 dark:border-[#1a2e23] rounded-2xl shadow-xs p-5 transition-colors">
+          <div className="flex items-center gap-3.5 mb-2">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/50 border border-blue-100 dark:border-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+              <Users className="w-5 h-5" />
             </div>
-            <h3 className="text-sm font-medium text-neutral-500">Total Enrollments</h3>
+            <h3 className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Total Enrollments</h3>
           </div>
-          <p className="text-2xl font-bold text-neutral-800">{totalEnrollments}</p>
+          <p className="text-2xl sm:text-3xl font-display font-bold text-neutral-900 dark:text-white">{totalEnrollments}</p>
         </div>
 
-        <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-purple-600" />
+        <div className="bg-white dark:bg-[#0f1a14] border border-neutral-200/80 dark:border-[#1a2e23] rounded-2xl shadow-xs p-5 transition-colors">
+          <div className="flex items-center gap-3.5 mb-2">
+            <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/50 border border-purple-100 dark:border-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400">
+              <BookOpen className="w-5 h-5" />
             </div>
-            <h3 className="text-sm font-medium text-neutral-500">Active Courses</h3>
+            <h3 className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Active Courses</h3>
           </div>
-          <p className="text-2xl font-bold text-neutral-800">{activeCourses.length}</p>
+          <p className="text-2xl sm:text-3xl font-display font-bold text-neutral-900 dark:text-white">{activeCourses.length}</p>
         </div>
       </div>
 
       {/* Course Analytics Table */}
-      <div className="bg-white border border-neutral-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-neutral-100">
-          <h3 className="font-semibold text-neutral-700">Course Analytics</h3>
+      <div className="bg-white dark:bg-[#0f1a14] border border-neutral-200/80 dark:border-[#1a2e23] rounded-2xl shadow-xs overflow-hidden">
+        <div className="px-6 py-4 border-b border-neutral-100 dark:border-[#1a2e23] flex items-center justify-between">
+          <h3 className="font-display font-bold text-neutral-900 dark:text-neutral-100 text-base">Course Analytics Breakdown</h3>
+          <span className="text-xs text-neutral-400">{courses.length} courses total</span>
         </div>
         {courses.length === 0 ? (
-          <EmptyState
-            icon={BookOpen}
-            title="No courses available"
-            description="Create courses to see analytics here."
-          />
+          <div className="p-12">
+            <EmptyState
+              icon={BookOpen}
+              title="No courses available"
+              description="Create courses to see analytics and enrollment breakdowns here."
+            />
+          </div>
         ) : (
           <Table>
             <TableHeader>
@@ -156,11 +158,11 @@ export function RevenueView() {
             <TableBody>
               {courses.map((course) => (
                 <TableRow key={course.id}>
-                  <TableCell className="font-medium">{course.title}</TableCell>
+                  <TableCell className="font-medium text-neutral-900 dark:text-neutral-100">{course.title}</TableCell>
                   <TableCell>${course.fee || 0}</TableCell>
                   <TableCell>{course.totalEnrolled}</TableCell>
                   <TableCell>{course.completedEnrolled}</TableCell>
-                  <TableCell className="font-semibold">${course.courseRevenue.toFixed(2)}</TableCell>
+                  <TableCell className="font-semibold text-emerald-600 dark:text-emerald-400">${course.courseRevenue.toFixed(2)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

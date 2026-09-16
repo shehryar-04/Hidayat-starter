@@ -20,9 +20,10 @@ export const Textarea = forwardRef(({ className, error, onInput, ...props }, ref
     <textarea
       ref={ref}
       className={cn(
-        'w-full min-h-[80px] max-h-[320px] rounded-lg border px-3 py-2 text-sm shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] transition-all duration-150 outline-none resize-none',
-        'border-neutral-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500',
-        error && 'border-red-500 focus:ring-red-500 focus:border-red-500',
+        'w-full min-h-[88px] max-h-[320px] rounded-xl border px-3.5 py-2.5 text-sm transition-all duration-150 outline-none resize-none',
+        'bg-white dark:bg-[#0f1a14] text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500',
+        'border-neutral-200/90 dark:border-[#1a2e23] focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:focus:border-emerald-500/80',
+        error && 'border-red-500 dark:border-red-500 focus:ring-red-500 focus:border-red-500',
         'disabled:opacity-50 disabled:pointer-events-none',
         className
       )}
@@ -33,3 +34,5 @@ export const Textarea = forwardRef(({ className, error, onInput, ...props }, ref
   )
 })
 Textarea.displayName = 'Textarea'
+
+export default Textarea

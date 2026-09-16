@@ -1,26 +1,29 @@
 import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
+import { GraduationCap, Users, Calendar, Globe, Tag, Sparkles } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-import { Button, Badge, Spinner, EmptyState } from '../../shared/ui'
-import { GraduationCap } from 'lucide-react'
+import { Button, Badge, Spinner, EmptyState, ConfirmDialog } from '../../shared/ui'
 
-const LEVEL_COLORS = {
-  Beginner: 'bg-green-100 text-green-700',
-  Intermediate: 'bg-yellow-100 text-yellow-700',
-  Advanced: 'bg-red-100 text-red-700',
-  'All levels': 'bg-blue-100 text-blue-700',
+const STATUS_VARIANT = {
+  draft: 'default',
+  pending_approval: 'warning',
+  published: 'success',
+  archived: 'error',
 }
 
-const STATUS_COLORS = {
-  draft: 'bg-gray-100 text-gray-600',
-  pending_approval: 'bg-yellow-100 text-yellow-700',
-  published: 'bg-green-100 text-green-700',
-  archived: 'bg-red-100 text-red-700',
+const LEVEL_VARIANT = {
+  Beginner: 'success',
+  Intermediate: 'warning',
+  Advanced: 'error',
+  'All levels': 'info',
 }
 
 export function CourseList({ onSelectCourse, onEditCourse }) {
   const [courses, setCourses] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [deleteTargetId, setDeleteTargetId] = useState(null)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => { loadCourses() }, [])
 
@@ -43,79 +46,156 @@ export function CourseList({ onSelectCourse, onEditCourse }) {
     }
   }
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Delete this course?')) return
-    const { error: err } = await supabase.from('short_courses').delete().eq('id', id)
+  const confirmDelete = async () => {
+    if (!deleteTargetId) return
+    setDeleting(true)
+    const { error: err } = await supabase.from('short_courses').delete().eq('id', deleteTargetId)
+    setDeleting(false)
     if (err) { setError(err.message); return }
-    setCourses(c => c.filter(x => x.id !== id))
+    setCourses(c => c.filter(x => x.id !== deleteTargetId))
+    setDeleteTargetId(null)
   }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-16">
+      <div className="flex flex-col items-center justify-center py-24">
         <Spinner size="lg" />
+        <span className="text-sm text-neutral-400 mt-3 font-medium">Loading courses...</span>
       </div>
     )
   }
 
   return (
-    <div className="max-w-[1280px] mx-auto px-4 py-6 md:px-6 md:py-8">
-      {error && <div className="bg-error-light text-error-dark rounded-lg p-4 text-sm mb-4">{error}</div>}
+    <div className="space-y-6">
+      {error && (
+        <div className="p-4 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-300 text-sm">
+          {error}
+        </div>
+      )}
 
       {courses.length === 0 ? (
-        <EmptyState
-          icon={GraduationCap}
-          title="No courses yet"
-          description="Create your first course to get started."
-        />
+        <div className="bg-white dark:bg-[#0f1a14] rounded-2xl border border-neutral-200/80 dark:border-[#1a2e23] p-12">
+          <EmptyState
+            icon={GraduationCap}
+            title="No courses yet"
+            description="Create your first interactive Islamic short course to get started."
+          />
+        </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-          {courses.map(course => {
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {courses.map((course) => {
             const now = new Date()
             const start = course.start_date ? new Date(course.start_date) : null
             const end = course.end_date ? new Date(course.end_date) : null
             const timeStatus = !start ? null : start > now ? 'Upcoming' : end && end < now ? 'Ended' : 'Active'
 
             return (
-              <div key={course.id} className="bg-white rounded-xl border border-neutral-200 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow">
-                {/* Thumbnail */}
-                <div className="h-36 bg-neutral-100 flex items-center justify-center overflow-hidden">
-                  {course.thumbnail_url
-                    ? <img src={course.thumbnail_url} alt={course.title} className="w-full h-full object-cover" />
-                    : <span className="text-4xl">🎓</span>}
+              <div
+                key={course.id}
+                className="group bg-white dark:bg-[#0f1a14] rounded-2xl border border-neutral-200/80 dark:border-[#1a2e23] shadow-xs hover:shadow-xl hover:border-emerald-500/50 dark:hover:border-emerald-500/50 overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1"
+              >
+                {/* Thumbnail Header */}
+                <div className="relative h-44 bg-gradient-to-br from-neutral-100 to-neutral-200 dark:from-[#112018] dark:to-[#09140e] flex items-center justify-center overflow-hidden border-b border-neutral-100 dark:border-[#1a2e23]">
+                  {course.thumbnail_url ? (
+                    <img
+                      src={course.thumbnail_url}
+                      alt={course.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-2xl bg-white/80 dark:bg-white/5 backdrop-blur-sm border border-neutral-200/50 dark:border-white/10 flex items-center justify-center text-3xl shadow-sm">
+                      🎓
+                    </div>
+                  )}
+
+                  {/* Top Badges */}
+                  <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
+                    <span className="backdrop-blur-md bg-white/90 dark:bg-[#0f1a14]/90 px-2.5 py-1 rounded-full text-[11px] font-bold text-neutral-800 dark:text-neutral-200 border border-neutral-200/60 dark:border-[#1a2e23] shadow-xs">
+                      {course.is_free ? 'Free' : `$${course.fee ?? '0'}`}
+                    </span>
+                    <Badge variant={STATUS_VARIANT[course.status] || 'default'} dot>
+                      <span className="capitalize">{course.status?.replace('_', ' ')}</span>
+                    </Badge>
+                  </div>
                 </div>
 
-                <div className="p-4 flex flex-col flex-1">
-                  {/* Badges */}
-                  <div className="flex flex-wrap gap-1.5 mb-2">
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${STATUS_COLORS[course.status] || 'bg-gray-100 text-gray-600'}`}>{course.status}</span>
-                    {course.level && <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${LEVEL_COLORS[course.level] || 'bg-gray-100 text-gray-600'}`}>{course.level}</span>}
-                    {timeStatus && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">{timeStatus}</span>}
+                {/* Content */}
+                <div className="p-5 flex flex-col flex-1">
+                  {/* Category & Level */}
+                  <div className="flex flex-wrap items-center gap-1.5 mb-2.5">
+                    {course.level && (
+                      <Badge variant={LEVEL_VARIANT[course.level] || 'default'}>
+                        {course.level}
+                      </Badge>
+                    )}
+                    {course.category && (
+                      <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-[#14221b] text-neutral-600 dark:text-neutral-400 border border-neutral-200/60 dark:border-[#1a2e23]">
+                        {course.category}
+                      </span>
+                    )}
+                    {timeStatus && (
+                      <Badge variant={timeStatus === 'Active' ? 'success' : 'info'}>
+                        {timeStatus}
+                      </Badge>
+                    )}
                   </div>
 
-                  <h3 className="font-semibold text-gray-800 text-sm leading-snug mb-1 line-clamp-2">{course.title}</h3>
-                  {course.subtitle && <p className="text-xs text-gray-500 mb-2 line-clamp-1">{course.subtitle}</p>}
+                  <h3 className="font-display font-bold text-neutral-900 dark:text-neutral-50 text-base leading-snug mb-1.5 line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-emerald-400 transition-colors">
+                    {course.title}
+                  </h3>
 
-                  <p className="text-xs text-gray-400 line-clamp-2 flex-1">{course.description}</p>
+                  {course.subtitle && (
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-2.5 line-clamp-1">
+                      {course.subtitle}
+                    </p>
+                  )}
 
-                  {/* Meta */}
-                  <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-400">
-                    <span>{course.is_free ? '🆓 Free' : `💳 $${course.fee ?? '—'}`}</span>
-                    <span>{course.language}</span>
-                    {course.profiles?.full_name && <span className="truncate max-w-[80px]">{course.profiles.full_name}</span>}
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 line-clamp-2 flex-1 leading-relaxed">
+                    {course.description || 'No description provided.'}
+                  </p>
+
+                  {/* Metadata Row */}
+                  <div className="mt-4 pt-3 border-t border-neutral-100 dark:border-[#1a2e23] flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
+                    <div className="flex items-center gap-1.5">
+                      <Globe className="w-3.5 h-3.5 text-neutral-400" />
+                      <span>{course.language || 'Urdu / English'}</span>
+                    </div>
+                    {course.profiles?.full_name && (
+                      <div className="flex items-center gap-1 truncate max-w-[120px]">
+                        <span className="text-neutral-400">By</span>
+                        <span className="font-medium text-neutral-700 dark:text-neutral-300 truncate">
+                          {course.profiles.full_name}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Actions */}
-                  <div className="mt-3 flex gap-2">
-                    <Button variant="primary" size="sm" className="flex-1" onClick={() => onSelectCourse(course)}>
-                      Manage
+                  {/* Action Buttons */}
+                  <div className="mt-4 pt-2 flex items-center gap-2">
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => onSelectCourse(course)}
+                    >
+                      Manage Course
                     </Button>
                     {onEditCourse && (
-                      <Button variant="outline" size="sm" onClick={() => onEditCourse(course)}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onEditCourse(course)}
+                        title="Edit course details"
+                      >
                         Edit
                       </Button>
                     )}
-                    <Button variant="destructive" size="sm" onClick={() => handleDelete(course.id)}>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => setDeleteTargetId(course.id)}
+                      title="Delete course"
+                    >
                       Delete
                     </Button>
                   </div>
@@ -125,6 +205,17 @@ export function CourseList({ onSelectCourse, onEditCourse }) {
           })}
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!deleteTargetId}
+        onClose={() => setDeleteTargetId(null)}
+        onConfirm={confirmDelete}
+        loading={deleting}
+        title="Delete Course"
+        message="Are you sure you want to delete this course? All modules, quizzes, and enrollments associated with it will be permanently removed."
+        confirmText="Delete Course"
+        variant="danger"
+      />
     </div>
   )
 }

@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { motion } from 'framer-motion'
+import { GraduationCap, Clock, PlusCircle, BarChart3, LayoutDashboard, Compass } from 'lucide-react'
 import { useRole } from '../../app/RoleProvider'
 import { supabase } from '../../lib/supabase'
 import { CourseList } from './CourseList'
@@ -9,9 +11,6 @@ import { AdminCourseReview } from './AdminCourseReview'
 import { StudentCourseList } from './StudentCourseList'
 import { StudentCourseView } from './StudentCourseView'
 import { StudentDashboard } from './StudentDashboard'
-import { QuizBuilder } from './components/QuizBuilder'
-import { CourseAnnouncements } from './components/CourseAnnouncements'
-import { TeacherAnalytics } from './components/TeacherAnalytics'
 import { AdminCourseManager } from './components/AdminCourseManager'
 import { cn } from '../../shared/ui'
 
@@ -24,43 +23,54 @@ function StudentShortCourses() {
     return <StudentCourseView course={selectedCourse} onBack={() => setSelectedCourse(null)} />
   }
 
-  if (tab === 'dashboard') {
-    return (
-      <div>
-        <div className="bg-white border-b border-neutral-200 px-4 sm:px-8 pt-4 pb-0">
-          <div className="flex gap-4 overflow-x-auto">
-            <button onClick={() => setTab('dashboard')}
-              className={cn('px-4 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors',
-                'text-primary-500 font-semibold border-primary-500')}>
-              My Dashboard
-            </button>
-            <button onClick={() => setTab('browse')}
-              className="px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-neutral-500 hover:text-neutral-800 whitespace-nowrap transition-colors">
-              Browse Courses
-            </button>
-          </div>
-        </div>
-        <StudentDashboard onSelectCourse={setSelectedCourse} />
-      </div>
-    )
-  }
+  const tabs = [
+    { key: 'dashboard', label: 'My Dashboard', icon: LayoutDashboard },
+    { key: 'browse', label: 'Browse Courses', icon: Compass },
+  ]
 
   return (
-    <div>
-      <div className="bg-white border-b border-neutral-200 px-4 sm:px-8 pt-4 pb-0">
-        <div className="flex gap-4 overflow-x-auto">
-          <button onClick={() => setTab('dashboard')}
-            className="px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-neutral-500 hover:text-neutral-800 whitespace-nowrap transition-colors">
-            My Dashboard
-          </button>
-          <button onClick={() => setTab('browse')}
-            className={cn('px-4 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors',
-              'text-primary-500 font-semibold border-primary-500')}>
-            Browse Courses
-          </button>
+    <div className="space-y-6">
+      {/* Header with modern tab navigation */}
+      <div className="bg-white dark:bg-[#0f1a14] border border-neutral-200/80 dark:border-[#1a2e23] rounded-2xl p-4 sm:p-6 shadow-xs transition-colors">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-display font-bold text-neutral-900 dark:text-white tracking-tight flex items-center gap-2.5">
+              <span className="w-8 h-8 rounded-xl bg-primary-50 dark:bg-primary-950/60 text-primary-600 dark:text-emerald-400 flex items-center justify-center border border-primary-100 dark:border-emerald-900/30">
+                <GraduationCap className="w-4 h-4" />
+              </span>
+              Short Courses & LMS
+            </h1>
+            <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-1">
+              Explore online modules, track your study progress, and obtain verified certificates
+            </p>
+          </div>
+
+          {/* Tab Switcher */}
+          <div className="flex items-center gap-1.5 p-1 bg-neutral-100/80 dark:bg-[#14221b] rounded-xl border border-neutral-200/60 dark:border-[#1a2e23] self-start sm:self-auto">
+            {tabs.map(({ key, label, icon: Icon }) => (
+              <button
+                key={key}
+                onClick={() => setTab(key)}
+                className={cn(
+                  'flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-150 cursor-pointer',
+                  tab === key
+                    ? 'bg-white dark:bg-primary-600 text-neutral-900 dark:text-white shadow-xs font-semibold'
+                    : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+                )}
+              >
+                <Icon className="w-4 h-4" />
+                <span>{label}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
-      <StudentCourseList onSelectCourse={setSelectedCourse} />
+
+      {tab === 'dashboard' ? (
+        <StudentDashboard onSelectCourse={setSelectedCourse} />
+      ) : (
+        <StudentCourseList onSelectCourse={setSelectedCourse} />
+      )}
     </div>
   )
 }
@@ -73,10 +83,10 @@ function AdminShortCourses() {
   const [editingCourse, setEditingCourse] = useState(null)
 
   const tabs = [
-    ['courses', 'All Courses'],
-    ['pending', '⏳ Pending Approval'],
-    ['create', 'Create Course'],
-    ['revenue', 'Revenue & Analytics'],
+    { key: 'courses', label: 'All Courses', icon: GraduationCap },
+    { key: 'pending', label: 'Pending Approval', icon: Clock },
+    { key: 'create', label: 'Create Course', icon: PlusCircle },
+    { key: 'revenue', label: 'Revenue & Analytics', icon: BarChart3 },
   ]
 
   const handleEdit = async (course) => {
@@ -96,25 +106,51 @@ function AdminShortCourses() {
     setView('manage')
   }
 
-  const isActive = (key) => view === key || (view === 'enrollment' && key === 'courses') || (view === 'edit' && key === 'courses') || (view === 'manage' && key === 'courses')
+  const isActive = (key) =>
+    view === key ||
+    (view === 'enrollment' && key === 'courses') ||
+    (view === 'edit' && key === 'courses') ||
+    (view === 'manage' && key === 'courses')
 
   return (
-    <div>
-      <div className="bg-white border-b border-neutral-200 px-8 pt-6 pb-0">
-        <h1 className="text-xl font-bold text-primary mb-4">Short Courses</h1>
-        <div className="flex border-b border-neutral-200 overflow-x-auto">
-          {tabs.map(([key, label]) => (
-            <button key={key}
-              onClick={() => { setView(key); setSelectedCourse(null); setEditingCourse(null) }}
-              className={cn(
-                'relative px-4 py-2.5 text-sm font-medium transition-colors duration-150 whitespace-nowrap outline-none',
-                isActive(key)
-                  ? 'text-primary-500 font-semibold border-b-2 border-primary-500'
-                  : 'text-neutral-500 hover:text-neutral-800'
-              )}>
-              {label}
-            </button>
-          ))}
+    <div className="space-y-6">
+      {/* Header Container */}
+      <div className="bg-white dark:bg-[#0f1a14] border border-neutral-200/80 dark:border-[#1a2e23] rounded-2xl p-4 sm:p-6 shadow-xs transition-colors">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-display font-bold text-neutral-900 dark:text-white tracking-tight flex items-center gap-2.5">
+              <span className="w-8 h-8 rounded-xl bg-primary-50 dark:bg-primary-950/60 text-primary-600 dark:text-emerald-400 flex items-center justify-center border border-primary-100 dark:border-emerald-900/30">
+                <GraduationCap className="w-4 h-4" />
+              </span>
+              Short Courses Management
+            </h1>
+            <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-1">
+              Curate, review, approve and monitor interactive Islamic courses and student progress
+            </p>
+          </div>
+
+          {/* Navigation Tabs */}
+          <div className="flex items-center gap-1 p-1 bg-neutral-100/80 dark:bg-[#14221b] rounded-xl border border-neutral-200/60 dark:border-[#1a2e23] overflow-x-auto custom-scrollbar">
+            {tabs.map(({ key, label, icon: Icon }) => (
+              <button
+                key={key}
+                onClick={() => {
+                  setView(key)
+                  setSelectedCourse(null)
+                  setEditingCourse(null)
+                }}
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-150 whitespace-nowrap cursor-pointer',
+                  isActive(key)
+                    ? 'bg-white dark:bg-primary-600 text-neutral-900 dark:text-white shadow-xs font-semibold'
+                    : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+                )}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                <span>{label}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -152,8 +188,8 @@ function ScholarShortCourses() {
   const [editingCourse, setEditingCourse] = useState(null)
 
   const tabs = [
-    ['courses', 'My Courses'],
-    ['create', 'Create Course'],
+    { key: 'courses', label: 'My Courses', icon: GraduationCap },
+    { key: 'create', label: 'Create Course', icon: PlusCircle },
   ]
 
   const handleEdit = async (course) => {
@@ -161,25 +197,45 @@ function ScholarShortCourses() {
     if (data) { setEditingCourse(data); setView('edit') }
   }
 
-  const isActive = (key) => view === key || (view === 'enrollment' && key === 'courses') || (view === 'edit' && key === 'courses')
+  const isActive = (key) =>
+    view === key ||
+    (view === 'enrollment' && key === 'courses') ||
+    (view === 'edit' && key === 'courses')
 
   return (
-    <div>
-      <div className="bg-white border-b border-neutral-200 px-8 pt-6 pb-0">
-        <h1 className="text-xl font-bold text-primary mb-4">Short Courses</h1>
-        <div className="flex border-b border-neutral-200 overflow-x-auto">
-          {tabs.map(([key, label]) => (
-            <button key={key}
-              onClick={() => { setView(key); setSelectedCourse(null); setEditingCourse(null) }}
-              className={cn(
-                'relative px-4 py-2.5 text-sm font-medium transition-colors duration-150 whitespace-nowrap outline-none',
-                isActive(key)
-                  ? 'text-primary-500 font-semibold border-b-2 border-primary-500'
-                  : 'text-neutral-500 hover:text-neutral-800'
-              )}>
-              {label}
-            </button>
-          ))}
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-white dark:bg-[#0f1a14] border border-neutral-200/80 dark:border-[#1a2e23] rounded-2xl p-4 sm:p-6 shadow-xs transition-colors">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-display font-bold text-neutral-900 dark:text-white tracking-tight flex items-center gap-2.5">
+              <span className="w-8 h-8 rounded-xl bg-primary-50 dark:bg-primary-950/60 text-primary-600 dark:text-emerald-400 flex items-center justify-center border border-primary-100 dark:border-emerald-900/30">
+                <GraduationCap className="w-4 h-4" />
+              </span>
+              Scholar Course Portal
+            </h1>
+            <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-1">
+              Create curriculum, upload lessons, manage enrolled students, and publish quizzes
+            </p>
+          </div>
+
+          <div className="flex items-center gap-1.5 p-1 bg-neutral-100/80 dark:bg-[#14221b] rounded-xl border border-neutral-200/60 dark:border-[#1a2e23] self-start sm:self-auto">
+            {tabs.map(({ key, label, icon: Icon }) => (
+              <button
+                key={key}
+                onClick={() => { setView(key); setSelectedCourse(null); setEditingCourse(null) }}
+                className={cn(
+                  'flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-150 cursor-pointer',
+                  isActive(key)
+                    ? 'bg-white dark:bg-primary-600 text-neutral-900 dark:text-white shadow-xs font-semibold'
+                    : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+                )}
+              >
+                <Icon className="w-4 h-4" />
+                <span>{label}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

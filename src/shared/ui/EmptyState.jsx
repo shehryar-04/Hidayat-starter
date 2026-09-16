@@ -21,9 +21,13 @@ export function EmptyState({ icon: Icon, title, description, action, className }
       transition={{ duration: 0.3, ease: [0, 0, 0.2, 1] }}
       role="status"
     >
-      {Icon && <Icon className="w-12 h-12 text-neutral-300 mb-4" strokeWidth={1.5} />}
-      {title && <h3 className="text-lg font-semibold text-neutral-700 mb-1">{title}</h3>}
-      {description && <p className="text-sm text-neutral-500 max-w-sm mb-6">{description}</p>}
+      {Icon && (
+        <div className="w-16 h-16 rounded-2xl bg-primary-50 dark:bg-primary-950/50 flex items-center justify-center mb-4 text-primary-600 dark:text-emerald-400 border border-primary-100 dark:border-[#1a2e23]">
+          <Icon className="w-8 h-8" strokeWidth={1.75} />
+        </div>
+      )}
+      {title && <h3 className="text-lg font-semibold text-neutral-800 dark:text-neutral-100 mb-1">{title}</h3>}
+      {description && <p className="text-sm text-neutral-500 dark:text-neutral-400 max-w-sm mb-6">{description}</p>}
       {action && action}
     </motion.div>
   )

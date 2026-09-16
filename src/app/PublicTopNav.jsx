@@ -5,7 +5,7 @@ import { useRole } from './RoleProvider'
 import { useProfile } from './useProfile'
 import Logo from './Logo'
 import ProfileModal from './ProfileModal'
-import { Button, cn } from '../shared/ui'
+import { Button, cn, ThemeLanguageToggle } from '../shared/ui'
 
 function AvatarCircle({ avatarUrl, initials }) {
   const [err, setErr] = useState(false)
@@ -14,13 +14,13 @@ function AvatarCircle({ avatarUrl, initials }) {
       <img
         src={avatarUrl}
         alt="avatar"
-        className="w-8 h-8 rounded-full object-cover ring-2 ring-white/30"
+        className="w-8 h-8 rounded-full object-cover ring-2 ring-primary-500/30 shadow-xs"
         onError={() => setErr(true)}
       />
     )
   }
   return (
-    <div className="w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center text-white text-xs font-bold ring-2 ring-white/30">
+    <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-white text-xs font-bold ring-2 ring-primary-500/30 shadow-xs">
       {initials}
     </div>
   )
@@ -37,31 +37,23 @@ function NavItem({ to, onClick, children, isActive }) {
       className={cn(
         'relative font-medium text-sm cursor-pointer transition-colors duration-normal whitespace-nowrap py-1 group',
         isActive
-          ? 'text-primary-500 font-semibold'
-          : 'text-neutral-600 hover:text-neutral-800'
+          ? 'text-primary-600 dark:text-emerald-400 font-semibold'
+          : 'text-neutral-700 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white'
       )}
     >
       {children}
       {/* Active indicator: 2px bottom border in primary */}
       {isActive && (
-        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500 rounded-full" />
+        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500 dark:bg-emerald-400 rounded-full" />
       )}
       {/* Hover underline animation: slides from left 0→100% */}
       {!isActive && (
-        <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-primary-500 rounded-full transition-all duration-[250ms] ease-out group-hover:w-full" />
+        <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-primary-500 dark:bg-emerald-400 rounded-full transition-all duration-[250ms] ease-out group-hover:w-full" />
       )}
     </button>
   )
 }
 
-/**
- * Single navbar for the entire app — same links for guest and logged-in users.
- * Protected pages redirect guests to /login. Public pages work for everyone.
- * Right side: Login button (guest) or profile dropdown (authenticated).
- *
- * Design: Frosted-glass effect, hover underline animations, active route indicator,
- * mobile hamburger at md breakpoint with slide-down drawer, max-width 1280px, 64px height, sticky.
- */
 export default function PublicTopNav() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -94,17 +86,22 @@ export default function PublicTopNav() {
   }
 
   // Primary links shown directly in navbar
+  const authPrimaryLinks = role ? [
+    { label: 'Dashboard',     href: '/dashboard',     protected: true },
+  ] : []
+
   const basePrimaryLinks = [
     { label: 'Home',          href: '/',              protected: false },
+    ...authPrimaryLinks,
     { label: 'Darse Nizami',  href: '/dars-e-nizami', protected: false },
     { label: 'Hifz & Nazrah', href: '/hifz',          protected: false },
     { label: 'Short Courses', href: '/short-courses', protected: true },
     { label: 'Darul Ifta',    href: '/darul-ifta',    protected: false },
   ]
 
-  // Admin-only links (shown in primary nav when admin is logged in)
+  // Admin-only links
   const adminLinks = role === 'admin' ? [
-    { label: 'Dashboard',     href: '/admin-dashboard',           protected: true },
+    { label: 'Admin Hub',     href: '/admin-dashboard',           protected: true },
     { label: 'Students',      href: '/student-admin',             protected: true },
   ] : []
 
@@ -126,8 +123,6 @@ export default function PublicTopNav() {
   ] : []
 
   const moreLinks = [...baseMoreLinks, ...adminMoreLinks]
-
-  // All links combined (for mobile drawer)
   const navLinks = [...primaryLinks, ...moreLinks]
 
   const handleLinkClick = (link) => {
@@ -151,8 +146,7 @@ export default function PublicTopNav() {
 
   return (
     <>
-      {/* Frosted-glass navbar: backdrop-blur-xl, bg-white/80, 1px bottom border gray-200, sticky, h-16, z-50 */}
-      <nav className="sticky top-0 w-full z-50 border-b border-gray-200 bg-white/80 backdrop-blur-xl h-16 flex items-center">
+      <nav className="sticky top-0 w-full z-50 border-b border-neutral-200/90 dark:border-[#1a2e23] bg-white/85 dark:bg-[#0c1410]/90 backdrop-blur-xl h-16 flex items-center transition-colors duration-200">
         <div className="flex justify-between items-center w-full px-4 sm:px-6 max-w-[1280px] mx-auto">
           {/* Logo */}
           <a
@@ -183,8 +177,8 @@ export default function PublicTopNav() {
                 className={cn(
                   'relative font-medium text-sm cursor-pointer transition-colors duration-normal whitespace-nowrap flex items-center gap-1 py-1 group',
                   moreLinks.some((l) => isActive(l.href))
-                    ? 'text-primary-500 font-semibold'
-                    : 'text-neutral-600 hover:text-neutral-800'
+                    ? 'text-primary-600 dark:text-emerald-400 font-semibold'
+                    : 'text-neutral-700 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white'
                 )}
               >
                 More
@@ -194,26 +188,25 @@ export default function PublicTopNav() {
                     moreMenuOpen && 'rotate-180'
                   )}
                 />
-                {/* Hover underline for More button */}
                 {!moreLinks.some((l) => isActive(l.href)) && (
-                  <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-primary-500 rounded-full transition-all duration-[250ms] ease-out group-hover:w-full" />
+                  <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-primary-500 dark:bg-emerald-400 rounded-full transition-all duration-[250ms] ease-out group-hover:w-full" />
                 )}
                 {moreLinks.some((l) => isActive(l.href)) && (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500 rounded-full" />
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500 dark:bg-emerald-400 rounded-full" />
                 )}
               </button>
 
               {moreMenuOpen && (
-                <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-48 bg-white/90 backdrop-blur-xl rounded-xl shadow-lg border border-neutral-200 py-1.5 z-50">
+                <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-52 bg-white dark:bg-[#0f1a14] rounded-xl shadow-xl border border-neutral-200 dark:border-[#1a2e23] p-1.5 z-50">
                   {moreLinks.map((link) => (
                     <button
                       key={link.label}
                       onClick={() => { handleLinkClick(link); setMoreMenuOpen(false) }}
                       className={cn(
-                        'block w-full text-left px-4 py-2.5 text-sm font-medium transition-colors rounded-md mx-auto',
+                        'block w-full text-left px-3.5 py-2 text-sm font-medium transition-colors rounded-lg',
                         isActive(link.href)
-                          ? 'text-primary-500 bg-primary-50'
-                          : 'text-neutral-600 hover:text-neutral-800 hover:bg-neutral-50'
+                          ? 'text-primary-600 dark:text-emerald-400 bg-primary-50 dark:bg-primary-950/60 font-semibold'
+                          : 'text-neutral-700 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-[#14221b]'
                       )}
                     >
                       {link.label}
@@ -224,8 +217,10 @@ export default function PublicTopNav() {
             </div>
           </div>
 
-          {/* Right side: Login / User menu + Hamburger */}
-          <div className="flex items-center gap-3">
+          {/* Right side: Language, Theme, Login / User menu + Hamburger */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <ThemeLanguageToggle className="hidden xs:flex" />
+
             {!role ? (
               <Button
                 variant="primary"
@@ -236,74 +231,89 @@ export default function PublicTopNav() {
                 Login
               </Button>
             ) : (
-              <div className="relative" ref={userMenuRef}>
-                {/* Avatar trigger with hover background transition 150–200ms */}
-                <button
-                  onClick={() => setUserMenuOpen((o) => !o)}
-                  className="flex items-center gap-2 px-2 py-1.5 rounded-lg transition-colors duration-[175ms] hover:bg-neutral-100"
+              <>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => navigate('/dashboard')}
+                  className="hidden sm:inline-flex items-center gap-1.5 font-medium shadow-xs"
                 >
-                  <AvatarCircle avatarUrl={avatarUrl} initials={initials} />
-                  <div className="hidden sm:block text-left">
-                    <div className="text-xs font-semibold text-neutral-800 leading-tight max-w-[120px] truncate">
-                      {displayName}
+                  <span>Dashboard</span>
+                </Button>
+                <div className="relative" ref={userMenuRef}>
+                  <button
+                    onClick={() => setUserMenuOpen((o) => !o)}
+                    className="flex items-center gap-2 px-2 py-1.5 rounded-xl transition-colors duration-150 hover:bg-neutral-100 dark:hover:bg-[#14221b] cursor-pointer"
+                  >
+                    <AvatarCircle avatarUrl={avatarUrl} initials={initials} />
+                    <div className="hidden sm:block text-left">
+                      <div className="text-xs font-semibold text-neutral-800 dark:text-neutral-100 leading-tight max-w-[120px] truncate">
+                        {displayName}
+                      </div>
+                      <div className="text-[10px] text-neutral-400 dark:text-neutral-500 capitalize">{role}</div>
                     </div>
-                    <div className="text-[10px] text-neutral-400 capitalize">{role}</div>
-                  </div>
-                  <ChevronDown
-                    className={cn(
-                      'w-3.5 h-3.5 text-neutral-400 transition-transform duration-fast',
-                      userMenuOpen && 'rotate-180'
-                    )}
-                  />
-                </button>
+                    <ChevronDown
+                      className={cn(
+                        'w-3.5 h-3.5 text-neutral-400 dark:text-neutral-500 transition-transform duration-fast',
+                        userMenuOpen && 'rotate-180'
+                      )}
+                    />
+                  </button>
 
-                {/* User dropdown */}
-                {userMenuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-52 bg-white/90 backdrop-blur-xl rounded-xl shadow-lg border border-neutral-200 py-1 z-50">
-                    <div className="px-4 py-3 border-b border-neutral-100">
-                      <div className="text-sm font-semibold text-neutral-800 truncate">{displayName}</div>
-                      <div className="text-xs text-neutral-400 capitalize mt-0.5">{role}</div>
-                    </div>
-                    <button
-                      onClick={() => { setUserMenuOpen(false); setProfileOpen(true) }}
-                      className="w-full text-left px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50 flex items-center gap-2.5 transition-colors duration-fast rounded-md"
-                    >
-                      <User className="w-4 h-4 text-neutral-500" />
-                      My Profile
-                    </button>
-                    <div className="border-t border-neutral-100 mt-1 pt-1">
+                  {userMenuOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-[#0f1a14] rounded-xl shadow-xl border border-neutral-200 dark:border-[#1a2e23] p-1.5 z-50 text-sm">
+                      <div className="px-3 py-2.5 border-b border-neutral-100 dark:border-[#1a2e23] mb-1">
+                        <div className="font-semibold text-neutral-800 dark:text-neutral-100 truncate">{displayName}</div>
+                        <div className="text-xs text-neutral-400 dark:text-neutral-500 capitalize mt-0.5">{role} Account</div>
+                      </div>
                       <button
-                        onClick={handleSignOut}
-                        className="w-full text-left px-4 py-2.5 text-sm text-error hover:bg-error-light flex items-center gap-2.5 transition-colors duration-fast rounded-md"
+                        onClick={() => { setUserMenuOpen(false); navigate('/dashboard') }}
+                        className="w-full text-left px-3 py-2 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-[#14221b] flex items-center gap-2.5 transition-colors rounded-lg"
                       >
-                        <LogOut className="w-4 h-4" />
-                        Sign Out
+                        <span className="w-4 h-4 flex items-center justify-center font-bold text-xs text-primary-600 dark:text-emerald-400">📊</span>
+                        Dashboard
                       </button>
+                      <button
+                        onClick={() => { setUserMenuOpen(false); setProfileOpen(true) }}
+                        className="w-full text-left px-3 py-2 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-[#14221b] flex items-center gap-2.5 transition-colors rounded-lg"
+                      >
+                        <User className="w-4 h-4 text-neutral-500" />
+                        My Profile
+                      </button>
+                      <div className="border-t border-neutral-100 dark:border-[#1a2e23] mt-1 pt-1">
+                        <button
+                          onClick={handleSignOut}
+                          className="w-full text-left px-3 py-2 text-error dark:text-red-400 hover:bg-error-light dark:hover:bg-red-950/40 flex items-center gap-2.5 transition-colors rounded-lg"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          Sign Out
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              </>
             )}
 
-            {/* Hamburger — visible below md (768px) */}
+            {/* Hamburger */}
             <button
               onClick={() => setMobileOpen((o) => !o)}
-              className="md:hidden p-2 rounded-lg transition-colors duration-[175ms] hover:bg-neutral-100"
+              className="md:hidden p-2 rounded-xl transition-colors hover:bg-neutral-100 dark:hover:bg-[#14221b] text-neutral-700 dark:text-neutral-200"
               aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
             >
               {mobileOpen ? (
-                <X className="w-5 h-5 text-neutral-600" />
+                <X className="w-5 h-5" />
               ) : (
-                <Menu className="w-5 h-5 text-neutral-600" />
+                <Menu className="w-5 h-5" />
               )}
             </button>
           </div>
         </div>
 
-        {/* Mobile drawer — slide-down animation 200–300ms */}
+        {/* Mobile drawer */}
         <div
           className={cn(
-            'md:hidden absolute top-16 left-0 right-0 border-b border-gray-200 bg-white/95 backdrop-blur-xl overflow-hidden transition-all duration-[250ms] ease-out',
+            'md:hidden absolute top-16 left-0 right-0 border-b border-neutral-200 dark:border-[#1a2e23] bg-white/95 dark:bg-[#0c1410]/95 backdrop-blur-xl overflow-hidden transition-all duration-[250ms] ease-out shadow-xl',
             mobileOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
           )}
         >
@@ -313,10 +323,10 @@ export default function PublicTopNav() {
                 key={link.label}
                 onClick={() => handleLinkClick(link)}
                 className={cn(
-                  'block w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-fast',
+                  'block w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-colors',
                   isActive(link.href)
-                    ? 'bg-primary-50 text-primary-500 border-l-2 border-primary-500'
-                    : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-800'
+                    ? 'text-primary-600 dark:text-emerald-400 bg-primary-50 dark:bg-primary-950/50 font-semibold'
+                    : 'text-neutral-700 dark:text-neutral-200 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-[#14221b]'
                 )}
               >
                 {link.label}

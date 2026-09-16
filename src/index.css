@@ -12,16 +12,162 @@
 }
 
 @layer base {
-  html,
-  body {
-    @apply font-sans bg-neutral-50 text-neutral-900 antialiased;
+  :root {
+    --color-primary: #2d8659;
+    --color-primary-hover: #206f47;
+    --color-primary-active: #18593a;
+    --color-primary-light: #f0faf5;
+    --color-primary-subtle: #d9f2e6;
+    --color-primary-border: #aee0c9;
+    --color-primary-foreground: #ffffff;
+
+    --color-secondary: #4b5563;
+    --color-secondary-hover: #374151;
+    --color-secondary-light: #f1f3f6;
+    --color-secondary-foreground: #ffffff;
+
+    --color-background: #f8f9fb;
+    --color-background-subtle: #f1f3f6;
+    --color-surface: #ffffff;
+    --color-surface-elevated: #ffffff;
+    --color-surface-hover: #f8f9fb;
+    --color-surface-subtle: #f9fafb;
+
+    --color-border: #e2e5eb;
+    --color-border-subtle: #f1f3f6;
+    --color-border-strong: #cfd3da;
+    --color-border-focus: #2d8659;
+
+    --color-text: #111826;
+    --color-text-secondary: #4b5563;
+    --color-text-muted: #6b7280;
+    --color-text-subtle: #9ba2b0;
+    --color-text-inverse: #ffffff;
+
+    --color-input-bg: #ffffff;
+    --color-input-border: #e2e5eb;
+    --color-input-text: #111826;
+    --color-input-placeholder: #9ba2b0;
+
+    --color-success: #10b981;
+    --color-success-light: #ecfdf5;
+    --color-success-border: #a7f3d0;
+    --color-success-foreground: #065f46;
+
+    --color-warning: #f59e0b;
+    --color-warning-light: #fffbeb;
+    --color-warning-border: #fde68a;
+    --color-warning-foreground: #92400e;
+
+    --color-danger: #ef4444;
+    --color-danger-light: #fef2f2;
+    --color-danger-border: #fecaca;
+    --color-danger-foreground: #991b1b;
+
+    --color-info: #3b82f6;
+    --color-info-light: #eff6ff;
+    --color-info-border: #bfdbfe;
+    --color-info-foreground: #1e40af;
+
+    --color-overlay: rgba(0, 0, 0, 0.5);
+    --color-overlay-subtle: rgba(0, 0, 0, 0.25);
+    --color-overlay-strong: rgba(0, 0, 0, 0.75);
   }
 
-  /* Global focus-visible indicator for all interactive elements.
-     Components with their own focus-visible styles (Button, Card, Input)
-     override this via specificity from their utility classes. */
+  .dark {
+    --color-primary: #38b273;
+    --color-primary-hover: #47c785;
+    --color-primary-active: #65d99b;
+    --color-primary-light: #0d2418;
+    --color-primary-subtle: #091c13;
+    --color-primary-border: #1c4a33;
+    --color-primary-foreground: #04140c;
+
+    --color-secondary: #94a3b8;
+    --color-secondary-hover: #cbd5e1;
+    --color-secondary-light: #14221b;
+    --color-secondary-foreground: #ffffff;
+
+    --color-background: #070d0a;
+    --color-background-subtle: #0c1410;
+    --color-surface: #0f1a14;
+    --color-surface-elevated: #14221b;
+    --color-surface-hover: #182b22;
+    --color-surface-subtle: #0a120e;
+
+    --color-border: #1a2e23;
+    --color-border-subtle: #132219;
+    --color-border-strong: #254433;
+    --color-border-focus: #38b273;
+
+    --color-text: #f8f9fb;
+    --color-text-secondary: #cfd3da;
+    --color-text-muted: #9ba2b0;
+    --color-text-subtle: #6b7280;
+    --color-text-inverse: #111826;
+
+    --color-input-bg: #0f1a14;
+    --color-input-border: #1a2e23;
+    --color-input-text: #f8f9fb;
+    --color-input-placeholder: #6b7280;
+
+    --color-success: #34d399;
+    --color-success-light: #064e3b;
+    --color-success-border: #065f46;
+    --color-success-foreground: #a7f3d0;
+
+    --color-warning: #fbbf24;
+    --color-warning-light: #78350f;
+    --color-warning-border: #92400e;
+    --color-warning-foreground: #fde68a;
+
+    --color-danger: #f87171;
+    --color-danger-light: #7f1d1d;
+    --color-danger-border: #991b1b;
+    --color-danger-foreground: #fecaca;
+
+    --color-info: #60a5fa;
+    --color-info-light: #1e3a8a;
+    --color-info-border: #1e40af;
+    --color-info-foreground: #bfdbfe;
+
+    --color-overlay: rgba(0, 0, 0, 0.75);
+    --color-overlay-subtle: rgba(0, 0, 0, 0.5);
+    --color-overlay-strong: rgba(0, 0, 0, 0.9);
+  }
+
+  html,
+  body {
+    @apply font-sans bg-neutral-50 dark:bg-[#070d0a] text-neutral-900 dark:text-neutral-100 antialiased transition-colors duration-200;
+  }
+
+  /* When Urdu is selected as the active app language */
+  html[lang="ur"] body,
+  html.font-urdu-mode body {
+    font-family: 'Jameel Noori Nastaleeq', 'Inter', serif;
+  }
+
+  /* Global focus-visible indicator for interactive elements */
   :focus-visible {
     @apply outline-none ring-2 ring-primary-500 ring-offset-2;
+  }
+
+  /* Custom subtle scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-neutral-300 dark:bg-neutral-700 rounded-full;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-neutral-400 dark:bg-neutral-600;
   }
 }
 
@@ -63,8 +209,7 @@
   line-height: 2.4;
 }
 
-/* Published answer typography. Classification is added only to the rendered,
-   sanitized DOM; stored answer HTML is never changed. */
+/* Published answer typography */
 .fatwa-answer-content {
   max-width: 720px;
   overflow-wrap: anywhere;
@@ -123,12 +268,24 @@
   text-align: center;
 }
 
+.dark .fatwa-answer-quran {
+  color: #a7f3d0;
+  background: linear-gradient(90deg, rgba(6, 78, 59, 0.35), #064e3b, rgba(6, 78, 59, 0.35));
+  border-block: 1px solid #065f46;
+}
+
 .fatwa-answer-hadith {
   color: #374151;
   background: #f9fafb;
   border-inline-start: 4px solid #16a34a;
   border-radius: 0.375rem;
   padding: 0.9rem 1.1rem;
+}
+
+.dark .fatwa-answer-hadith {
+  color: #cfd3da;
+  background: #0f1a14;
+  border-inline-start: 4px solid #38b273;
 }
 
 .fatwa-answer-urdu {

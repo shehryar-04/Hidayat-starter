@@ -234,19 +234,19 @@ export default function CategoryPage() {
         <BreadcrumbNav items={breadcrumbItems} />
 
         {/* Category heading */}
-        <header className="mb-8">
+        <header className="mb-8 bg-white dark:bg-[#0f1a14] border border-neutral-200/80 dark:border-[#1a2e23] rounded-2xl p-6 shadow-xs">
           <h1
-            className={`text-2xl sm:text-3xl font-bold text-gray-900 mb-2 ${detectDirection(currentCategoryName) === 'rtl' ? 'font-urdu text-right' : ''}`}
+            className={`text-2xl sm:text-3xl font-display font-bold text-neutral-900 dark:text-white mb-2 ${detectDirection(currentCategoryName) === 'rtl' ? 'font-urdu text-right' : ''}`}
             dir={detectDirection(currentCategoryName) === 'rtl' ? 'rtl' : undefined}
           >
             {currentCategoryName || 'Category'}
           </h1>
           {isLeaf ? (
-            <p className="text-gray-500 text-sm">
+            <p className="text-neutral-500 dark:text-neutral-400 text-sm">
               {categoryLoading ? 'Loading fatwas...' : `${fatwas.length} ${fatwas.length === 1 ? 'fatwa' : 'fatwas'}`}
             </p>
           ) : (
-            <p className="text-gray-500 text-sm">
+            <p className="text-neutral-500 dark:text-neutral-400 text-sm">
               {childCategories.length} {childCategories.length === 1 ? 'subcategory' : 'subcategories'}
             </p>
           )}
@@ -254,27 +254,27 @@ export default function CategoryPage() {
 
         {/* Subcategories (when not a leaf) */}
         {!isLeaf && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {childCategories.map((child) => {
               const isChildRtl = detectDirection(child.name) === 'rtl'
               return (
                 <Link
                   key={child.slug}
                   to={child.url}
-                  className="group block bg-white rounded-xl border border-gray-200 shadow-sm p-6 hover:shadow-lg hover:border-green-300 hover:scale-[1.02] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
+                  className="group block bg-white dark:bg-[#0f1a14] rounded-2xl border border-neutral-200/80 dark:border-[#1a2e23] shadow-xs p-5 hover:shadow-xl hover:border-emerald-500/40 dark:hover:border-emerald-500/40 hover:-translate-y-0.5 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
                 >
                   <h3
-                    className={`text-base font-semibold text-gray-800 mb-2 group-hover:text-green-700 transition-colors ${isChildRtl ? 'font-urdu text-right' : ''}`}
+                    className={`text-base font-display font-bold text-neutral-900 dark:text-neutral-100 mb-2 group-hover:text-primary-600 dark:group-hover:text-emerald-400 transition-colors ${isChildRtl ? 'font-urdu text-right' : ''}`}
                     dir={isChildRtl ? 'rtl' : undefined}
                   >
                     {child.name}
                   </h3>
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm text-gray-500">
+                  <div className="flex items-center justify-between pt-2 border-t border-neutral-100 dark:border-[#1a2e23]">
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400 font-mono">
                       {child.count.toLocaleString()} {child.count === 1 ? 'fatwa' : 'fatwas'}
                     </p>
                     {child.hasChildren && (
-                      <span className="text-xs text-gray-400">Has subcategories</span>
+                      <span className="text-[11px] font-medium text-primary-600 dark:text-emerald-400">View subcategories →</span>
                     )}
                   </div>
                 </Link>

@@ -1,13 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { Upload, FileText, CheckCircle, XCircle, Loader2, Play, AlertTriangle } from 'lucide-react'
 import { supabase } from '../../../lib/supabase'
-import { Button, Badge, Spinner, Card, CardContent, EmptyState, PageWrapper, PageHeader } from '../../../shared/ui'
+import { Button, Badge, Spinner, Card, CardContent, EmptyState, PageWrapper, PageHeader, ConfirmDialog, useToast } from '../../../shared/ui'
 
 /**
  * BulkImport — Admin tool for importing fatwas from CSV/JSON.
  * Pipeline: Upload → Parse → Stage → Validate → Publish
  */
 export default function BulkImport() {
+  const { toast } = useToast()
   const [batches, setBatches] = useState([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
@@ -15,6 +16,7 @@ export default function BulkImport() {
   const [publishing, setPublishing] = useState(null)
   const [stagedRows, setStagedRows] = useState([])
   const [selectedBatch, setSelectedBatch] = useState(null)
+  const [publishConfirmBatchId, setPublishConfirmBatchId] = useState(null)
   const fileInputRef = useRef(null)
 
   const loadBatches = useCallback(async () => {
@@ -90,7 +92,7 @@ export default function BulkImport() {
       }
 
       if (rows.length === 0) {
-        alert('No valid rows found in file.')
+        toast.error('Import Failed', 'No valid rows found in file.')
         setUploading(false)
         return
       }
@@ -129,10 +131,11 @@ export default function BulkImport() {
         await supabase.from('import_staged_fatwas').insert(chunk)
       }
 
+      toast.success('File Imported', `Successfully staged ${rows.length} rows for validation.`)
       loadBatches()
     } catch (err) {
       console.error('Import error:', err)
-      alert('Failed to import file. Check the format and try again.')
+      toast.error('Import Failed', 'Failed to import file. Check the format and try again.')
     } finally {
       setUploading(false)
       if (fileInputRef.current) fileInputRef.current.value = ''
@@ -148,9 +151,10 @@ export default function BulkImport() {
     if (selectedBatch === batchId) loadStagedRows(batchId)
   }
 
-  const handlePublish = async (batchId) => {
-    if (!confirm('Publish all valid rows in this batch? This will create new fatwa entries.')) return
-
+  const confirmPublish = async () => {
+    if (!publishConfirmBatchId) return
+    const batchId = publishConfirmBatchId
+    setPublishConfirmBatchId(null)
     setPublishing(batchId)
 
     // Get valid rows
@@ -162,7 +166,6 @@ export default function BulkImport() {
       .eq('is_published', false)
 
     if (!validRows || validRows.length === 0) {
-      alert('No valid unpublished rows to publish.')
       setPublishing(null)
       return
     }
@@ -304,7 +307,7 @@ export default function BulkImport() {
                       <Button
                         size="sm"
                         disabled={publishing === batch.id}
-                        onClick={() => handlePublish(batch.id)}
+                        onClick={() => setPublishConfirmBatchId(batch.id)}
                       >
                         {publishing === batch.id ? <Loader2 size={14} className="animate-spin mr-1" /> : <Play size={14} className="mr-1" />}
                         Publish ({batch.valid_rows})
@@ -366,6 +369,17 @@ export default function BulkImport() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!publishConfirmBatchId}
+        onClose={() => setPublishConfirmBatchId(null)}
+        onConfirm={confirmPublish}
+        loading={!!publishing}
+        title="Publish Staged Batch"
+        message="Publish all valid rows in this batch? This will create new live fatwa entries."
+        confirmText="Publish Batch"
+        variant="primary"
+      />
     </PageWrapper>
   )
 }

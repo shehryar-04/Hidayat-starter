@@ -4,31 +4,20 @@ import { detectDirection } from '../utils/rtlDetection'
 
 /**
  * Sanitize a server-generated snippet so only <mark> tags survive.
- * Everything else is escaped to plain text. Defense-in-depth against
- * any HTML that might slip through ts_headline.
- *
- * @param {string} raw
- * @returns {string} HTML-safe string containing only <mark> markup
  */
 function sanitizeSnippet(raw) {
   if (!raw || typeof raw !== 'string') return ''
-  // 1. Escape ALL HTML special characters
   const escaped = raw
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;')
-  // 2. Re-enable ONLY the <mark> tags that the server inserted
   return escaped
-    .replace(/&lt;mark&gt;/g, '<mark>')
+    .replace(/&lt;mark&gt;/g, '<mark class="bg-emerald-100 dark:bg-emerald-950/80 text-emerald-900 dark:text-emerald-300 font-semibold px-1 rounded">')
     .replace(/&lt;\/mark&gt;/g, '</mark>')
 }
 
-/**
- * EnterpriseSearchResults — Displays search results with highlighted snippets,
- * category paths, relevance indicators, and click tracking.
- */
 export default function EnterpriseSearchResults({
   results = [],
   query = '',
@@ -44,9 +33,9 @@ export default function EnterpriseSearchResults({
 
   if (error) {
     return (
-      <div className="text-center py-12 px-4" role="alert">
-        <div className="text-red-500 mb-2">⚠️</div>
-        <p className="text-sm text-red-600">{error}</p>
+      <div className="text-center py-12 px-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50" role="alert">
+        <div className="text-red-500 mb-2 text-xl">⚠️</div>
+        <p className="text-sm text-red-600 dark:text-red-300">{error}</p>
       </div>
     )
   }
@@ -55,10 +44,10 @@ export default function EnterpriseSearchResults({
     return (
       <div className="space-y-4" aria-busy="true" aria-label="Loading search results">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="bg-white rounded-xl border border-gray-200 p-5 animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-3/4 mb-3" />
-            <div className="h-3 bg-gray-100 rounded w-full mb-2" />
-            <div className="h-3 bg-gray-100 rounded w-2/3" />
+          <div key={i} className="bg-white dark:bg-[#0f1a14] rounded-2xl border border-neutral-200/80 dark:border-[#1a2e23] p-5 animate-pulse">
+            <div className="h-5 bg-neutral-200 dark:bg-neutral-800 rounded w-3/4 mb-3" />
+            <div className="h-3.5 bg-neutral-100 dark:bg-neutral-800/60 rounded w-full mb-2" />
+            <div className="h-3.5 bg-neutral-100 dark:bg-neutral-800/40 rounded w-2/3" />
           </div>
         ))}
       </div>
@@ -67,16 +56,16 @@ export default function EnterpriseSearchResults({
 
   if (query && results.length === 0) {
     return (
-      <div className="text-center py-16 px-4">
+      <div className="text-center py-16 px-4 bg-white dark:bg-[#0f1a14] rounded-2xl border border-neutral-200/80 dark:border-[#1a2e23]">
         <div className="text-4xl mb-4">🔍</div>
-        <h2 className="text-lg font-semibold text-gray-700 mb-2">No results found</h2>
-        <p className="text-sm text-gray-600 mb-6 max-w-md mx-auto">
-          We couldn't find any fatwas matching "{query}". Try different keywords or check the spelling.
+        <h2 className="text-lg font-display font-bold text-neutral-800 dark:text-neutral-100 mb-2">No fatwas found</h2>
+        <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-6 max-w-md mx-auto">
+          We couldn't find any fatwas matching "{query}". Try searching with alternate keywords or category filters.
         </p>
-        <div className="space-y-2 text-sm text-gray-500">
+        <div className="space-y-1.5 text-xs text-neutral-400">
           <p>• Use broader or more general terms</p>
-          <p>• Try searching in Urdu or Arabic</p>
-          <p>• Check for spelling mistakes</p>
+          <p>• Try searching in Urdu or Arabic script</p>
+          <p>• Check for spelling variations</p>
         </div>
       </div>
     )
@@ -91,8 +80,8 @@ export default function EnterpriseSearchResults({
   return (
     <div>
       {/* Results count */}
-      <p className="text-sm text-gray-600 mb-4">
-        {total.toLocaleString()} result{total !== 1 ? 's' : ''} found
+      <p className="text-xs sm:text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-4">
+        {total.toLocaleString()} fatwa result{total !== 1 ? 's' : ''} found
       </p>
 
       {/* Results list */}
@@ -107,11 +96,11 @@ export default function EnterpriseSearchResults({
               to={result.slug ? `${basePath}/${result.slug}` : `${basePath}/id/${result.id}`}
               state={{ fromSearch: true, searchQuery: query }}
               onClick={() => onResultClick?.(result.id, position)}
-              className="block bg-white rounded-xl border border-gray-200 shadow-sm p-5 hover:shadow-md hover:border-green-300 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
+              className="block bg-white dark:bg-[#0f1a14] rounded-2xl border border-neutral-200/80 dark:border-[#1a2e23] shadow-xs p-5 hover:shadow-xl hover:border-emerald-500/40 dark:hover:border-emerald-500/40 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
             >
               {/* Title */}
               <h3
-                className={`text-base font-semibold text-gray-900 mb-2 leading-relaxed ${titleRtl ? 'text-right font-urdu' : ''}`}
+                className={`text-base font-display font-bold text-neutral-900 dark:text-neutral-100 mb-2 leading-relaxed hover:text-primary-600 dark:hover:text-emerald-400 transition-colors ${titleRtl ? 'text-right font-urdu' : ''}`}
                 dir={titleRtl ? 'rtl' : undefined}
               >
                 {result.title}
@@ -120,7 +109,7 @@ export default function EnterpriseSearchResults({
               {/* Snippet: Question */}
               {result.snippet_question && (
                 <p
-                  className="text-sm text-gray-600 mb-2 line-clamp-2 leading-relaxed"
+                  className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 mb-2 line-clamp-2 leading-relaxed"
                   dir={detectDirection(result.snippet_question) === 'rtl' ? 'rtl' : undefined}
                   dangerouslySetInnerHTML={{ __html: sanitizeSnippet(result.snippet_question) }}
                 />
@@ -129,31 +118,31 @@ export default function EnterpriseSearchResults({
               {/* Snippet: Answer */}
               {result.snippet_answer && (
                 <p
-                  className="text-sm text-gray-500 mb-3 line-clamp-2 leading-relaxed"
+                  className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mb-3 line-clamp-2 leading-relaxed"
                   dir={detectDirection(result.snippet_answer) === 'rtl' ? 'rtl' : undefined}
                   dangerouslySetInnerHTML={{ __html: sanitizeSnippet(result.snippet_answer) }}
                 />
               )}
 
               {/* Metadata row */}
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-2 flex-wrap pt-2 border-t border-neutral-100 dark:border-[#1a2e23]">
                 {result.category_1 && (
-                  <span className={`inline-block text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-50 text-green-700 ${detectDirection(result.category_1) === 'rtl' ? 'font-urdu' : ''}`}>
+                  <span className={`inline-block text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200/50 dark:border-emerald-800/40 ${detectDirection(result.category_1) === 'rtl' ? 'font-urdu' : ''}`}>
                     {result.category_1}
                   </span>
                 )}
                 {result.category_2 && (
-                  <span className={`inline-block text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-50/60 text-green-600 ${detectDirection(result.category_2) === 'rtl' ? 'font-urdu' : ''}`}>
+                  <span className={`inline-block text-[10px] font-medium px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-[#14221b] text-neutral-600 dark:text-neutral-300 border border-neutral-200/60 dark:border-[#1a2e23] ${detectDirection(result.category_2) === 'rtl' ? 'font-urdu' : ''}`}>
                     {result.category_2}
                   </span>
                 )}
                 {result.dar_ul_ifta && (
-                  <span className="inline-block text-[10px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
+                  <span className="inline-block text-[10px] font-medium px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-[#14221b] text-neutral-500 dark:text-neutral-400">
                     {result.dar_ul_ifta}
                   </span>
                 )}
                 {result.combined_score != null && result.combined_score > 0 && (
-                  <span className="text-[10px] text-gray-400 ml-auto">
+                  <span className="text-[10px] text-neutral-400 ml-auto font-mono">
                     {result.combined_score >= 0.66 ? 'Strong match' : result.combined_score >= 0.33 ? 'Good match' : 'Related'}
                   </span>
                 )}

@@ -6,6 +6,7 @@ export function StudentSearch({ onSelectStudent }) {
   const [searchParams, setSearchParams] = useState({ name: '', enrollmentNumber: '', program: '', level: '', status: 'active' })
   const [results, setResults] = useState([])
   const [loading, setLoading] = useState(false)
+  const [searched, setSearched] = useState(false)
   const [levels, setLevels] = useState([])
   const programs = ['dars-e-nizami', 'hifz', 'nazra', 'short-courses']
 
@@ -21,7 +22,7 @@ export function StudentSearch({ onSelectStudent }) {
       let query = supabase.from('students').select('id, enrollment_number, profile_id, status, enrollment_date')
       if (searchParams.enrollmentNumber) query = query.ilike('enrollment_number', `${searchParams.enrollmentNumber}%`)
       if (searchParams.status) query = query.eq('status', searchParams.status)
-      const { data: students, error } = await query.limit(100)
+      const { data: students, error } = typeof query.limit === 'function' ? await query.limit(100) : await query
       if (error) throw error
       if (students?.length > 0) {
         const profileIds = students.map(s => s.profile_id).filter(Boolean)
@@ -30,20 +31,25 @@ export function StudentSearch({ onSelectStudent }) {
         let filtered = students.map(s => ({ ...s, full_name: profileMap[s.profile_id] || 'Unknown' }))
         if (searchParams.name) filtered = filtered.filter(s => s.full_name.toLowerCase().includes(searchParams.name.toLowerCase()))
         setResults(filtered)
-      } else setResults([])
-    } catch (err) { console.error(err); setResults([]) }
-    finally { setLoading(false) }
+      } else {
+        setResults([])
+      }
+      setSearched(true)
+    } catch (err) {
+      console.error(err)
+      setResults([])
+      setSearched(true)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const set = (key, val) => setSearchParams(p => ({ ...p, [key]: val }))
 
   return (
-    <div className="max-w-[1280px] mx-auto px-4 py-6 md:px-6 md:py-8">
-      <div className="page-header">
-        <h1 className="page-title">Search Students</h1>
-      </div>
-
-      <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6 mb-6">
+    <div className="space-y-6">
+      <div className="bg-white dark:bg-[#0f1a14] border border-neutral-200/90 dark:border-[#1a2e23] rounded-2xl shadow-xs p-6">
+        <h2 className="text-xl font-display font-bold text-neutral-900 dark:text-white mb-4">Search Students</h2>
         <form onSubmit={handleSearch}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div className="space-y-2">
@@ -55,24 +61,24 @@ export function StudentSearch({ onSelectStudent }) {
               <Input type="text" value={searchParams.enrollmentNumber} onChange={e => set('enrollmentNumber', e.target.value)} placeholder="Search by enrollment number…" />
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
             <div className="space-y-2">
               <Label>Program</Label>
-              <select className="h-10 w-full rounded-lg border border-neutral-200 px-3 text-sm shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500" value={searchParams.program} onChange={e => set('program', e.target.value)}>
+              <select className="h-10 w-full rounded-xl border border-neutral-200/90 dark:border-[#1a2e23] bg-white dark:bg-[#0f1a14] text-neutral-900 dark:text-neutral-100 px-3 text-sm transition-all outline-none focus:ring-2 focus:ring-primary-500" value={searchParams.program} onChange={e => set('program', e.target.value)}>
                 <option value="">All Programs</option>
                 {programs.map(p => <option key={p} value={p}>{p}</option>)}
               </select>
             </div>
             <div className="space-y-2">
               <Label>Academic Level</Label>
-              <select className="h-10 w-full rounded-lg border border-neutral-200 px-3 text-sm shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500" value={searchParams.level} onChange={e => set('level', e.target.value)}>
+              <select className="h-10 w-full rounded-xl border border-neutral-200/90 dark:border-[#1a2e23] bg-white dark:bg-[#0f1a14] text-neutral-900 dark:text-neutral-100 px-3 text-sm transition-all outline-none focus:ring-2 focus:ring-primary-500" value={searchParams.level} onChange={e => set('level', e.target.value)}>
                 <option value="">All Levels</option>
                 {levels.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
               </select>
             </div>
             <div className="space-y-2">
               <Label>Status</Label>
-              <select className="h-10 w-full rounded-lg border border-neutral-200 px-3 text-sm shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500" value={searchParams.status} onChange={e => set('status', e.target.value)}>
+              <select className="h-10 w-full rounded-xl border border-neutral-200/90 dark:border-[#1a2e23] bg-white dark:bg-[#0f1a14] text-neutral-900 dark:text-neutral-100 px-3 text-sm transition-all outline-none focus:ring-2 focus:ring-primary-500" value={searchParams.status} onChange={e => set('status', e.target.value)}>
                 <option value="">All Statuses</option>
                 <option value="active">Active</option>
                 <option value="suspended">Suspended</option>
@@ -85,24 +91,42 @@ export function StudentSearch({ onSelectStudent }) {
         </form>
       </div>
 
+      {searched && results.length === 0 && (
+        <div className="bg-white dark:bg-[#0f1a14] border border-neutral-200/90 dark:border-[#1a2e23] rounded-2xl shadow-xs p-12 text-center text-neutral-400">
+          <p className="text-sm">No students found matching your criteria.</p>
+        </div>
+      )}
+
       {results.length > 0 && (
-        <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-6">
-          <h3 className="text-base font-semibold text-gray-700 mb-4">Results ({results.length})</h3>
-          <div className="table-container">
-            <table className="table">
-              <thead><tr><th>Name</th><th>Enrollment #</th><th>Status</th><th>Enrolled</th><th></th></tr></thead>
-              <tbody>
+        <div className="bg-white dark:bg-[#0f1a14] border border-neutral-200/90 dark:border-[#1a2e23] rounded-2xl shadow-xs p-6">
+          <h3 className="text-base font-display font-bold text-neutral-800 dark:text-neutral-200 mb-4">Results ({results.length})</h3>
+          <div className="overflow-x-auto custom-scrollbar">
+            <table className="w-full text-sm">
+              <thead className="border-b border-neutral-200/80 dark:border-[#1a2e23] bg-neutral-50/60 dark:bg-[#14221b]">
+                <tr>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400">Name</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400">Enrollment #</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400">Status</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400">Enrolled</th>
+                  <th className="px-4 py-2.5 text-right"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-neutral-100 dark:divide-[#1a2e23]">
                 {results.map(s => (
-                  <tr key={s.id}>
-                    <td className="font-medium">{s.full_name}</td>
-                    <td className="text-gray-500">{s.enrollment_number}</td>
-                    <td>
+                  <tr key={s.id} className="hover:bg-neutral-50 dark:hover:bg-[#14221b]/60 transition-colors">
+                    <td className="px-4 py-3 font-medium text-neutral-900 dark:text-neutral-100">{s.full_name}</td>
+                    <td className="px-4 py-3 text-neutral-500 dark:text-neutral-400 font-mono">{s.enrollment_number}</td>
+                    <td className="px-4 py-3">
                       {s.status === 'active' ? <Badge variant="success">{s.status}</Badge> :
-                       s.status === 'suspended' ? <Badge variant="error">{s.status}</Badge> :
-                       <Badge variant="default">{s.status}</Badge>}
+                       s.status === 'suspended' ? <Badge variant="warning">{s.status}</Badge> :
+                       <Badge variant="secondary">{s.status}</Badge>}
                     </td>
-                    <td className="text-gray-500">{s.enrollment_date ? new Date(s.enrollment_date).toLocaleDateString() : '—'}</td>
-                    <td><Button variant="outline" size="sm" onClick={() => onSelectStudent(s)} className="text-xs py-1 px-3">View / Edit</Button></td>
+                    <td className="px-4 py-3 text-neutral-500 dark:text-neutral-400 text-xs">{s.enrollment_date ? new Date(s.enrollment_date).toLocaleDateString() : '—'}</td>
+                    <td className="px-4 py-3 text-right">
+                      {onSelectStudent && (
+                        <Button size="sm" variant="outline" onClick={() => onSelectStudent(s.id)}>View Profile</Button>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -110,10 +134,8 @@ export function StudentSearch({ onSelectStudent }) {
           </div>
         </div>
       )}
-
-      {!loading && results.length === 0 && searchParams.enrollmentNumber && (
-        <div className="text-center py-10 text-gray-400 text-sm">No students found matching your criteria.</div>
-      )}
     </div>
   )
 }
+
+export default StudentSearch
