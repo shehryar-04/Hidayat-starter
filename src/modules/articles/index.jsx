@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { useRole } from '../../app/RoleProvider'
 import ReactQuill from 'react-quill'
 import 'react-quill/dist/quill.snow.css'
+import DOMPurify from 'dompurify'
 import { Search, Plus, ArrowLeft, Image, CloudUpload, FileText, Download, User } from 'lucide-react'
 import { Button, Input, Textarea, Label, EmptyState, Spinner, buttonVariants, CourseGridSkeleton } from '../../shared/ui'
 import SEOHead from '../fatwa-platform/components/SEOHead'
@@ -468,7 +469,7 @@ function ArticleDetail({ article, onBack }) {
         </div>
 
         <div className="mt-8 prose prose-slate prose-headings:font-serif prose-headings:text-primary prose-strong:text-gray-800 max-w-none article-content"
-          dangerouslySetInnerHTML={{ __html: article.content || article.excerpt || '<p>No content available.</p>' }} />
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content || article.excerpt || '<p>No content available.</p>') }} />
 
         {article.file_url && (
           <div className="mt-10 p-6 bg-white rounded-xl border border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-4">
