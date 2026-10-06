@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Menu, X, ChevronDown, User, LogOut } from 'lucide-react'
+import { Menu, X, ChevronDown, User, LogOut, ShieldCheck, GraduationCap } from 'lucide-react'
 import { useRole } from './RoleProvider'
 import { useProfile } from './useProfile'
 import Logo from './Logo'
@@ -57,7 +57,7 @@ function NavItem({ to, onClick, children, isActive }) {
 export default function PublicTopNav() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { role, signOut } = useRole()
+  const { role, signOut, switchRole, isTestingMode } = useRole()
   const { profile, avatarUrl } = useProfile()
 
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -261,11 +261,91 @@ export default function PublicTopNav() {
                   </button>
 
                   {userMenuOpen && (
-                    <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-[#0f1a14] rounded-xl shadow-xl border border-neutral-200 dark:border-[#1a2e23] p-1.5 z-50 text-sm">
-                      <div className="px-3 py-2.5 border-b border-neutral-100 dark:border-[#1a2e23] mb-1">
+                    <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-[#0f1a14] rounded-2xl shadow-xl border border-neutral-200 dark:border-[#1a2e23] p-2 z-50 text-sm animate-in fade-in zoom-in-95 duration-100">
+                      <div className="px-3 py-2 border-b border-neutral-100 dark:border-[#1a2e23] mb-1.5">
                         <div className="font-semibold text-neutral-800 dark:text-neutral-100 truncate">{displayName}</div>
-                        <div className="text-xs text-neutral-400 dark:text-neutral-500 capitalize mt-0.5">{role} Account</div>
+                        <div className="flex items-center justify-between mt-1">
+                          <span className={cn(
+                            "text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full inline-block",
+                            role === 'student'
+                              ? "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
+                              : "bg-primary-100 dark:bg-primary-950/60 text-primary-800 dark:text-primary-300 border border-primary-200 dark:border-primary-800"
+                          )}>
+                            {role} Account
+                          </span>
+                          <span className="text-[10px] text-neutral-400 font-medium">Testing Mode</span>
+                        </div>
                       </div>
+
+                      {/* Role Switcher Box (Testing Mode) */}
+                      {isTestingMode && (
+                        <div className="p-2.5 mx-1 mb-2 bg-neutral-50 dark:bg-[#14221b] border border-neutral-200/70 dark:border-[#1a2e23] rounded-xl">
+                          <div className="text-[11px] font-semibold text-neutral-600 dark:text-neutral-300 mb-2 flex items-center justify-between">
+                            <span>Switch Role</span>
+                            <span className="text-[10px] text-neutral-400 font-normal">Test views</span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-1.5 bg-neutral-200/60 dark:bg-[#0c1410] p-1 rounded-lg">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                switchRole('admin')
+                                setUserMenuOpen(false)
+                              }}
+                              className={cn(
+                                'flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md text-xs font-semibold transition-all cursor-pointer',
+                                role === 'admin'
+                                  ? 'bg-white dark:bg-primary-600 text-neutral-900 dark:text-white shadow-xs'
+                                  : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+                              )}
+                            >
+                              <ShieldCheck className="w-3.5 h-3.5 text-primary-600 dark:text-emerald-400" />
+                              <span>Admin</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                switchRole('student')
+                                setUserMenuOpen(false)
+                              }}
+                              className={cn(
+                                'flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md text-xs font-semibold transition-all cursor-pointer',
+                                role === 'student'
+                                  ? 'bg-white dark:bg-primary-600 text-neutral-900 dark:text-white shadow-xs'
+                                  : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+                              )}
+                            >
+                              <GraduationCap className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                              <span>Student</span>
+                            </button>
+                          </div>
+                          {role === 'admin' ? (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                switchRole('student')
+                                setUserMenuOpen(false)
+                                navigate('/short-courses')
+                              }}
+                              className="mt-2 w-full text-[11px] font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 hover:underline flex items-center justify-center gap-1 cursor-pointer"
+                            >
+                              <span>👉 View Student Course Catalog</span>
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                switchRole('admin')
+                                setUserMenuOpen(false)
+                                navigate('/dashboard')
+                              }}
+                              className="mt-2 w-full text-[11px] font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 hover:underline flex items-center justify-center gap-1 cursor-pointer"
+                            >
+                              <span>👉 Return to Admin Dashboard</span>
+                            </button>
+                          )}
+                        </div>
+                      )}
+
                       <button
                         onClick={() => { setUserMenuOpen(false); navigate('/dashboard') }}
                         className="w-full text-left px-3 py-2 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-[#14221b] flex items-center gap-2.5 transition-colors rounded-lg"
@@ -318,6 +398,48 @@ export default function PublicTopNav() {
           )}
         >
           <div className="px-4 py-3 space-y-1 max-w-[1280px] mx-auto">
+            {isTestingMode && (
+              <div className="p-3 mb-2 bg-neutral-50 dark:bg-[#14221b] border border-neutral-200/70 dark:border-[#1a2e23] rounded-xl">
+                <div className="text-[11px] font-semibold text-neutral-600 dark:text-neutral-300 mb-2 flex items-center justify-between">
+                  <span>Switch Role (Testing)</span>
+                  <span className="text-[10px] font-bold text-primary-600 dark:text-emerald-400 uppercase tracking-wider">{role} Mode</span>
+                </div>
+                <div className="grid grid-cols-2 gap-1.5 bg-neutral-200/60 dark:bg-[#0c1410] p-1 rounded-lg">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      switchRole('admin')
+                      setMobileOpen(false)
+                    }}
+                    className={cn(
+                      'flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md text-xs font-semibold transition-all cursor-pointer',
+                      role === 'admin'
+                        ? 'bg-white dark:bg-primary-600 text-neutral-900 dark:text-white shadow-xs'
+                        : 'text-neutral-600 dark:text-neutral-400'
+                    )}
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5 text-primary-600 dark:text-emerald-400" />
+                    <span>Admin</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      switchRole('student')
+                      setMobileOpen(false)
+                    }}
+                    className={cn(
+                      'flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md text-xs font-semibold transition-all cursor-pointer',
+                      role === 'student'
+                        ? 'bg-white dark:bg-primary-600 text-neutral-900 dark:text-white shadow-xs'
+                        : 'text-neutral-600 dark:text-neutral-400'
+                    )}
+                  >
+                    <GraduationCap className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                    <span>Student</span>
+                  </button>
+                </div>
+              </div>
+            )}
             {navLinks.map((link) => (
               <button
                 key={link.label}

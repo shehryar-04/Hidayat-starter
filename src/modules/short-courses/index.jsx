@@ -67,7 +67,10 @@ function StudentShortCourses() {
       </div>
 
       {tab === 'dashboard' ? (
-        <StudentDashboard onSelectCourse={setSelectedCourse} />
+        <StudentDashboard
+          onSelectCourse={setSelectedCourse}
+          onBrowseCourses={() => setTab('browse')}
+        />
       ) : (
         <StudentCourseList onSelectCourse={setSelectedCourse} />
       )}

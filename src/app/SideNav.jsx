@@ -58,7 +58,7 @@ function AvatarCircle({ avatarUrl, initials }) {
 }
 
 export default function SideNav({ collapsed = false, onToggleCollapse, isMobile = false, onCloseMobile }) {
-  const { role, signOut } = useRole()
+  const { role, signOut, switchRole, isTestingMode } = useRole()
   const { flags, loading: flagsLoading } = useFeatureFlags()
   const { profile, avatarUrl } = useProfile()
   const navigate = useNavigate()
@@ -299,6 +299,46 @@ export default function SideNav({ collapsed = false, onToggleCollapse, isMobile 
 
         {/* Footer User Profile & Actions */}
         <div className="p-3 border-t border-neutral-200/80 dark:border-[#1a2e23] bg-neutral-50/50 dark:bg-[#0c1410] flex-shrink-0">
+          {isTestingMode && (!collapsed || isMobile) && (
+            <div className="mb-2 p-1.5 bg-neutral-100/90 dark:bg-[#14221b] border border-neutral-200/80 dark:border-[#1a2e23] rounded-xl flex items-center justify-between text-xs">
+              <span className="text-[10px] font-semibold text-neutral-500 dark:text-neutral-400 pl-1">Testing:</span>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => switchRole('admin')}
+                  className={cn(
+                    "px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer",
+                    role === 'admin'
+                      ? "bg-primary-600 text-white shadow-2xs"
+                      : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                  )}
+                >
+                  Admin
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    switchRole('student')
+                    if (
+                      location.pathname.startsWith('/admin') ||
+                      location.pathname.startsWith('/student-admin') ||
+                      location.pathname.startsWith('/scholar-admin')
+                    ) {
+                      navigate('/short-courses')
+                    }
+                  }}
+                  className={cn(
+                    "px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer",
+                    role === 'student'
+                      ? "bg-emerald-600 text-white shadow-2xs"
+                      : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                  )}
+                >
+                  Student
+                </button>
+              </div>
+            </div>
+          )}
           <div
             className={cn(
               'flex items-center gap-3 p-2 rounded-xl bg-white dark:bg-[#111c16] border border-neutral-200/80 dark:border-[#1a2e23] shadow-xs transition-colors',

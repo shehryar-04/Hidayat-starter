@@ -27,12 +27,13 @@ export function useProfile() {
       if (prof) {
         setProfile(prof)
       } else {
+        const isStudent = role === 'student'
         setProfile({
           id: userId,
           role: role || 'admin',
-          full_name: 'Administrator',
-          first_name: 'Admin',
-          last_name: 'User',
+          full_name: isStudent ? 'Talib-e-Ilm (Student)' : 'Administrator',
+          first_name: isStudent ? 'Talib' : 'Admin',
+          last_name: isStudent ? 'Ilm' : 'User',
           avatar_url: null,
         })
       }
@@ -59,12 +60,13 @@ export function useProfile() {
         setScholarData(scholar)
       }
     } catch (err) {
+      const isStudent = role === 'student'
       setProfile({
         id: userId,
         role: role || 'admin',
-        full_name: 'Administrator',
-        first_name: 'Admin',
-        last_name: 'User',
+        full_name: isStudent ? 'Talib-e-Ilm (Student)' : 'Administrator',
+        first_name: isStudent ? 'Talib' : 'Admin',
+        last_name: isStudent ? 'Ilm' : 'User',
         avatar_url: null,
       })
     } finally {

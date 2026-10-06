@@ -11,7 +11,7 @@ import { Button, Spinner, EmptyState, Badge, DashboardSkeleton } from '../../sha
 /**
  * StudentDashboard — Dedicated LMS dashboard for students.
  */
-export function StudentDashboard({ onSelectCourse }) {
+export function StudentDashboard({ onSelectCourse, onBrowseCourses }) {
   const { userId } = useRole()
   const [studentId, setStudentId] = useState(null)
   const [dashData, setDashData] = useState({ active: [], completed: [] })
@@ -249,6 +249,13 @@ export function StudentDashboard({ onSelectCourse }) {
             icon={BookOpen}
             title="No enrolled courses yet"
             description="Browse our short course offerings and enroll to start your learning journey."
+            action={
+              onBrowseCourses && (
+                <Button variant="primary" onClick={onBrowseCourses} className="mt-2 font-medium">
+                  Browse Courses Catalog
+                </Button>
+              )
+            }
           />
         </div>
       )}

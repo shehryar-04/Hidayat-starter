@@ -17,12 +17,14 @@ vi.mock('../lib/supabase', () => ({
 
 // Test component that uses the role context
 function TestComponent() {
-  const { role, userId, loading } = useRole()
+  const { role, userId, loading, switchRole } = useRole()
   return (
     <div>
       <div data-testid="loading">{loading ? 'loading' : 'loaded'}</div>
       <div data-testid="role">{role || 'no-role'}</div>
       <div data-testid="userId">{userId || 'no-userId'}</div>
+      <button data-testid="switch-student" onClick={() => switchRole('student')}>Switch to Student</button>
+      <button data-testid="switch-admin" onClick={() => switchRole('admin')}>Switch to Admin</button>
     </div>
   )
 }
@@ -30,6 +32,7 @@ function TestComponent() {
 describe('RoleProvider', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    localStorage.clear()
   })
 
   it('should load role from profile record on authentication', async () => {
@@ -82,7 +85,7 @@ describe('RoleProvider', () => {
     expect(screen.getByTestId('loading')).toHaveTextContent('loaded')
   })
 
-  it('should redirect to login when unauthenticated', async () => {
+  it('should support switching role between admin and student in testing mode', async () => {
     // Mock getSession to return no session
     vi.mocked(supabase.auth.getSession).mockResolvedValue({
       data: {
@@ -110,13 +113,27 @@ describe('RoleProvider', () => {
       expect(screen.getByTestId('loading')).toHaveTextContent('loaded')
     })
 
-    expect(screen.getByTestId('role')).toHaveTextContent('no-role')
-    expect(screen.getByTestId('userId')).toHaveTextContent('no-userId')
+    // Default test role is admin
+    expect(screen.getByTestId('role')).toHaveTextContent('admin')
+
+    // Switch to student
+    screen.getByTestId('switch-student').click()
+    await waitFor(() => {
+      expect(screen.getByTestId('role')).toHaveTextContent('student')
+    })
+    expect(localStorage.getItem('hidayat_test_role')).toBe('student')
+
+    // Switch back to admin
+    screen.getByTestId('switch-admin').click()
+    await waitFor(() => {
+      expect(screen.getByTestId('role')).toHaveTextContent('admin')
+    })
+    expect(localStorage.getItem('hidayat_test_role')).toBe('admin')
   })
 
   it('should handle role changes on auth state change', async () => {
     const mockUserId = 'test-user-id'
-    const mockRole = 'admin'
+    const mockRole = 'student'
 
     // Mock getSession to return no initial session
     vi.mocked(supabase.auth.getSession).mockResolvedValue({
@@ -156,11 +173,6 @@ describe('RoleProvider', () => {
         <TestComponent />
       </RoleProvider>
     )
-
-    // Initially no role
-    await waitFor(() => {
-      expect(screen.getByTestId('role')).toHaveTextContent('no-role')
-    })
 
     // Simulate auth state change
     authStateChangeCallback('SIGNED_IN', {

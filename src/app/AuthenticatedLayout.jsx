@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Menu, Home, User, LogOut, ChevronRight, ExternalLink } from 'lucide-react'
+import { Menu, Home, User, LogOut, ChevronRight, ExternalLink, ShieldCheck, GraduationCap } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRole } from './RoleProvider'
 import { useProfile } from './useProfile'
@@ -57,7 +57,7 @@ const routeTitles = {
 }
 
 export default function AuthenticatedLayout({ children }) {
-  const { role, signOut } = useRole()
+  const { role, signOut, switchRole, isTestingMode } = useRole()
   const { profile, avatarUrl } = useProfile()
   const location = useLocation()
   const navigate = useNavigate()
@@ -201,11 +201,97 @@ export default function AuthenticatedLayout({ children }) {
                     className="fixed inset-0 z-40"
                     onClick={() => setUserDropdownOpen(false)}
                   />
-                  <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-[#0f1a14] rounded-xl shadow-lg border border-neutral-200 dark:border-[#1a2e23] py-1.5 z-50 text-sm animate-in fade-in zoom-in-95 duration-100">
+                  <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-[#0f1a14] rounded-2xl shadow-xl border border-neutral-200 dark:border-[#1a2e23] py-2 z-50 text-sm animate-in fade-in zoom-in-95 duration-100">
                     <div className="px-4 py-2.5 border-b border-neutral-100 dark:border-[#1a2e23]">
                       <p className="font-semibold text-neutral-800 dark:text-neutral-100 truncate">{displayName}</p>
-                      <p className="text-xs text-neutral-500 dark:text-neutral-400 capitalize mt-0.5">{role} Account</p>
+                      <div className="flex items-center justify-between mt-1">
+                        <span className={cn(
+                          "text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full inline-block",
+                          role === 'student'
+                            ? "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
+                            : "bg-primary-100 dark:bg-primary-950/60 text-primary-800 dark:text-primary-300 border border-primary-200 dark:border-primary-800"
+                        )}>
+                          {role} Account
+                        </span>
+                        <span className="text-[10px] text-neutral-400 font-medium">Testing Mode</span>
+                      </div>
                     </div>
+
+                    {/* Role Switcher Box (Testing Mode) */}
+                    {isTestingMode && (
+                      <div className="p-2.5 mx-2 my-1.5 bg-neutral-50 dark:bg-[#14221b] border border-neutral-200/70 dark:border-[#1a2e23] rounded-xl">
+                        <div className="text-[11px] font-semibold text-neutral-600 dark:text-neutral-300 mb-2 flex items-center justify-between">
+                          <span>Switch Role</span>
+                          <span className="text-[10px] text-neutral-400 font-normal">Test views</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-1.5 bg-neutral-200/60 dark:bg-[#0c1410] p-1 rounded-lg">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              switchRole('admin')
+                              setUserDropdownOpen(false)
+                            }}
+                            className={cn(
+                              'flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md text-xs font-semibold transition-all cursor-pointer',
+                              role === 'admin'
+                                ? 'bg-white dark:bg-primary-600 text-neutral-900 dark:text-white shadow-xs'
+                                : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+                            )}
+                          >
+                            <ShieldCheck className="w-3.5 h-3.5 text-primary-600 dark:text-emerald-400" />
+                            <span>Admin</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              switchRole('student')
+                              setUserDropdownOpen(false)
+                              if (
+                                location.pathname.startsWith('/admin') ||
+                                location.pathname.startsWith('/student-admin') ||
+                                location.pathname.startsWith('/scholar-admin')
+                              ) {
+                                navigate('/short-courses')
+                              }
+                            }}
+                            className={cn(
+                              'flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md text-xs font-semibold transition-all cursor-pointer',
+                              role === 'student'
+                                ? 'bg-white dark:bg-primary-600 text-neutral-900 dark:text-white shadow-xs'
+                                : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+                            )}
+                          >
+                            <GraduationCap className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                            <span>Student</span>
+                          </button>
+                        </div>
+                        {role === 'admin' ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              switchRole('student')
+                              setUserDropdownOpen(false)
+                              navigate('/short-courses')
+                            }}
+                            className="mt-2 w-full text-[11px] font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 hover:underline flex items-center justify-center gap-1 cursor-pointer"
+                          >
+                            <span>👉 View Student Course Catalog</span>
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              switchRole('admin')
+                              setUserDropdownOpen(false)
+                              navigate('/dashboard')
+                            }}
+                            className="mt-2 w-full text-[11px] font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 hover:underline flex items-center justify-center gap-1 cursor-pointer"
+                          >
+                            <span>👉 Return to Admin Dashboard</span>
+                          </button>
+                        )}
+                      </div>
+                    )}
 
                     <Link
                       to="/"

@@ -1,14 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { KeyRound, Camera } from 'lucide-react'
+import { KeyRound, Camera, ShieldCheck, GraduationCap } from 'lucide-react'
 import { useRole } from './RoleProvider'
 import { useProfile } from './useProfile'
-import { Modal, Button, Input, Textarea, FormField, Badge } from '../shared/ui'
+import { Modal, Button, Input, Textarea, FormField, Badge, cn } from '../shared/ui'
 import { useIntl } from '../lib/intl'
 
 export default function ProfileModal({ onClose }) {
   const navigate = useNavigate()
-  const { role } = useRole()
+  const { role, switchRole, isTestingMode } = useRole()
   const { profile, scholarData, avatarUrl, loading, uploadAvatar, saveStudentProfile, saveScholarProfile } = useProfile()
   const { intl } = useIntl()
 
@@ -125,11 +125,48 @@ export default function ProfileModal({ onClose }) {
             onChange={handleAvatarChange}
           />
           <p className="text-xs text-neutral-400 mt-2">Click avatar to change photo</p>
-          <div className="mt-1">
+          <div className="mt-1 flex items-center gap-2">
             <Badge variant="primary" size="sm" className="capitalize">
-              {role}
+              {role} Account
             </Badge>
           </div>
+
+          {isTestingMode && (
+            <div className="w-full max-w-xs mt-3 p-2.5 bg-neutral-50 dark:bg-[#14221b] border border-neutral-200/80 dark:border-[#1a2e23] rounded-xl text-center">
+              <div className="text-[11px] font-semibold text-neutral-600 dark:text-neutral-300 mb-1.5 flex items-center justify-between">
+                <span>Active Testing Role</span>
+                <span className="text-[10px] text-neutral-400 font-normal">Switch preview</span>
+              </div>
+              <div className="grid grid-cols-2 gap-1.5 bg-neutral-200/60 dark:bg-[#0c1410] p-1 rounded-lg">
+                <button
+                  type="button"
+                  onClick={() => switchRole('admin')}
+                  className={cn(
+                    'flex items-center justify-center gap-1.5 py-1 px-2 rounded-md text-xs font-semibold transition-all cursor-pointer',
+                    role === 'admin'
+                      ? 'bg-white dark:bg-primary-600 text-neutral-900 dark:text-white shadow-xs'
+                      : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+                  )}
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-primary-600 dark:text-emerald-400" />
+                  <span>Admin</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => switchRole('student')}
+                  className={cn(
+                    'flex items-center justify-center gap-1.5 py-1 px-2 rounded-md text-xs font-semibold transition-all cursor-pointer',
+                    role === 'student'
+                      ? 'bg-white dark:bg-primary-600 text-neutral-900 dark:text-white shadow-xs'
+                      : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+                  )}
+                >
+                  <GraduationCap className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>Student</span>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {msg && (
