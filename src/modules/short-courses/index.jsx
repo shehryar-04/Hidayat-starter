@@ -84,6 +84,7 @@ function AdminShortCourses() {
 
   const tabs = [
     { key: 'courses', label: 'All Courses', icon: GraduationCap },
+    { key: 'catalog', label: 'Student Catalog & Viewer', icon: Compass },
     { key: 'pending', label: 'Pending Approval', icon: Clock },
     { key: 'create', label: 'Create Course', icon: PlusCircle },
     { key: 'revenue', label: 'Revenue & Analytics', icon: BarChart3 },
@@ -160,6 +161,7 @@ function AdminShortCourses() {
           onEditCourse={handleEdit}
         />
       )}
+      {view === 'catalog' && <StudentShortCourses />}
       {view === 'pending' && <AdminCourseReview />}
       {view === 'create' && <CourseForm onComplete={() => setView('courses')} />}
       {view === 'edit' && editingCourse && (

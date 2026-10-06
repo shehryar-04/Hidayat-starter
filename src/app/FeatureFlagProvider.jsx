@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
+import { isAuthBypassEnabled } from '../config/authBypass'
 
 const defaultFlags = {
   dars_e_nizami: false,
@@ -12,18 +13,37 @@ const defaultFlags = {
   student_reports: false,
 }
 
+const allEnabledFlags = {
+  dars_e_nizami: true,
+  hifz: true,
+  nazra: true,
+  short_courses: true,
+  darul_ifta: true,
+  research_center: true,
+  wazifa: true,
+  student_reports: true,
+}
+
 const FeatureFlagContext = createContext({
   flags: defaultFlags,
   loading: true,
 })
 
 export function FeatureFlagProvider({ children }) {
-  const [flags, setFlags] = useState(defaultFlags)
-  const [loading, setLoading] = useState(true)
+  const [flags, setFlags] = useState(() => (isAuthBypassEnabled() ? allEnabledFlags : defaultFlags))
+  const [loading, setLoading] = useState(() => (isAuthBypassEnabled() ? false : true))
   const initializedRef = { current: false }
 
   const fetchFlags = async (showLoading = false) => {
+    if (isAuthBypassEnabled()) {
+      setFlags(allEnabledFlags)
+      setLoading(false)
+      initializedRef.current = true
+      return
+    }
+
     if (showLoading) setLoading(true)
+
     const { data } = await supabase
       .from('feature_flags')
       .select('module, enabled')
@@ -42,6 +62,11 @@ export function FeatureFlagProvider({ children }) {
   useEffect(() => {
     // Initial fetch — show loading only the first time
     fetchFlags(true)
+
+    const handleBypassChange = () => {
+      fetchFlags(false)
+    }
+    window.addEventListener('auth_bypass_changed', handleBypassChange)
 
     // Re-fetch when auth state changes (login/logout) — silently
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {

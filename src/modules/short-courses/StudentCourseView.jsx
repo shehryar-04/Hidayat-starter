@@ -912,8 +912,9 @@ export function StudentCourseView({ course, onBack }) {
   }, [course])
 
   const canAccessLecture = (lecture) => {
+    if (role === 'admin') return true
     if (enrolled) return true
-    if (lecture.is_free_preview) return true
+    if (lecture?.is_free_preview) return true
     return false
   }
 

@@ -1,13 +1,22 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react'
+import { Mail, Lock, User, Eye, EyeOff, ShieldCheck, ArrowRight, ToggleLeft, ToggleRight } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { FUNCTIONS_BASE_URL, SUPABASE_ANON_KEY } from '../lib/env'
 import { Button, Input, Label, cn } from '../shared/ui'
+import { isAuthBypassEnabled, setAuthBypass } from '../config/authBypass'
 
 export default function LoginPage() {
+  const [bypassActive, setBypassActive] = useState(isAuthBypassEnabled)
   const [isSignUp, setIsSignUp] = useState(false)
+
+  useEffect(() => {
+    const handler = () => setBypassActive(isAuthBypassEnabled())
+    window.addEventListener('auth_bypass_changed', handler)
+    return () => window.removeEventListener('auth_bypass_changed', handler)
+  }, [])
+
   const [showResendVerification, setShowResendVerification] = useState(false)
   const [resendEmail, setResendEmail] = useState('')
   const [email, setEmail] = useState('')
@@ -199,6 +208,47 @@ export default function LoginPage() {
           transition={{ duration: 0.3, ease: [0, 0, 0.2, 1] }}
           className="bg-white dark:bg-[#0f1a14] border border-neutral-200/90 dark:border-[#1a2e23] rounded-2xl p-6 sm:p-8 shadow-xl transition-colors"
         >
+          {bypassActive ? (
+            <div className="mb-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 text-xs sm:text-sm space-y-2.5">
+              <div className="flex items-center gap-2 font-semibold text-amber-800 dark:text-amber-300">
+                <ShieldCheck className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                <span>Testing Mode Active: Auth Unplugged</span>
+              </div>
+              <p className="text-neutral-600 dark:text-neutral-300 text-xs leading-relaxed">
+                Authentication and authorization checks are bypassed. You can interact with all pages as an Administrator without logging in.
+              </p>
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <Button
+                  size="sm"
+                  variant="primary"
+                  onClick={() => navigate(returnTo)}
+                  className="text-xs py-1 px-3 h-auto"
+                >
+                  <span>Go to Dashboard</span>
+                  <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                </Button>
+                <button
+                  type="button"
+                  onClick={() => setAuthBypass(false)}
+                  className="text-xs text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white underline cursor-pointer px-2 py-1"
+                >
+                  Turn Off Bypass
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="mb-4 flex items-center justify-between p-2.5 rounded-xl bg-neutral-100 dark:bg-[#14221b] text-xs text-neutral-600 dark:text-neutral-400">
+              <span>Testing bypass is currently inactive.</span>
+              <button
+                type="button"
+                onClick={() => setAuthBypass(true)}
+                className="font-semibold text-primary-600 dark:text-emerald-400 hover:underline cursor-pointer"
+              >
+                Enable Admin Bypass
+              </button>
+            </div>
+          )}
+
           <h2 className="text-xl font-display font-bold text-neutral-900 dark:text-white mb-6">
             {showForgotPassword
               ? 'Reset Password'
