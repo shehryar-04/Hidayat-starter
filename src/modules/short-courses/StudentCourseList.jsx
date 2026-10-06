@@ -6,6 +6,7 @@ import { Button, Input, Badge, EmptyState, Spinner, CourseGridSkeleton } from '.
 import { Helmet } from 'react-helmet-async'
 import { WhatsAppButton } from '../../shared/WhatsAppButton'
 import { generateCourseSchema } from '../fatwa-platform/utils/structuredData'
+import { personalBrandingCourse } from './data/personalBrandingCourse'
 
 export function StudentCourseList({ onSelectCourse }) {
   const { userId } = useRole()
@@ -32,9 +33,16 @@ export function StudentCourseList({ onSelectCourse }) {
                  profiles:created_by(full_name)`)
         .eq('status', 'published')
         .order('created_at', { ascending: false })
-      if (cErr) throw cErr
-      setCourses(courseData || [])
-      setCategories([...new Set((courseData || []).map(c => c.category).filter(Boolean))])
+      const raw = courseData || []
+      const list = [...raw]
+      if (!list.some(c => c.id === personalBrandingCourse.id || c.title === personalBrandingCourse.title)) {
+        list.unshift({
+          ...personalBrandingCourse,
+          profiles: { full_name: 'Hidayat Institute Faculty' },
+        })
+      }
+      setCourses(list)
+      setCategories([...new Set(list.map(c => c.category).filter(Boolean))])
 
       if (userId) {
         const { data: studentRow } = await supabase.from('students').select('id').eq('profile_id', userId).single()
@@ -50,7 +58,15 @@ export function StudentCourseList({ onSelectCourse }) {
           setPendingCourseIds(new Set(pending.map(e => e.course_id)))
         }
       }
-    } catch (err) { setError(err.message) }
+    } catch (err) {
+      console.warn('Using local fallback for courses catalog:', err.message)
+      const fallback = [{
+        ...personalBrandingCourse,
+        profiles: { full_name: 'Hidayat Institute Faculty' },
+      }]
+      setCourses(fallback)
+      setCategories([personalBrandingCourse.category])
+    }
     finally { setLoading(false) }
   }
 

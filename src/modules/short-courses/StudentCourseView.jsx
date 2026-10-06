@@ -13,7 +13,9 @@ import { CourseAnnouncements } from './components/CourseAnnouncements'
 import { CourseResources } from './components/CourseResources'
 import { CourseDiscussion } from './components/CourseDiscussion'
 import { LectureResources } from './components/LectureResources'
-import { FileText, CheckCircle, XCircle, PlayCircle, Download, Megaphone, FolderOpen, MessageSquare } from 'lucide-react'
+import { LectureProgressButton } from './components/LectureProgressButton'
+import { personalBrandingCourse } from './data/personalBrandingCourse'
+import { FileText, CheckCircle, XCircle, PlayCircle, Download, Megaphone, FolderOpen, MessageSquare, BookOpen, Quote, Sparkles, Video } from 'lucide-react'
 
 function getYouTubeId(url) {
   if (!url) return null
@@ -418,6 +420,200 @@ function InvoiceCard({ invoice }) {
 }
 
 
+// ─── Masterclass Lecture Script & Study Reader ────────────────
+function LectureScriptReader({ lecture, courseId, studentId, enrolled, hasVideo }) {
+  if (!lecture) return null
+
+  const text = lecture.content_text || ''
+
+  const parsePart = (pattern, nextPatterns = []) => {
+    const idx = text.indexOf(pattern)
+    if (idx === -1) return null
+    const start = idx + pattern.length
+    let end = text.length
+    for (const np of nextPatterns) {
+      const nIdx = text.indexOf(np, start)
+      if (nIdx !== -1 && nIdx < end) {
+        end = nIdx
+      }
+    }
+    return text.substring(start, end).trim()
+  }
+
+  const hook = parsePart('🎯 HOOK', ['📌 INTRODUCTION', '📖 STORY', '💡 CORE LESSON'])
+  const intro = parsePart('📌 INTRODUCTION', ['📖 STORY', '⚡ PATTERN INTERRUPT', '💡 CORE LESSON', '💎 POWER STATEMENT'])
+  const story = parsePart('📖 STORY', ['⚡ PATTERN INTERRUPT', '💡 CORE LESSON', '💎 POWER STATEMENT'])
+  const patternInterrupt = parsePart('⚡ PATTERN INTERRUPT', ['💡 CORE LESSON', '💎 POWER STATEMENT'])
+  const coreLesson = parsePart('💡 CORE LESSON', ['💎 POWER STATEMENT', '🚀 ACTION STEP'])
+  const powerStatement = parsePart('💎 POWER STATEMENT', ['🚀 ACTION STEP'])
+  const actionStep = parsePart('🚀 ACTION STEP', [])
+
+  const isStructured = hook || intro || coreLesson || powerStatement || actionStep
+
+  return (
+    <div className="bg-white dark:bg-[#0f1a14] rounded-2xl border border-neutral-200/90 dark:border-[#1a2e23] p-5 sm:p-7 shadow-xs space-y-6">
+      {/* Header bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-neutral-100 dark:border-[#1a2e23]">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40">
+              <BookOpen className="w-3.5 h-3.5" />
+              {hasVideo ? 'Video + Masterclass Script' : 'Masterclass Script & Study Guide'}
+            </span>
+            {lecture.duration_minutes && (
+              <span className="text-xs text-neutral-400 dark:text-neutral-500 font-medium">
+                ⏱️ {lecture.duration_minutes} min read/watch
+              </span>
+            )}
+            {lecture.is_free_preview && (
+              <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200/60">
+                Free Preview
+              </span>
+            )}
+          </div>
+          <h2 className="text-xl sm:text-2xl font-display font-bold text-neutral-900 dark:text-white tracking-tight">
+            {lecture.title}
+          </h2>
+        </div>
+
+        {enrolled && studentId && (
+          <div className="self-start sm:self-center flex-shrink-0">
+            <LectureProgressButton
+              courseId={courseId}
+              lectureId={lecture.id}
+              studentId={studentId}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Production Notice when video is in production */}
+      {!hasVideo && (
+        <div className="bg-emerald-50/70 dark:bg-[#14261c] border border-emerald-200/70 dark:border-emerald-800/60 rounded-xl p-4 flex items-start gap-3.5">
+          <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <Sparkles className="w-4 h-4" />
+          </div>
+          <div className="text-xs sm:text-sm text-emerald-900 dark:text-emerald-200 leading-relaxed">
+            <span className="font-semibold">🎬 Video Lecture in Production:</span> Master this lesson using the complete script, scroll-stopping hook breakdown, core principles, and daily action assignment below.
+          </div>
+        </div>
+      )}
+
+      {/* Structured Content or Fallback raw content */}
+      {isStructured ? (
+        <div className="space-y-6 text-neutral-800 dark:text-neutral-200 text-sm sm:text-base leading-relaxed">
+          {/* Hook */}
+          {hook && (
+            <div className="bg-neutral-50 dark:bg-[#14221b] border-l-4 border-emerald-500 rounded-r-xl p-4">
+              <div className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-1 flex items-center gap-1.5">
+                <span>🎯 The Scroll-Stopping Hook</span>
+              </div>
+              <p className="font-semibold text-neutral-900 dark:text-neutral-100 text-base sm:text-lg italic">
+                {hook.replace(/^:\s*/, '')}
+              </p>
+            </div>
+          )}
+
+          {/* Introduction */}
+          {intro && (
+            <div className="space-y-1.5">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                📌 Introduction & Context
+              </h3>
+              <p className="whitespace-pre-line text-neutral-700 dark:text-neutral-300">
+                {intro.replace(/^:\s*/, '')}
+              </p>
+            </div>
+          )}
+
+          {/* Story / Pattern Interrupt */}
+          {story && (
+            <div className="space-y-1.5 bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/40 rounded-xl p-4">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-blue-300">
+                📖 Case Study / Real-World Story
+              </h3>
+              <p className="whitespace-pre-line text-neutral-700 dark:text-neutral-300">
+                {story.replace(/^:\s*/, '')}
+              </p>
+            </div>
+          )}
+
+          {patternInterrupt && (
+            <div className="space-y-1.5 bg-purple-50/50 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-900/40 rounded-xl p-4">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-purple-700 dark:text-purple-300">
+                ⚡ Pattern Interrupt
+              </h3>
+              <p className="whitespace-pre-line text-neutral-700 dark:text-neutral-300">
+                {patternInterrupt.replace(/^:\s*/, '')}
+              </p>
+            </div>
+          )}
+
+          {/* Core Lesson */}
+          {coreLesson && (
+            <div className="space-y-2">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                💡 Core Framework & Teachings
+              </h3>
+              <div className="whitespace-pre-line text-neutral-800 dark:text-neutral-200 bg-white dark:bg-[#0f1a14] border border-neutral-200/80 dark:border-[#1a2e23] rounded-xl p-4 sm:p-5">
+                {coreLesson.replace(/^:\s*/, '')}
+              </div>
+            </div>
+          )}
+
+          {/* Power Statement Callout */}
+          {powerStatement && (
+            <div className="bg-gradient-to-r from-emerald-500 to-teal-600 dark:from-emerald-600 dark:to-teal-700 text-white rounded-2xl p-5 sm:p-6 shadow-md relative overflow-hidden">
+              <Quote className="w-16 h-16 text-white/15 absolute -right-2 -bottom-2 pointer-events-none" />
+              <div className="relative z-10 space-y-1.5">
+                <span className="inline-block text-[11px] font-bold tracking-widest uppercase bg-white/20 px-2.5 py-0.5 rounded-full">
+                  💎 Power Statement
+                </span>
+                <p className="text-lg sm:text-xl font-bold font-serif leading-snug">
+                  {powerStatement.replace(/^:\s*/, '')}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Action Step / CTA */}
+          {actionStep && (
+            <div className="bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-900/40 rounded-xl p-4 sm:p-5 space-y-2">
+              <div className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
+                <span>🚀 Today's Action Step / Challenge</span>
+              </div>
+              <p className="text-neutral-800 dark:text-neutral-200 whitespace-pre-line font-medium text-sm sm:text-base">
+                {actionStep.replace(/^:\s*/, '')}
+              </p>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="whitespace-pre-line text-neutral-700 dark:text-neutral-300 text-sm sm:text-base leading-relaxed bg-neutral-50 dark:bg-[#14221b] border border-neutral-200/70 dark:border-[#1a2e23] rounded-xl p-4 sm:p-5">
+          {text || 'No lesson script provided for this lecture.'}
+        </div>
+      )}
+
+      {/* Completion footer */}
+      {enrolled && studentId && (
+        <div className="pt-4 border-t border-neutral-100 dark:border-[#1a2e23] flex items-center justify-between">
+          <p className="text-xs text-neutral-400 dark:text-neutral-500">
+            Have you completed reading and taking notes on this lesson?
+          </p>
+          <LectureProgressButton
+            courseId={courseId}
+            lectureId={lecture.id}
+            studentId={studentId}
+          />
+        </div>
+      )}
+
+      {/* Lecture Resources */}
+      {enrolled && <LectureResources lectureId={lecture.id} isTeacher={false} />}
+    </div>
+  )
+}
+
 // ─── Main Component ──────────────────────────────────────────
 export function StudentCourseView({ course, onBack }) {
   const { userId } = useRole()
@@ -514,8 +710,23 @@ export function StudentCourseView({ course, onBack }) {
             setOpenSections({ [enriched[0].id]: true })
             if (enriched[0].lectures[0]) setActiveLecture(enriched[0].lectures[0])
           }
+        } else if (course.id === personalBrandingCourse.id || course.title?.includes('Personal Branding')) {
+          setSections(personalBrandingCourse.sections)
+          setOpenSections({ [personalBrandingCourse.sections[0].id]: true })
+          if (personalBrandingCourse.sections[0]?.lectures[0]) {
+            setActiveLecture(personalBrandingCourse.sections[0].lectures[0])
+          }
         }
-      } catch (err) { console.error(err) }
+      } catch (err) {
+        console.error(err)
+        if (course.id === personalBrandingCourse.id || course.title?.includes('Personal Branding')) {
+          setSections(personalBrandingCourse.sections)
+          setOpenSections({ [personalBrandingCourse.sections[0].id]: true })
+          if (personalBrandingCourse.sections[0]?.lectures[0]) {
+            setActiveLecture(personalBrandingCourse.sections[0].lectures[0])
+          }
+        }
+      }
       finally { setLoading(false) }
     }
     init()
@@ -799,9 +1010,9 @@ export function StudentCourseView({ course, onBack }) {
           {/* Certificate banner — shown when course is completed */}
           {enrolled && <CertificateBanner courseId={course.id} studentId={studentId} />}
 
-          {/* Video player */}
+          {/* Lecture Viewer: Video Player + Script Reader */}
           {activeLecture && canAccessLecture(activeLecture) && activeLecture.video_url ? (
-            <div>
+            <div className="space-y-4">
               <ProtectedVideoPlayer
                 url={activeLecture.video_url}
                 title={activeLecture.title}
@@ -811,30 +1022,47 @@ export function StudentCourseView({ course, onBack }) {
                 studentId={studentId}
                 onComplete={() => {/* progress updated automatically */}}
               />
-              <div className="mt-3">
-                <h2 className="font-semibold text-gray-800 text-lg">{activeLecture.title}</h2>
-                {activeLecture.duration_minutes && (
-                  <p className="text-xs text-gray-400 mt-0.5">{activeLecture.duration_minutes} min</p>
+              <LectureScriptReader
+                lecture={activeLecture}
+                courseId={course.id}
+                studentId={studentId}
+                enrolled={enrolled}
+                hasVideo={true}
+              />
+            </div>
+          ) : activeLecture && canAccessLecture(activeLecture) && !activeLecture.video_url ? (
+            <LectureScriptReader
+              lecture={activeLecture}
+              courseId={course.id}
+              studentId={studentId}
+              enrolled={enrolled}
+              hasVideo={false}
+            />
+          ) : activeLecture && !canAccessLecture(activeLecture) ? (
+            <div className="aspect-video bg-neutral-900 rounded-2xl flex items-center justify-center relative overflow-hidden border border-neutral-800">
+              <div className="text-center px-6 space-y-3">
+                <div className="text-5xl">🔒</div>
+                <h3 className="text-white font-bold text-lg">Enroll to Unlock this Masterclass</h3>
+                <p className="text-neutral-400 text-xs sm:text-sm max-w-md">
+                  This 30-day personal branding video script and action assignment is accessible to enrolled students.
+                </p>
+                {!enrolled && !pendingEnrollment && (
+                  <Button variant="primary" size="sm" onClick={handleEnroll}>
+                    {course.is_free ? 'Enroll for Free' : `Enroll for Rs. ${course.fee}`}
+                  </Button>
                 )}
-                {activeLecture.content_text && (
-                  <p className="text-sm text-gray-600 mt-3 leading-relaxed">{activeLecture.content_text}</p>
-                )}
-                {/* Lecture-specific resources (downloads, links) */}
-                {enrolled && <LectureResources lectureId={activeLecture.id} isTeacher={false} />}
               </div>
             </div>
-          ) : activeLecture && !canAccessLecture(activeLecture) ? (
-            <ProtectedVideoPlayer url={null} title={null} isEnrolled={false} />
           ) : course.promo_video_url ? (
             <div>
               <YouTubeEmbed url={course.promo_video_url} title={course.title} />
-              <p className="text-xs text-gray-400 mt-2">Promotional preview — enroll to access all lectures.</p>
+              <p className="text-xs text-gray-400 mt-2">Promotional preview — enroll to access all 30 lectures and scripts.</p>
             </div>
           ) : (
-            <div className="aspect-video bg-primary-900 rounded-xl flex items-center justify-center">
-              <div className="text-center text-white/60">
-                <div className="text-5xl mb-3">🎓</div>
-                <p className="text-sm">Select a lecture to start watching</p>
+            <div className="aspect-video bg-primary-900/90 dark:bg-[#0c1811] rounded-2xl flex items-center justify-center border border-primary-800/40">
+              <div className="text-center text-white/70 space-y-2">
+                <div className="text-5xl">🎓</div>
+                <p className="text-sm font-medium">Select a lecture from the curriculum sidebar to start reading or watching</p>
               </div>
             </div>
           )}
@@ -1157,8 +1385,13 @@ function StudentQuizSection({ courseId, studentId }) {
   const loadQuizzes = async () => {
     setLoading(true)
     try {
-      const data = await getCourseQuizzes(courseId)
-      const published = data.filter(q => q.is_published)
+      let published = data.filter(q => q.is_published)
+      if (published.length === 0 && (courseId === personalBrandingCourse.id || courseId === 'a1000000-0000-0000-0000-000000000001')) {
+        published = (personalBrandingCourse.quizzes || []).map(q => ({
+          ...q,
+          is_published: true,
+        }))
+      }
       setQuizzes(published)
 
       // Load attempts for each quiz

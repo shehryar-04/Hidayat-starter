@@ -15,7 +15,9 @@
     "search:backfill-slugs": "node scripts/search/backfill-slugs.js",
     "search:generate-embeddings": "node scripts/search/generate-embeddings.js",
     "search:reindex": "node scripts/search/generate-embeddings.js --mode=initial",
-    "search:populate-suggestions": "node scripts/search/populate-suggestions.js"
+    "search:populate-suggestions": "node scripts/search/populate-suggestions.js",
+    "course:seed-personal-branding": "node scripts/seed-personal-branding-course.js",
+    "course:generate-sql": "node scripts/generate-course-sql.js"
   },
   "dependencies": {
     "@fontsource/amiri": "5.3.0",

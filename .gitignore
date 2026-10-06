@@ -39,3 +39,36 @@ npm-debug.log*
 
 # Lock file (optional — remove this line if you want to track it)
 package-lock.json
+
+# Media & Videos
+*.mp4
+*.mkv
+*.avi
+*.mov
+*.webm
+*.flv
+*.wmv
+public/videos/
+
+# Temporary / Scraper Scripts & Tools
+scripts/*.mjs
+scripts/*.cjs
+scripts/*.ps1
+scripts/crawler_status.json
+yt-dlp.exe
+*.timestamp-*.mjs
+
+# Temporary Scraped Data, Databases & Dumps
+*.db
+/chrome_*.html
+/insta_*.html
+/instagram_reels_screenshot.png
+/main_grid.png
+/captured_*.json
+/cdp_*.json
+/script_*.json
+/verified_*.json
+
+# SQL Dumps & Generated Seed Scripts
+scripts/*.sql
+/supabase_personal_branding_course.sql
