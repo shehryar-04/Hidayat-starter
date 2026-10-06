@@ -7,7 +7,7 @@ import { useProfile } from './useProfile'
 import SideNav from './SideNav'
 import Logo from './Logo'
 import ProfileModal from './ProfileModal'
-import { cn, ThemeLanguageToggle, AuthBypassBadge } from '../shared/ui'
+import { cn, ThemeLanguageToggle } from '../shared/ui'
 
 function AvatarCircle({ avatarUrl, initials }) {
   const [err, setErr] = useState(false)
@@ -173,7 +173,6 @@ export default function AuthenticatedLayout({ children }) {
 
           {/* Right section: Theme/Lang, Link to Public Home + User Avatar & Menu */}
           <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-            <AuthBypassBadge />
             <ThemeLanguageToggle />
 
             {/* Direct button to Public Home */}

@@ -4,6 +4,10 @@ import { configDefaults } from 'vitest/config'
 
 export default defineConfig({
   plugins: [react()],
+  server: {
+    host: true,
+    port: 5173,
+  },
   build: {
     rollupOptions: {
       output: {

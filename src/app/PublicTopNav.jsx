@@ -5,7 +5,7 @@ import { useRole } from './RoleProvider'
 import { useProfile } from './useProfile'
 import Logo from './Logo'
 import ProfileModal from './ProfileModal'
-import { Button, cn, ThemeLanguageToggle, AuthBypassBadge } from '../shared/ui'
+import { Button, cn, ThemeLanguageToggle } from '../shared/ui'
 
 function AvatarCircle({ avatarUrl, initials }) {
   const [err, setErr] = useState(false)
@@ -219,7 +219,6 @@ export default function PublicTopNav() {
 
           {/* Right side: Language, Theme, Login / User menu + Hamburger */}
           <div className="flex items-center gap-2 sm:gap-3">
-            <AuthBypassBadge />
             <ThemeLanguageToggle className="hidden xs:flex" />
 
             {!role ? (

@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Clock, LogIn, RefreshCw } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useRole } from './RoleProvider'
-import { isAuthBypassEnabled } from '../config/authBypass'
 
 /**
  * SessionGuard — Monitors JWT expiry and user activity.
@@ -22,11 +21,6 @@ const IDLE_TIMEOUT_MS = 30 * 60 * 1000 // 30 minutes idle = show expired
 
 export default function SessionGuard() {
   const { role, signOut } = useRole()
-
-  // In testing bypass mode, session timeouts are completely disabled
-  if (isAuthBypassEnabled()) {
-    return null
-  }
   const [expired, setExpired] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
   const refreshTimerRef = useRef(null)

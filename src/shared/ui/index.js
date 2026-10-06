@@ -50,7 +50,6 @@ export { LoadingOverlay } from './LoadingOverlay'
 export { StaggerContainer, StaggerItem, MAX_STAGGER_ITEMS, STAGGER_DELAY } from './StaggerContainer'
 export { ToastProvider, useToast } from './Toast'
 export { ThemeLanguageToggle } from './ThemeLanguageToggle'
-export { AuthBypassBadge } from './AuthBypassBadge'
 
 // Utilities
 export { cn } from './utils'

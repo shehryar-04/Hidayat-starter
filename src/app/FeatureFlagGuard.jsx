@@ -1,6 +1,5 @@
 import { Navigate } from 'react-router-dom'
 import { useFeatureFlags } from './FeatureFlagProvider'
-import { isAuthBypassEnabled } from '../config/authBypass'
 
 /**
  * FeatureFlagGuard wraps a route and redirects to dashboard if the feature flag is disabled.
@@ -8,11 +7,6 @@ import { isAuthBypassEnabled } from '../config/authBypass'
  */
 export default function FeatureFlagGuard({ children, flagKey }) {
   const { flags, loading } = useFeatureFlags()
-
-  // In testing bypass mode, all features and modules are fully accessible
-  if (isAuthBypassEnabled()) {
-    return children
-  }
 
   // Only block on initial load. Once flags are loaded, keep showing content
   // even during background refetches to prevent unmounting.

@@ -1,12 +1,13 @@
 import { Navigate } from 'react-router-dom'
 import { useRole } from './RoleProvider'
-import { isAuthBypassEnabled } from '../config/authBypass'
+
+// Unplugged for testing: set to false to re-enable route authentication
+const UNPLUG_LOGIN_FOR_TESTING = true
 
 export default function ProtectedRoute({ children }) {
   const { role, loading } = useRole()
 
-  // Testing bypass active: immediately render children without requiring login
-  if (isAuthBypassEnabled()) {
+  if (UNPLUG_LOGIN_FOR_TESTING) {
     return children
   }
 
@@ -22,4 +23,3 @@ export default function ProtectedRoute({ children }) {
 
   return children
 }
-

@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import { useRole } from './RoleProvider'
-import { isAuthBypassEnabled, DEV_ADMIN_PROFILE } from '../config/authBypass'
 
 /*
  * Fetches and manages the current user's profile data.
@@ -9,19 +8,13 @@ import { isAuthBypassEnabled, DEV_ADMIN_PROFILE } from '../config/authBypass'
  */
 export function useProfile() {
   const { userId, role } = useRole()
-  const [profile, setProfile] = useState(() => (isAuthBypassEnabled() ? DEV_ADMIN_PROFILE : null))
+  const [profile, setProfile] = useState(null)
   const [scholarData, setScholarData] = useState(null)
   const [avatarUrl, setAvatarUrl] = useState(null)
-  const [loading, setLoading] = useState(() => (isAuthBypassEnabled() ? false : true))
+  const [loading, setLoading] = useState(true)
 
   const fetchProfile = useCallback(async () => {
-    if (!userId) {
-      if (isAuthBypassEnabled()) {
-        setProfile(DEV_ADMIN_PROFILE)
-      }
-      setLoading(false)
-      return
-    }
+    if (!userId) { setLoading(false); return }
     setLoading(true)
     try {
       // Fetch base profile
@@ -33,8 +26,15 @@ export function useProfile() {
 
       if (prof) {
         setProfile(prof)
-      } else if (isAuthBypassEnabled()) {
-        setProfile(DEV_ADMIN_PROFILE)
+      } else {
+        setProfile({
+          id: userId,
+          role: role || 'admin',
+          full_name: 'Administrator',
+          first_name: 'Admin',
+          last_name: 'User',
+          avatar_url: null,
+        })
       }
 
       // Resolve avatar URL from storage if not already a full URL
@@ -59,16 +59,18 @@ export function useProfile() {
         setScholarData(scholar)
       }
     } catch (err) {
-      if (isAuthBypassEnabled()) {
-        setProfile(DEV_ADMIN_PROFILE)
-      } else {
-        console.error('useProfile fetch error:', err)
-      }
+      setProfile({
+        id: userId,
+        role: role || 'admin',
+        full_name: 'Administrator',
+        first_name: 'Admin',
+        last_name: 'User',
+        avatar_url: null,
+      })
     } finally {
       setLoading(false)
     }
   }, [userId, role])
-
 
   useEffect(() => { fetchProfile() }, [fetchProfile])
 
